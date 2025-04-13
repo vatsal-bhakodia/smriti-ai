@@ -115,14 +115,14 @@ export async function PUT(req: NextRequest) {
 }
 
 // DELETE: Delete topic
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest,{params}: { params: { id: string }}) {
   const { userId } = getAuth(req);
   if (!userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json();
-  const { id } = body;
+  // const body = await req.json();
+  const { id } = params
 
   if (!id) {
     return NextResponse.json(

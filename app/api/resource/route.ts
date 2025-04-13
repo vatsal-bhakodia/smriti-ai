@@ -109,8 +109,10 @@ export async function DELETE(req: NextRequest) {
   if (!userId)
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const { id } = body;
+  // const body = await req.json();
+  // const { id } = body;
+  const { searchParams } = new URL(req.url);
+  const id= searchParams.get('id');
 
   if (!id)
     return NextResponse.json(

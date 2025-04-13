@@ -1,12 +1,12 @@
 "use client";
 
-import { TopicsTable } from "@/components/dashboard/topics-table";
 import { PerformanceChart } from "@/components/dashboard/performance-chart";
 import { LearningStatusChart } from "@/components/dashboard/learning-chart";
 import { Award, CalendarCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import TopicsTable from "@/components/dashboard/topics-table";
 
 const stats = [
   {
