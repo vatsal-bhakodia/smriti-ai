@@ -39,14 +39,14 @@ Use it on web, and soon — on WhatsApp & mobile apps too!
 
 Smriti AI is built on a modern, modular stack to handle conversational AI tasks efficiently. The core components work together as follows:
 
-- **🌐 FastAPI:** Serves as the high-performance web framework for the API server. It handles all incoming HTTP requests, manages endpoints (e.g., `/upload`, `/chat`), and returns responses. All server-side logic is located in the `smriti_ai/server/` directory.
+- 🖥️ **Streamlit:** Serves as the web app framework that creates the user interface. It is responsible for displaying the chat window, handling file uploads, and managing user interaction. The main application logic can be found in `app.py`.
 
-- **🧠 LlamaIndex:** This is the core data framework that powers the Retrieval-Augmented Generation (RAG) pipeline. It is responsible for:
+- 🧠 **LlamaIndex:** This is the core data framework that powers the Retrieval-Augmented Generation (RAG) pipeline. It is responsible for:
   - **Data Ingestion:** Processing and chunking documents and websites.
   - **Indexing:** Creating vector embeddings from the data chunks.
   - **Querying:** Finding the most relevant context from the knowledge base to answer a user's question.
 
-- **💾 Qdrant:** Acts as the specialized vector database. When documents are indexed, the resulting vector embeddings are stored in Qdrant. Its job is to perform ultra-fast similarity searches to retrieve the context that LlamaIndex needs to formulate an answer.
+- 💾 **Qdrant:** Acts as the specialized vector database. When documents are indexed, the resulting vector embeddings are stored in Qdrant. Its job is to perform ultra-fast similarity searches to retrieve the context that LlamaIndex needs to formulate an answer.
 
 ---
 
