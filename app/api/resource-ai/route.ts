@@ -11,6 +11,7 @@ import prisma from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getYoutubeTranscript } from "@/utils/youtube";
+import { extractPDFText, cleanPDFText } from "@/utils/pdf";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -49,9 +50,17 @@ export async function POST(req: NextRequest) {
       where: { id: resourceId },
     });
 
-    if (!resource || resource.type !== "VIDEO") {
+    if (!resource) {
       return NextResponse.json(
-        { message: "Invalid or unsupported resource" },
+        { message: "Resource not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check if resource type is supported
+    if (!["VIDEO", "PDF"].includes(resource.type)) {
+      return NextResponse.json(
+        { message: "Unsupported resource type. Only VIDEO and PDF are supported." },
         { status: 400 }
       );
     }
@@ -73,11 +82,43 @@ export async function POST(req: NextRequest) {
           const fallbackPrompt = FALLBACK_PROMPT(resource.title);
           summary = await askGemini(fallbackPrompt);
         }
+      } else if (resource.type === "PDF") {
+        console.log("Processing PDF resource:", resource.title);
+        console.log("PDF URL:", resource.url);
+        
+        // Step 1: Extract text from PDF
+        console.log("Step 1: Extracting text from PDF...");
+        const pdfText = await extractPDFText(resource.url);
+        
+        // Step 2: Clean the extracted text
+        console.log("Step 2: Cleaning extracted text...");
+        const cleanedText = cleanPDFText(pdfText);
+        
+        if (!cleanedText || cleanedText.trim().length === 0) {
+          throw new Error("No text content found in PDF after cleaning");
+        }
 
+        console.log("Step 3: Generating prompt for AI...");
+        console.log("Cleaned text length:", cleanedText.length);
+        
+        // Step 3: Create prompt and generate summary using AI
+        const prompt = SUMMARY_PROMPT(cleanedText);
+        console.log("Step 4: Calling askGemini with prompt...");
+        summary = await askGemini(prompt);
+        
+        console.log("✅ PDF summary generated successfully");
+      }
+
+      // Step 5: Save the generated summary to database
+      if (summary) {
+        console.log("Step 5: Saving summary to database...");
         await prisma.resource.update({
           where: { id: resourceId },
           data: { summary },
         });
+        console.log("✅ Summary saved to database successfully");
+      } else {
+        console.log("⚠️ No summary generated to save");
       }
     }
 
