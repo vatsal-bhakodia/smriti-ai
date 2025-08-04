@@ -18,6 +18,13 @@ export default function Navbar() {
 
           {/* Right side buttons */}
           <div className="flex items-center gap-4">
+            {/* Contact Link */}
+            <Link href="/contact" className="hidden md:block">
+              <Button variant="ghost" className="rounded-full">
+                Contact
+              </Button>
+            </Link>
+
             {/* GitHub Star Button */}
             <a
               href="https://github.com/vatsal-bhakodia/smriti-ai"

@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -73,4 +74,13 @@ model QuizResult {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   quiz      Quiz     @relation(fields: [quizId], references: [id],onDelete: Cascade)
+}
+
+model ContactQuery {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  createdAt DateTime @default(now())
 }
