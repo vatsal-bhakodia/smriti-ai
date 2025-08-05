@@ -2,11 +2,14 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "npx prisma migrate deploy && next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:reminder": "node scripts/test-reminder-api.js",
+    "test:reminder-logic": "node scripts/test-reminder-logic.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.23.3",

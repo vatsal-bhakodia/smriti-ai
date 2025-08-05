@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "app/api/reminder-message/route.js": {
+      "maxDuration": 60
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/reminder-message",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}
