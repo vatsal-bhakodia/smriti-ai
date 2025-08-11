@@ -1,7 +1,7 @@
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Brain, Star, LayoutDashboard } from "lucide-react";
+import { Brain, Star, LayoutDashboard, Users } from "lucide-react";
 
 export default function Navbar() {
   return (
@@ -22,7 +22,7 @@ export default function Navbar() {
           </div>
 
           {/* Center Navigation Links */}
-          <div className="hidden md:flex items-center justify-center gap-8 w-3/5">
+          <div className="hidden md:flex items-center justify-center gap-6 w-3/5">
             <Link href="/#" className="cursor-pointer">
               <Button
                 variant="ghost"
@@ -37,6 +37,15 @@ export default function Navbar() {
                 className="rounded-full cursor-pointer hover:bg-[#adff2f]/10 hover:text-[#adff2f] transition-all duration-300 hover:scale-105"
               >
                 About Us
+              </Button>
+            </Link>
+            <Link href="/contributors" className="cursor-pointer">
+              <Button
+                variant="ghost"
+                className="rounded-full cursor-pointer hover:bg-[#adff2f]/10 hover:text-[#adff2f] transition-all duration-300 hover:scale-105 flex items-center gap-2"
+              >
+                <Users className="h-4 w-4" />
+                Contributors
               </Button>
             </Link>
             <Link href="/contact" className="cursor-pointer">
