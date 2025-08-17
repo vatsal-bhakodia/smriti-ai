@@ -133,7 +133,7 @@ In today's world of scattered PDFs, YouTube videos, and online tutorials — **S
 ## 🌟 Features
 
 📁 **Centralized Learning Hub**  
-Organize your learning by creating topic-wise folders. Store PDFs, videos, and links all in one place.
+Organize your learning with topic-wise folders-store PDFs, videos, and links all in one place.
 
 🪄 **Smart Content Processing**  
 Smriti breaks down your content into:
@@ -143,10 +143,10 @@ Smriti breaks down your content into:
 - ❓ Interactive quizzes to boost recall
 
 ⏳ **Spaced Revision with WhatsApp Reminders**  
-Receive gentle reminders every 3 days to revise. Quizzes are delivered directly on WhatsApp for on-the-go revision.
+Revise smarter with gentle reminders every 3 days and quick quizzes delivered straight to your WhatsApp for easy on-the-go revision.
 
 📊 **Progress Tracking**  
-See how much you’ve improved over time, identify weak areas, and never lose track of your learning.
+Watch your progress, fix your weak spots, and never lose momentum in learning.
 
 💬 **Multimodal Interface**  
 Use it on web, and soon — on WhatsApp & mobile apps too!
