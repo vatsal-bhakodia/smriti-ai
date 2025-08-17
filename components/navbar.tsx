@@ -47,6 +47,15 @@ export default function Navbar() {
                 Contributors
               </Button>
             </Link>
+            <Link href="/blog" className="cursor-pointer">
+              <Button
+                variant="ghost"
+                className="rounded-full cursor-pointer hover:bg-[#adff2f]/10 hover:text-[#adff2f] transition-all duration-300 hover:scale-105"
+              >
+                Blog
+              </Button>
+            </Link>
+
             <Link href="/contact" className="cursor-pointer">
               <Button
                 variant="ghost"
@@ -85,13 +94,13 @@ export default function Navbar() {
 
             <SignedIn>
               <Link href="/dashboard" className="cursor-pointer">
-                  <Button
-                    variant="outline"
-                    className="rounded-full flex items-center gap-2 cursor-pointer border-[#adff2f]/30 text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] hover:text-black hover:border-[#adff2f] transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#adff2f]/25"
-                  >
-                    <LayoutDashboard className="h-4 w-4" />
-                    Dashboard
-                  </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-full flex items-center gap-2 cursor-pointer border-[#adff2f]/30 text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] hover:text-black hover:border-[#adff2f] transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#adff2f]/25"
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Button>
               </Link>
             </SignedIn>
 
