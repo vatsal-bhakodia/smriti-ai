@@ -52,47 +52,50 @@ const QuizFinalResult = ({
   }, [userAnswers, quizData]);
 
   return (
-    <div className="flex flex-col items-center justify-center text-center space-y-6">
-      <h2 className="text-3xl font-bold text-primary">Your Quiz Summary</h2>
+   <div className="flex flex-col items-center justify-center text-center space-y-6">
+  <h2 className="text-3xl font-bold text-primary light:text-lime-600">
+    Your Quiz Summary
+  </h2>
 
-      <div className="w-40 h-40">
-        <CircularProgressbar
-          value={percentage}
-          text={`${percentage}%`}
-          strokeWidth={10}
-          styles={buildStyles({
-            textColor: "#fff",
-            pathColor: color,
-            trailColor: "#1e1e2f",
-            textSize: "16px",
-          })}
-        />
-      </div>
+  <div className="w-40 h-40">
+    <CircularProgressbar
+      value={percentage}
+      text={`${percentage}%`}
+      strokeWidth={10}
+      styles={buildStyles({
+        textColor: "#fff", // dark mode
+        pathColor: color,
+        trailColor: "#1e1e2f",
+        textSize: "16px",
+      })}
+    />
+  </div>
 
-      <p className="text-white text-lg">
-        You answered <span className="font-bold text-primary">{score}</span> out
-        of <span className="font-bold text-primary">{total}</span> questions
-        correctly.
-      </p>
+  <p className="text-white text-lg light:text-gray-900">
+    You answered <span className="font-bold text-primary light:text-lime-600">{score}</span> out
+    of <span className="font-bold text-primary light:text-lime-600">{total}</span> questions
+    correctly.
+  </p>
 
-      <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-        <button
-          onClick={resetQuiz}
-          className="bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 transition-colors"
-        >
-          Retry Quiz
-        </button>
+  <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+    <button
+      onClick={resetQuiz}
+      className="bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 light:bg-lime-400 light:text-black light:hover:bg-lime-300 transition-colors"
+    >
+      Retry Quiz
+    </button>
 
-        {wrongAnswersCount > 0 && (
-          <button
-            onClick={startReview}
-            className="bg-zinc-700 text-white px-6 py-2 rounded hover:bg-zinc-600 transition-colors"
-          >
-            Revisit Incorrect Questions ({wrongAnswersCount})
-          </button>
-        )}
-      </div>
-    </div>
+    {wrongAnswersCount > 0 && (
+      <button
+        onClick={startReview}
+        className="bg-zinc-700 text-white px-6 py-2 rounded hover:bg-zinc-600 light:bg-white light:text-gray-900 light:hover:bg-gray-100 transition-colors"
+      >
+        Revisit Incorrect Questions ({wrongAnswersCount})
+      </button>
+    )}
+  </div>
+</div>
+
   );
 };
 

@@ -50,33 +50,45 @@ export default function ActionsCell({
   };
 
   return (
-    <div className="flex justify-center">
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogTrigger asChild>
-          <button
-            className="p-2 text-muted-foreground hover:text-red-500 transition-colors"
-            onClick={() => setOpen(true)}
-            disabled={isDeleting}
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Topic</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this topic? This action cannot be
-              undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+   <div className="flex justify-center">
+  <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialogTrigger asChild>
+      <button
+        className="p-2 text-muted-foreground hover:text-red-500 light:text-gray-900 light:hover:text-red-600 transition-colors"
+        onClick={() => setOpen(true)}
+        disabled={isDeleting}
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </AlertDialogTrigger>
+    <AlertDialogContent className="light:bg-white light:text-gray-900 dark:bg-background dark:text-white">
+      <AlertDialogHeader>
+        <AlertDialogTitle className="light:text-gray-900 dark:text-white">
+          Delete Topic
+        </AlertDialogTitle>
+        <AlertDialogDescription className="light:text-gray-700 dark:text-gray-300">
+          Are you sure you want to delete this topic? This action cannot be
+          undone.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel
+          disabled={isDeleting}
+          className="light:text-gray-700 dark:text-gray-300"
+        >
+          Cancel
+        </AlertDialogCancel>
+        <AlertDialogAction
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="light:bg-red-500 light:text-white light:hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+        >
+          Delete
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+</div>
+
   );
 }

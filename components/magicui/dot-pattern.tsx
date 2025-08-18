@@ -108,51 +108,53 @@ export function DotPattern({
   );
 
   return (
-    <svg
-      ref={containerRef}
-      aria-hidden="true"
-      className={cn(
-        "pointer-events-none absolute inset-0 h-full w-full",
-        className,
-      )}
-      {...props}
-    >
-      <defs>
-        <radialGradient id={`${id}-gradient`}>
-          <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
-          <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-      {dots.map((dot, index) => (
-        <motion.circle
-          key={`${dot.x}-${dot.y}`}
-          cx={dot.x}
-          cy={dot.y}
-          r={cr}
-          fill={glow ? `url(#${id}-gradient)` : "currentColor"}
-          className="text-neutral-400/80"
-          initial={glow ? { opacity: 0.4, scale: 1 } : {}}
-          animate={
-            glow
-              ? {
-                  opacity: [0.4, 1, 0.4],
-                  scale: [1, 1.5, 1],
-                }
-              : {}
-          }
-          transition={
-            glow
-              ? {
-                  duration: dot.duration,
-                  repeat: Infinity,
-                  repeatType: "reverse",
-                  delay: dot.delay,
-                  ease: "easeInOut",
-                }
-              : {}
-          }
-        />
-      ))}
-    </svg>
+   <svg
+  ref={containerRef}
+  aria-hidden="true"
+  className={cn(
+    "pointer-events-none absolute inset-0 h-full w-full",
+    "light:text-neutral-800", // light mode color
+    className
+  )}
+  {...props}
+>
+  <defs>
+    <radialGradient id={`${id}-gradient`}>
+      <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
+      <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+    </radialGradient>
+  </defs>
+  {dots.map((dot, index) => (
+    <motion.circle
+      key={`${dot.x}-${dot.y}`}
+      cx={dot.x}
+      cy={dot.y}
+      r={cr}
+      fill={glow ? `url(#${id}-gradient)` : "currentColor"}
+      className="text-neutral-400/80 light:text-neutral-600/80" // light mode applied
+      initial={glow ? { opacity: 0.4, scale: 1 } : {}}
+      animate={
+        glow
+          ? {
+              opacity: [0.4, 1, 0.4],
+              scale: [1, 1.5, 1],
+            }
+          : {}
+      }
+      transition={
+        glow
+          ? {
+              duration: dot.duration,
+              repeat: Infinity,
+              repeatType: "reverse",
+              delay: dot.delay,
+              ease: "easeInOut",
+            }
+          : {}
+      }
+    />
+  ))}
+</svg>
+
   );
 }

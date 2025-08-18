@@ -1,9 +1,9 @@
-
 "use client";
 
 import { SignUp } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import LeftSidePanel from "./leftPanel";
+
 export default function Page() {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
 
@@ -18,82 +18,71 @@ export default function Page() {
   }, []);
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-neutral-900">
+    <main className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-neutral-900 transition-colors duration-300">
       <div className="w-full min-h-screen flex justify-center pt-15 overflow-hidden">
 
         {/* Left Column */}
         {isLargeScreen && (
-          
-          <div className="hidden w-1/2 bg-[#111]  lg:block">
-            <LeftSidePanel/>
+          <div className="hidden w-1/2 lg:block">
+            <LeftSidePanel />
           </div>
         )}
 
         {/* Right Column */}
         <div
-          className={`flex justify-center m-auto  p-auto ${isLargeScreen ? 'w-1/2' : 'w-full'
-            }`}
+          className={`flex justify-center m-auto p-auto ${
+            isLargeScreen ? "w-1/2" : "w-full"
+          }`}
         >
           <SignUp
             appearance={{
               variables: {
-                colorBackground: "#171717",
+                colorBackground: "#f6f6f6", // Light mode background
                 colorPrimary: "#a3ff19",      // Neon green
-                colorPrimaryForeground: "#222", // Button text 
-                colorForeground: "#fff",        // Normal text
-                colorInput: "#222",             // Input background
-                colorBorder: "#333",
+                colorPrimaryForeground: "#222", // Button text
+                colorForeground: "#111",        // Normal text
+                colorInput: "#fff",             // Input background
+                colorBorder: "#ccc",            // Light border
                 fontSize: "14px",
-
               },
               elements: {
                 cardBox: {
-                  boxShadow: "none",
+                  boxShadow: "0 0 20px rgba(0,0,0,0.05)", // subtle shadow in light mode
                   width: "500px",
                 },
-                card:{
-                  width:"100%"
+                card: {
+                  width: "100%",
                 },
-
                 formFieldInput: {
-                  backgroundColor: "#222",
-                  color: "#fff",
-                  border: "1px solid #fff",
-                  
-                  height:"35px"
+                  backgroundColor: "#fff",
+                  color: "#111",
+                  border: "1px solid #ccc",
+                  height: "35px",
                 },
-                
-            
-                
                 formButtonPrimary: {
                   background: "#a3ff19",
-                  color: "#333",
+                  color: "#222",
                   border: "none",
                   boxShadow: "0 0 10px #39FF14, 0 0 20px #39FF14",
-                  fontWeight: 700
+                  fontWeight: 700,
                 },
-
-
-                formFieldLabel: { color: "#eee" },
-
+                formFieldLabel: { color: "#111" },
                 socialButtonsBlockButton__google: {
-                  backgroundColor: "#222",
+                  backgroundColor: "#fff",
                   transition: "all 0.2s",
                   width: "420px",
                   height: "40px",
                   margin: "0 auto",
+                  border: "1px solid #ccc",
                 },
-
-
                 socialButtonsBlockButtonText: {
-                  color: "#fff",
-                }
-              }
-            }} />
+                  color: "#111",
+                },
+              },
+            }}
+          />
         </div>
       </div>
     </main>
   );
 }
-
-

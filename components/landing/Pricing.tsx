@@ -1,7 +1,7 @@
 "use client";
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs"; // Clerk hook
+import { useUser } from "@clerk/nextjs";
 
 const pricingPlans = [
   {
@@ -41,66 +41,70 @@ const pricingPlans = [
       "Priority support",
     ],
     cta: "Talk to Sales",
-    link: "/contact", // fixed
+    link: "/contact",
   },
 ];
 
 export const Pricing = () => {
-  const { isSignedIn } = useUser(); // check Clerk auth
+  const { isSignedIn } = useUser();
 
   return (
     <section
       id="pricing"
-      className="w-full text-white px-6 md:px-20 py-24 relative"
+      className="text-gray-900 dark:text-white flex flex-col justify-center items-center px-6 py-24 relative bg-gray-50 dark:bg-background transition-colors duration-300"
     >
-      <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight pb-1">
-          Simple,
-          <span className="text-primary"> Transparent </span>
-          Price
+      {/* Heading */}
+      <div className="text-center mb-16 max-w-4xl">
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight text-gray-900 dark:text-white">
+          Simple, <span className="text-lime-600 dark:text-lime-400">Transparent</span> Price
         </h2>
-        <p className="text-gray-400 text-lg">
-          Choose the plan that fits your learning style and boost your retention
-          with Smriti AI.
+        <p className="text-gray-700 dark:text-gray-300 text-lg md:text-xl leading-relaxed">
+          Choose the plan that fits your learning style and boost your retention with Smriti AI.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto relative z-[1]">
+      {/* Pricing Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-7xl mx-auto w-full">
         {pricingPlans.map((plan) => {
-          // redirect logic
-          let buttonLink = "/sign-up"; // default
-          // if signed in, goes to dashboard
+          let buttonLink = "/sign-up";
           if (plan.title === "SmritiX") buttonLink = "/contact";
           else if (isSignedIn) buttonLink = "/dashboard";
 
           return (
             <div
               key={plan.title}
-              className="rounded-xl px-8 py-10 shadow-lg backdrop-blur-md transition bg-white/5 border border-white/10 hover:border-primary hover:scale-[1.02]"
+              className="bg-white/70 dark:bg-white/5 border border-gray-200 dark:border-white/10 backdrop-blur p-6 md:p-8 rounded-xl transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl"
             >
-              <h3 className="text-2xl font-extrabold mb-2 text-primary">
-                {plan.title}
-              </h3>
-              <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
-              <p className="text-gray-400 mb-6">{plan.description}</p>
-              <ul className="space-y-3 mb-6 text-sm text-gray-300">
+              <h3 className="text-2xl font-extrabold mb-2 text-lime-600 dark:text-primary">{plan.title}</h3>
+              <p className="text-3xl font-extrabold mb-4 text-gray-900 dark:text-white">{plan.price}</p>
+              <p className="text-gray-700 dark:text-gray-400 mb-6">{plan.description}</p>
+
+              <ul className="space-y-3 mb-6 text-sm text-gray-700 dark:text-gray-300">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-2">
-                    <Check className="text-primary" /> {feature}
+                    <Check className="text-lime-600 dark:text-primary" /> {feature}
                   </li>
                 ))}
               </ul>
-              <Link href={buttonLink}>
-                <button className="w-full text-center py-3 rounded-xl font-semibold transition bg-transparent border border-white/20 hover:bg-white hover:text-black hover:border-white">
-                  {plan.cta}
-                </button>
-              </Link>
+
+            <Link href={buttonLink}>
+  <button
+    className={`w-full py-3 rounded-xl font-semibold border 
+      ${isSignedIn ? "border-gray-300 dark:border-white/20" : "border-gray-300 dark:border-white/20"} 
+      ${isSignedIn ? "bg-white text-gray-900 hover:bg-lime-200 dark:bg-gray-800 dark:text-white dark:hover:bg-lime-600" : "bg-white text-gray-900 hover:bg-lime-200 dark:bg-gray-800 dark:text-white dark:hover:bg-lime-600"} 
+      transition-colors duration-300`}
+  >
+    {plan.cta}
+  </button>
+</Link>
+
             </div>
           );
         })}
       </div>
 
-      <div className="absolute bottom-0 left-1/2 w-[180px] h-[180px] bg-primary opacity-80 blur-[200px] transform -translate-x-1/2 -translate-y-1/2"></div>
+      {/* Background Glow */}
+      <div className="absolute bottom-5 left-1/2 w-[180px] h-[180px] bg-lime-400 dark:bg-primary opacity-100 blur-[200px] transform -translate-x-1/2 -translate-y-1/2 transition-colors duration-300"></div>
     </section>
   );
 };

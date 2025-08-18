@@ -67,59 +67,62 @@ export default function LoginStreakCard({ days = 90 }: LoginStreakProps) {
     fetchStreak();
   }, [days]);
 
-  if (isLoading) {
-    return (
-      <Card className="rounded-xl shadow-sm hover:shadow-md transition-all">
-        <CardContent>
-          <div className="flex items-center gap-4">
-            <div className="bg-muted/50 rounded-lg p-3">
-              <CalendarCheck className="text-primary h-5 w-5" />
-            </div>
-            <div className="space-y-1 w-full">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Study Streak</p>
-                <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
-                  Loading...
-                </span>
-              </div>
-              <p className="text-xl font-bold">--</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
+ if (isLoading) {
   return (
-    <Card className="rounded-xl shadow-sm hover:shadow-md transition-all">
+    <Card className="rounded-xl shadow-sm hover:shadow-md transition-all light:bg-white light:border light:border-gray-200">
       <CardContent>
         <div className="flex items-center gap-4">
-          <div className="bg-muted/50 rounded-lg p-3">
-            <CalendarCheck className="text-primary h-5 w-5" />
+          <div className="bg-muted/50 light:bg-gray-100 rounded-lg p-3">
+            <CalendarCheck className="text-primary light:text-lime-600 h-5 w-5" />
           </div>
           <div className="space-y-1 w-full">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Study Streak</p>
-              <span className="text-xs font-medium text-[#adff2f] bg-[#adff2f]/10 px-3 py-1 rounded-full flex items-center gap-1 border border-[#adff2f]/20">
-                {getGrowthTrend()}
+              <p className="text-sm text-muted-foreground light:text-gray-900">Study Streak</p>
+              <span className="text-xs font-medium text-primary light:text-lime-600 bg-primary/10 light:bg-lime-100 px-3 py-1 rounded-full">
+                Loading...
               </span>
             </div>
-            <p className="text-xl font-bold">{currentStreak} days</p>
+            <p className="text-xl font-bold text-muted-foreground light:text-gray-700">--</p>
           </div>
-        </div>
-
-        <div className="mt-4">
-          <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary rounded-full transition-all duration-500"
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-          <p className="text-right text-xs text-muted-foreground mt-1">
-            {Math.round(progressPercentage)}% to {currentGoal.label}
-          </p>
         </div>
       </CardContent>
     </Card>
   );
+}
+
+return (
+  <Card className="rounded-xl shadow-sm hover:shadow-md transition-all light:bg-white light:border light:border-gray-200">
+    <CardContent>
+      <div className="flex items-center gap-4">
+        <div className="bg-muted/50 light:bg-gray-100 rounded-lg p-3">
+          <CalendarCheck className="text-primary light:text-lime-600 h-5 w-5" />
+        </div>
+        <div className="space-y-1 w-full">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground light:text-gray-900">Study Streak</p>
+            <span className="text-xs font-medium text-[#adff2f] bg-[#adff2f]/10 px-3 py-1 rounded-full flex items-center gap-1 border border-[#adff2f]/20 light:text-lime-600 light:bg-lime-100 light:border-lime-200">
+              {getGrowthTrend()}
+            </span>
+          </div>
+          <p className="text-xl font-bold text-[#adff2f] light:text-lime-600">
+            {currentStreak} days
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <div className="h-2 w-full bg-muted light:bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary light:bg-lime-600 rounded-full transition-all duration-500"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+        <p className="text-right text-xs text-muted-foreground light:text-gray-700 mt-1">
+          {Math.round(progressPercentage)}% to {currentGoal.label}
+        </p>
+      </div>
+    </CardContent>
+  </Card>
+);
+
 }

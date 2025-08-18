@@ -207,98 +207,99 @@ export function TopicsTable(): React.JSX.Element {
   }, []);
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between py-4">
-        <div className="flex items-center space-x-2">
-          <GraduationCap className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold">Topics</h2>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((c) => c.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value: boolean) =>
-                    column.toggleVisibility(!!value)
+  <div className="w-full">
+    <div className="flex items-center justify-between py-4">
+      <div className="flex items-center space-x-2">
+        <GraduationCap className="h-5 w-5 text-primary light:text-lime-600" />
+        <h2 className="text-xl font-semibold light:text-gray-900">Topics</h2>
+      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="light:bg-white light:border light:border-gray-200 light:text-gray-900">
+            Columns <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="light:bg-white light:border light:border-gray-200 light:text-gray-900">
+          {table
+            .getAllColumns()
+            .filter((c) => c.getCanHide())
+            .map((column) => (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                className="capitalize light:text-gray-900"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value: boolean) =>
+                  column.toggleVisibility(!!value)
+                }
+              >
+                {column.id}
+              </DropdownMenuCheckboxItem>
+            ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+
+    {isLoading ? (
+      <div className="flex flex-col items-center justify-center text-white light:text-gray-900 text-lg gap-4">
+        <div className="w-10 h-10 border-4 border-white light:border-gray-300 border-t-transparent rounded-full animate-spin" />
+        <span>Loading Topics...</span>
+      </div>
+    ) : (
+      <div className="rounded-md border light:border-gray-200 light:bg-white">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id} className="light:text-gray-900">
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-id={row.original.id}
+                  className={
+                    row.original.isDeleting
+                      ? "opacity-0 transition-opacity duration-500"
+                      : "light:text-gray-900"
                   }
                 >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {isLoading ? (
-        <div className="flex flex-col items-center justify-center text-white text-lg gap-4">
-          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          <span>Loading Topics...</span>
-        </div>
-      ) : (
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="light:text-gray-900">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-id={row.original.id}
-                    className={
-                      row.original.isDeleting
-                        ? "opacity-0 transition-opacity duration-500"
-                        : ""
-                    }
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-    </div>
-  );
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center light:text-gray-900"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    )}
+  </div>
+);
+
 }

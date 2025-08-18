@@ -1,3 +1,5 @@
+import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import AuthGate from "@/components/AuthGate";
 
 export default function RootLayout({
@@ -5,5 +7,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthGate>{children}</AuthGate>;
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body>
+        <ThemeProvider>
+          <AuthGate>{children}</AuthGate>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }

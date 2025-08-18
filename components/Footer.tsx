@@ -13,12 +13,11 @@ const Footer = () => {
   const handleNav = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#")) {
       e.preventDefault();
-
       if (pathname === "/") {
         const el = document.querySelector(href);
         if (el) el.scrollIntoView({ behavior: "smooth" });
       } else {
-        router.push("/" + href); // example: "/#pricing"
+        router.push("/" + href);
       }
     }
   };
@@ -50,36 +49,36 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-black border-t border-neutral-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+    <footer className="bg-gray-50 dark:bg-zinc-900 border-t border-gray-200 dark:border-neutral-800 transition-colors duration-300">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+          {/* Logo + Description */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center group">
-              <Link href="/" className="flex items-center">
-                <div className="relative">
-                  <Brain className="me-[5px] h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
-                  <div className="absolute inset-0 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                <span className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
-                  Smriti AI
-                </span>
-              </Link>
-            </div>
-            <p className="text-gray-400 text-sm max-w-md leading-relaxed">
-              Transform passive learning into active remembering. Smriti AI
-              helps you retain knowledge faster with AI-powered study tools and
-              spaced repetition.
+            <Link href="/" className="flex items-center group">
+              <div className="relative">
+                <Brain className="h-7 w-7 text-green-500 dark:text-green-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" />
+                <div className="absolute inset-0 bg-green-500/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span className="ml-2 text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-green-500">
+                Smriti AI
+              </span>
+            </Link>
+            <p className="text-gray-600 dark:text-gray-400 max-w-md leading-relaxed transition-colors duration-300">
+              Transform passive learning into active remembering. Smriti AI helps
+              you retain knowledge faster with AI-powered study tools and spaced
+              repetition.
             </p>
           </div>
 
+          {/* Footer Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category} className="space-y-4">
-              <h3 className="text-white font-semibold text-sm uppercase tracking-wider">
+              <h3 className="text-gray-900 dark:text-white font-semibold text-sm uppercase tracking-wider transition-colors duration-300">
                 {category}
               </h3>
-              <ul className="space-y-3">
-                {links.map((link, index) => (
-                  <li key={index}>
+              <ul className="space-y-2">
+                {links.map((link, idx) => (
+                  <li key={idx}>
                     <Link
                       href={link.href}
                       onClick={
@@ -87,7 +86,7 @@ const Footer = () => {
                           ? (e) => handleNav(e, link.href)
                           : undefined
                       }
-                      className="group flex items-center text-gray-400 hover:text-primary text-sm transition-all duration-300 hover:translate-x-1"
+                      className="group flex items-center text-gray-600 dark:text-gray-400 hover:text-green-500 transition-all duration-300 hover:translate-x-1"
                     >
                       <span>{link.name}</span>
                       <ArrowUpRight className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -100,19 +99,16 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="border-t border-neutral-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="md:flex md:items-center md:justify-between">
-            <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <span>© {currentYear} Smriti AI. All rights reserved.</span>
-            </div>
-            <div className="mt-4 md:mt-0 text-sm text-gray-400 flex items-center space-x-2">
-              <div className="hidden md:flex items-center space-x-1">
-                <span>Made in India with</span>
-                <Heart className="h-3 w-3 text-red-500 animate-pulse" />
-                <span>for learners</span>
-              </div>
-            </div>
+      {/* Bottom Bar */}
+      <div className="border-t border-gray-200 dark:border-neutral-800 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+          <span className="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
+            © {currentYear} Smriti AI. All rights reserved.
+          </span>
+          <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
+            <span className="hidden md:block">Made in India with</span>
+            <Heart className="h-3 w-3 text-red-500 animate-pulse" />
+            <span className="hidden md:block">for learners</span>
           </div>
         </div>
       </div>

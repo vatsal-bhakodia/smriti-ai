@@ -72,55 +72,109 @@ export function AddReminderModal({ isOpen, setIsOpen, onSave, initialData }: Add
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Reminder' : 'Set Study Time'}</DialogTitle>
-          <DialogDescription>
-            {isEditMode ? 'Update the details for your study reminder.' : 'Add a new study reminder to your schedule.'}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-6 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="time" className="text-right">Time</Label>
-            {/* The `dark-time-picker` class will be defined in globals.css */}
-            <Input id="time" type="time" value={time} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTime(e.target.value)} className="col-span-3 dark-time-picker" />
-          </div>
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label htmlFor="frequency" className="text-right pt-2">Frequency</Label>
-            <div className="col-span-3 space-y-3">
-              <Select value={frequency.type} onValueChange={(type) => setFrequency({ type: type as 'daily' | 'custom', days: [] })}>
-                <SelectTrigger><SelectValue/></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
-                </SelectContent>
-              </Select>
-               {frequency.type === 'custom' && (
-                <div className="grid grid-cols-7 gap-1 text-center items-center pt-1">
-                  {daysOfWeek.map((day, index) => (
-                    <div key={day} className="flex flex-col items-center justify-center gap-2">
-                      <Label htmlFor={`day-${index}`} className="text-xs text-muted-foreground">{day}</Label>
-                      <Checkbox id={`day-${index}`} checked={frequency.days.includes(index)} onCheckedChange={() => handleDayToggle(index)} />
-                    </div>
-                  ))}
+  <DialogContent className="sm:max-w-[425px] light:bg-white light:text-gray-900 dark:bg-background dark:text-white">
+    <DialogHeader>
+      <DialogTitle className="light:text-gray-900 dark:text-white">
+        {isEditMode ? 'Edit Reminder' : 'Set Study Time'}
+      </DialogTitle>
+      <DialogDescription className="light:text-gray-700 dark:text-gray-300">
+        {isEditMode
+          ? 'Update the details for your study reminder.'
+          : 'Add a new study reminder to your schedule.'}
+      </DialogDescription>
+    </DialogHeader>
+
+    <div className="grid gap-6 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="time" className="text-right light:text-gray-900 dark:text-white">
+          Time
+        </Label>
+        <Input
+          id="time"
+          type="time"
+          value={time}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTime(e.target.value)}
+          className="col-span-3 dark-time-picker light:bg-white light:text-gray-900 light:border-gray-300"
+        />
+      </div>
+
+      <div className="grid grid-cols-4 items-start gap-4">
+        <Label htmlFor="frequency" className="text-right pt-2 light:text-gray-900 dark:text-white">
+          Frequency
+        </Label>
+        <div className="col-span-3 space-y-3">
+          <Select
+            value={frequency.type}
+            onValueChange={(type) =>
+              setFrequency({ type: type as 'daily' | 'custom', days: [] })
+            }
+          >
+            <SelectTrigger className="light:bg-white light:text-gray-900">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="light:bg-white light:text-gray-900">
+              <SelectItem value="daily">Daily</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {frequency.type === 'custom' && (
+            <div className="grid grid-cols-7 gap-1 text-center items-center pt-1">
+              {daysOfWeek.map((day, index) => (
+                <div key={day} className="flex flex-col items-center justify-center gap-2">
+                  <Label
+                    htmlFor={`day-${index}`}
+                    className="text-xs text-muted-foreground light:text-gray-700 dark:text-gray-300"
+                  >
+                    {day}
+                  </Label>
+                  <Checkbox
+                    id={`day-${index}`}
+                    checked={frequency.days.includes(index)}
+                    onCheckedChange={() => handleDayToggle(index)}
+                  />
                 </div>
-              )}
+              ))}
             </div>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="method" className="text-right">Notify Via</Label>
-            <RadioGroup value={method} onValueChange={(value) => setMethod(value as StudyTime['method'])} className="col-span-3 flex items-center space-x-4">
-              <div className="flex items-center space-x-1.5"><RadioGroupItem value="site" id="r1" /><Label htmlFor="r1">Site</Label></div>
-              <div className="flex items-center space-x-1.5"><RadioGroupItem value="mail" id="r2" /><Label htmlFor="r2">Mail</Label></div>
-              <div className="flex items-center space-x-1.5"><RadioGroupItem value="whatsapp" id="r3" /><Label htmlFor="r3">WhatsApp</Label></div>
-            </RadioGroup>
-          </div>
+          )}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-          <Button onClick={handleSubmit}>Save Changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </div>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="method" className="text-right light:text-gray-900 dark:text-white">
+          Notify Via
+        </Label>
+        <RadioGroup
+          value={method}
+          onValueChange={(value) => setMethod(value as StudyTime['method'])}
+          className="col-span-3 flex items-center space-x-4"
+        >
+          <div className="flex items-center space-x-1.5">
+            <RadioGroupItem value="site" id="r1" />
+            <Label htmlFor="r1" className="light:text-gray-900 dark:text-white">Site</Label>
+          </div>
+          <div className="flex items-center space-x-1.5">
+            <RadioGroupItem value="mail" id="r2" />
+            <Label htmlFor="r2" className="light:text-gray-900 dark:text-white">Mail</Label>
+          </div>
+          <div className="flex items-center space-x-1.5">
+            <RadioGroupItem value="whatsapp" id="r3" />
+            <Label htmlFor="r3" className="light:text-gray-900 dark:text-white">WhatsApp</Label>
+          </div>
+        </RadioGroup>
+      </div>
+    </div>
+
+    <DialogFooter>
+      <Button className="light:bg-gray-200 light:text-gray-900 dark:bg-gray-700 dark:text-white" variant="outline" onClick={() => setIsOpen(false)}>
+        Cancel
+      </Button>
+      <Button className="light:bg-lime-500 light:text-white dark:bg-lime-600 dark:text-white" onClick={handleSubmit}>
+        Save Changes
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
   );
 }

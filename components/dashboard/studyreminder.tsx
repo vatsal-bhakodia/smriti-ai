@@ -74,43 +74,99 @@ export function StudyReminder() {
 
   return (
     <>
-      <AddReminderModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} onSave={handleSave} initialData={editingReminder} />
-      <Card className="rounded-xl shadow-sm hover:shadow-md transition-all">
-        <CardHeader className="flex flex-row items-start justify-between">
-          <div><CardTitle>Study Reminders</CardTitle><CardDescription>Manage your study schedule and notifications.</CardDescription></div>
-          <Button onClick={handleAddNew}>+ Add New</Button>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {sortedReminders.length > 0 ? (
-              sortedReminders.map((reminder) => (
-                <div key={reminder.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div className="bg-background rounded-lg p-3"><BellRing className={`h-6 w-6 ${reminder.isEnabled ? 'text-primary' : 'text-muted-foreground'}`} /></div>
-                    <div>
-                      <p className="text-lg font-semibold">{new Date(`1970-01-01T${reminder.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</p>
-                      <p className="text-sm text-muted-foreground capitalize">{formatFrequency(reminder.frequency)} &bull; {reminder.method}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch checked={reminder.isEnabled} onCheckedChange={(checked: boolean) => handleToggle(reminder.id, checked)} />
-                    <Button variant="ghost" size="icon" onClick={() => handleEdit(reminder)}><Edit className="h-4 w-4 text-muted-foreground" /></Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="hover:bg-red-500/10"><Trash2 className="h-4 w-4 text-muted-foreground hover:text-red-500" /></Button></AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader><AlertDialogTitle>Delete Reminder</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
-                        <AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(reminder.id)} className="bg-red-600 hover:bg-red-700">Delete</AlertDialogAction></AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center text-muted-foreground py-8 border-2 border-dashed rounded-lg"><p>You have no study reminders.</p><p className="text-sm">Click "+ Add New" to create one.</p></div>
-            )}
+   <AddReminderModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} onSave={handleSave} initialData={editingReminder} />
+
+<Card className="rounded-xl shadow-sm hover:shadow-md transition-all light:bg-white light:border light:border-gray-200">
+  <CardHeader className="flex flex-row items-start justify-between">
+    <div>
+      <CardTitle className="light:text-gray-900">Study Reminders</CardTitle>
+      <CardDescription className="light:text-gray-700">Manage your study schedule and notifications.</CardDescription>
+    </div>
+    <Button onClick={handleAddNew}>+ Add New</Button>
+  </CardHeader>
+
+  <CardContent>
+    <div className="space-y-4">
+      {sortedReminders.length > 0 ? (
+        sortedReminders.map((reminder) => (
+          <div
+            key={reminder.id}
+            className="flex items-center justify-between p-3 bg-muted/50 light:bg-gray-100 rounded-lg"
+          >
+            <div className="flex items-center gap-4">
+              <div className="bg-background light:bg-gray-200 rounded-lg p-3">
+                <BellRing
+                  className={`h-6 w-6 ${
+                    reminder.isEnabled
+                      ? "text-primary light:text-lime-600"
+                      : "text-muted-foreground light:text-gray-500"
+                  }`}
+                />
+              </div>
+              <div>
+                <p className="text-lg font-semibold light:text-gray-900">
+                  {new Date(`1970-01-01T${reminder.time}`).toLocaleTimeString("en-US", {
+                    hour: "numeric",
+                    minute: "numeric",
+                    hour12: true,
+                  })}
+                </p>
+                <p className="text-sm text-muted-foreground light:text-gray-600 capitalize">
+                  {formatFrequency(reminder.frequency)} &bull; {reminder.method}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={reminder.isEnabled}
+                onCheckedChange={(checked: boolean) => handleToggle(reminder.id, checked)}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleEdit(reminder)}
+              >
+                <Edit className="h-4 w-4 text-muted-foreground light:text-gray-600" />
+              </Button>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="hover:bg-red-500/10">
+                    <Trash2 className="h-4 w-4 text-muted-foreground hover:text-red-500 light:text-gray-600" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="light:text-gray-900">Delete Reminder</AlertDialogTitle>
+                    <AlertDialogDescription className="light:text-gray-700">
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDelete(reminder.id)}
+                      className="bg-red-600 hover:bg-red-700"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        ))
+      ) : (
+        <div className="text-center text-muted-foreground light:text-gray-600 py-8 border-2 border-dashed rounded-lg light:border-gray-300">
+          <p>You have no study reminders.</p>
+          <p className="text-sm">Click "+ Add New" to create one.</p>
+        </div>
+      )}
+    </div>
+  </CardContent>
+</Card>
+
     </>
   );
 }

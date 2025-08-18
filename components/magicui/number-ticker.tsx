@@ -53,15 +53,18 @@ export function NumberTicker({
   );
 
   return (
-    <span
-      ref={ref}
-      className={cn(
-        "inline-block tabular-nums tracking-wider text-black dark:text-muted-foreground",
-        className
-      )}
-      {...props}
-    >
-      {startValue}
-    </span>
+   <span
+  ref={ref}
+  className={cn(
+    "inline-block tabular-nums tracking-wider dark:text-muted-foreground",
+    // Light mode explicitly
+    "light:text-gray-900",
+    className
+  )}
+  {...props}
+>
+  {startValue}
+</span>
+
   );
 }
