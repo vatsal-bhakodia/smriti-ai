@@ -82,13 +82,14 @@ const Hero = () => {
 
       {/* Hero Image with Glow */}
       <motion.div variants={itemVariants}>
-        <AnimatedImage
-          src="/dashboard.png"
-          alt="Dashboard Image"
-          width={1200}
-          height={900}
-          className="w-full h-auto max-w-6xl mx-auto rounded-2xl shadow-lg dark:shadow-black/40 light:shadow-gray-300/40 transition-shadow duration-300"
-        />
+      <AnimatedImage
+  src="/dashboard.png"
+  alt="Dashboard Image"
+  width={1200}
+  height={900}
+  className="w-full h-auto max-w-6xl mx-auto shadow-lg dark:shadow-black/40 light:shadow-gray-300/40 transition-shadow duration-300"
+/>
+
       </motion.div>
     </motion.div>
   );

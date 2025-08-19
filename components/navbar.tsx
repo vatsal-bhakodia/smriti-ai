@@ -48,8 +48,8 @@ export default function Navbar() {
           href="/#"
           className="flex items-center cursor-pointer hover:opacity-90 transition-all duration-300 group whitespace-nowrap"
         >
-          <Brain className="me-[5px] h-5 w-5 text-green-500 dark:text-[#adff2f]" />
-          <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent group-hover:from-green-500 group-hover:to-green-400 transition-all duration-300">
+          <Brain className="me-[5px] h-5 w-5 text-[#adff2f] dark:text-[#adff2f]" />
+          <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent group-hover:from-[#adff2f] group-hover:to-[#adff2f] transition-all duration-300">
             Smriti AI
           </span>
         </Link>
@@ -63,7 +63,7 @@ export default function Navbar() {
             <Link href={href} key={idx}>
               <Button
                 variant="ghost"
-                className="rounded-full cursor-pointer hover:bg-green-500/10 hover:text-green-500 dark:hover:bg-[#adff2f]/10 dark:hover:text-[#adff2f] transition-all duration-300 hover:scale-105"
+                className="rounded-full cursor-pointer hover:bg-[#adff2f]/10 hover:text-[#adff2f] dark:hover:bg-[#adff2f]/10 dark:hover:text-[#adff2f] transition-all duration-300 hover:scale-105"
               >
                 {label}
               </Button>
@@ -80,7 +80,7 @@ export default function Navbar() {
             <Link href="/dashboard">
               <Button
                 variant="outline"
-                className="rounded-full flex items-center gap-2 border-green-500/30 text-green-500 dark:border-[#adff2f]/30 dark:text-[#adff2f] hover:bg-gradient-to-r hover:from-green-500 hover:to-green-400 dark:hover:from-[#adff2f] dark:hover:to-[#9dff07] hover:text-black transition-all duration-300 hover:scale-105"
+                className="rounded-full flex items-center gap-2 border-[#adff2f]/30 text-[#adff2f] dark:border-[#adff2f]/30 dark:text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] dark:hover:from-[#adff2f] dark:hover:to-[#9dff07] hover:text-black transition-all duration-300 hover:scale-105"
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
@@ -96,7 +96,7 @@ export default function Navbar() {
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full flex items-center gap-2 border-green-500/30 text-green-500 dark:border-[#adff2f]/30 dark:text-[#adff2f] hover:bg-gradient-to-r hover:from-green-500 hover:to-green-400 dark:hover:from-[#adff2f] dark:hover:to-[#9dff07] hover:text-black transition-all duration-300 hover:scale-105 px-4 py-2"
+                className="rounded-full flex items-center gap-2 border-[#adff2f]/30 text-[#adff2f] dark:border-[#adff2f]/30 dark:text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] dark:hover:from-[#adff2f] dark:hover:to-[#9dff07] hover:text-black transition-all duration-300 hover:scale-105 px-4 py-2"
               >
                 Sign In
               </Button>
@@ -104,7 +104,7 @@ export default function Navbar() {
             <Link href="/sign-up">
               <Button
                 size="sm"
-                className="rounded-full bg-gradient-to-r from-green-500 to-green-400 text-black dark:bg-gradient-to-r dark:from-[#adff2f] dark:to-[#9dff07] hover:from-green-400 hover:to-green-500 dark:hover:from-[#9dff07] dark:hover:to-[#adff2f] transition-all duration-300 hover:scale-105 px-4 py-2"
+                className="rounded-full bg-gradient-to-r from-[#adff2f] to-[#9dff07] text-black dark:bg-gradient-to-r dark:from-[#adff2f] dark:to-[#9dff07] hover:from-green-400 hover:to-green-500 dark:hover:from-[#9dff07] dark:hover:to-[#adff2f] transition-all duration-300 hover:scale-105 px-4 py-2"
               >
                 Sign Up
               </Button>
@@ -160,7 +160,7 @@ export default function Navbar() {
                 <Link href={href} key={idx}>
                   <Button
                     variant="ghost"
-                    className="w-full text-left rounded-full hover:bg-green-500/10 hover:text-green-500 dark:hover:bg-[#adff2f]/10 dark:hover:text-[#adff2f]"
+                    className="w-full text-left rounded-full hover:bg-[#adff2f]/10 hover:text-[#adff2f] dark:hover:bg-[#adff2f]/10 dark:hover:text-[#adff2f]"
                   >
                     {label}
                   </Button>
@@ -172,7 +172,7 @@ export default function Navbar() {
               <Link href="/dashboard">
                 <Button
                   variant="outline"
-                  className="w-full rounded-full flex items-center justify-center gap-2 border-green-500/30 text-green-500 dark:border-[#adff2f]/30 dark:text-[#adff2f] hover:bg-gradient-to-r hover:from-green-500 hover:to-green-400 dark:hover:from-[#adff2f] dark:hover:to-[#9dff07] hover:text-black"
+                  className="w-full rounded-full flex items-center justify-center gap-2 border-[#adff2f]/30 text-[#adff2f] dark:border-[#adff2f]/30 dark:text-[#adff2f] hover:bg-gradient-to-r hover:from-green-500 hover:to-green-400 dark:hover:from-[#adff2f] dark:hover:to-[#9dff07] hover:text-black"
                 >
                   <LayoutDashboard className="h-4 w-4" />
                   Dashboard
@@ -183,7 +183,7 @@ export default function Navbar() {
             <a href="https://github.com/vatsal-bhakodia/smriti-ai" target="_blank" rel="noopener noreferrer">
               <Button
                 variant="outline"
-                className="w-full rounded-full flex items-center justify-center gap-2 border-green-500/30 text-green-500 dark:border-[#adff2f]/30 dark:text-[#adff2f] hover:bg-gradient-to-r hover:from-green-500 hover:to-green-400 dark:hover:from-[#adff2f] dark:hover:to-[#9dff07] hover:text-black"
+                className="w-full rounded-full flex items-center justify-center gap-2 border-[#adff2f]/30 text-[#adff2f] dark:border-[#adff2f]/30 dark:text-[#adff2f] hover:bg-gradient-to-r hover:from-green-500 hover:to-green-400 dark:hover:from-[#adff2f] dark:hover:to-[#9dff07] hover:text-black"
               >
                 <Star className="h-4 w-4" />
                 Star on GitHub
@@ -194,7 +194,7 @@ export default function Navbar() {
             <div className="flex justify-center pt-2">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-full text-green-500 dark:text-[#adff2f] hover:scale-110 hover:shadow-lg hover:shadow-green-500/40 dark:hover:shadow-[#adff2f]/40 transition-all duration-300"
+                className="p-2 rounded-full text-[#adff2f] dark:text-[#adff2f] hover:scale-110 hover:shadow-lg hover:shadow-[#adff2f]-500/40 dark:hover:shadow-[#adff2f]/40 transition-all duration-300"
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
