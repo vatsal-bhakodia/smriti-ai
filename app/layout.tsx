@@ -14,7 +14,10 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Smriti AI",
+  title: {
+    default: "Smriti AI",
+    template: "%s | Smriti AI",
+  },
   description: "Smriti AI - Remember Smarter",
 };
 

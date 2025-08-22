@@ -1,5 +1,10 @@
 import Footer from "@/components/Footer";
 
+export const metadata = {
+  title: "Terms Of Use",
+  description: "Understand the terms and conditions for using Smriti AI responsibly.",
+};
+
 export default function TermsOfUse() {
   return (
     <>
