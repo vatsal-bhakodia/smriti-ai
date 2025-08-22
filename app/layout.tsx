@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { generateMetadata } from "@/lib/metadata";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
@@ -13,10 +14,8 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: "Smriti AI",
-  description: "Smriti AI - Remember Smarter",
-};
+// Default metadata for the root layout
+export const metadata = generateMetadata('home');
 
 export default function RootLayout({
   children,
