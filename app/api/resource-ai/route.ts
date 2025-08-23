@@ -34,8 +34,19 @@ export async function POST(req: NextRequest) {
   if (!userId)
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-  const body = await req.json();
-  const { resourceId, task, question } = body;
+  // Parse and validate input
+  let data: unknown;
+  try {
+    data = await req.json();
+  } catch {
+    return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
+  }
+  let resourceId: string | undefined;
+  let task: string | undefined;
+  let question: string | undefined;
+  if (typeof (data as any).resourceId === "string") resourceId = (data as any).resourceId;
+  if (typeof (data as any).task === "string") task = (data as any).task;
+  if (typeof (data as any).question === "string") question = (data as any).question;
 
   if (!resourceId || !task) {
     return NextResponse.json(
@@ -55,7 +66,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
     let summary = resource.summary;
 
     if (!summary || summary.length === 0) {
@@ -75,7 +85,7 @@ export async function POST(req: NextRequest) {
         }
 
         await prisma.resource.update({
-          where: { id: resourceId },
+      where: { id: resourceId },
           data: { summary },
         });
       }
