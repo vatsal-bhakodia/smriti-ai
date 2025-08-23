@@ -181,4 +181,7 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
+  // If no task matched, return a 400 error
+  return NextResponse.json({ message: "Invalid task type" }, { status: 400 });
 }
