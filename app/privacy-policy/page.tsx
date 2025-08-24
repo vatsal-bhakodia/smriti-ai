@@ -1,9 +1,14 @@
 import Footer from "@/components/Footer";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Privacy Policy",
-  description: "Read the Smriti AI privacy policy to understand how your data is collected, used, and protected.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Privacy Policy",
+    description:
+      "Read the Smriti AI privacy policy to understand how your data is collected, used, and protected.",
+    keywords: ["privacy policy", "smriti", "ai", "data protection", "security", "user rights"],
+  };
+}
 
 export default function PrivacyPolicy() {
   return (

@@ -1,9 +1,13 @@
 import Footer from "@/components/Footer";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Terms Of Use",
-  description: "Understand the terms and conditions for using Smriti AI responsibly.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Terms of Use",
+    description: "Understand the terms and conditions for using Smriti AI responsibly.",
+    keywords: ["terms of use", "smriti", "ai", "policy", "rules", "conditions"],
+  };
+}
 
 export default function TermsOfUse() {
   return (

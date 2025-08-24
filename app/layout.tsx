@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     template: "%s | Smriti AI",
   },
   description: "Smriti AI - Remember Smarter",
+  keywords: ["smriti", "ai", "memory", "notes", "productivity"],
 };
 
 export default function RootLayout({
