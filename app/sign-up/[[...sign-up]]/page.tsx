@@ -100,9 +100,9 @@ export default function Page() {
                 },
                 // If OTP uses different class names
                 verificationCodeInput: {
-                  backgroundColor: "#222 !important",
-                  color: "#fff !important",
-                  border: "2px solid #fff !important",
+                  backgroundColor: "#222",
+                  color: "#fff",
+                  border: "2px solid #fff",
                   borderRadius: "8px",
                   width: "50px",
                   height: "50px",
