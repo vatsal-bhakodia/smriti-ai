@@ -1,4 +1,4 @@
-declare module "pdf-parse" {
+declare module "pdf-parse/lib/pdf-parse.js" {
   interface PDFParseResult {
     text: string;
     info?: any;

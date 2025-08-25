@@ -3,16 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "deploy:db": "prisma migrate deploy",
-  "lint": "next lint"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "deploy:db": "prisma migrate deploy",
+    "lint": "next lint"
   },
   "dependencies": {
-
+    "@clerk/nextjs": "^6.31.3",
     "@contentful/rich-text-react-renderer": "^16.1.0",
-  "@clerk/nextjs": "^6.31.3",
     "@fontsource/outfit": "^5.2.5",
     "@google/generative-ai": "^0.24.0",
     "@next/font": "^14.2.15",
@@ -68,6 +67,7 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

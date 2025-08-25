@@ -80,7 +80,8 @@ export async function POST(req: NextRequest) {
           });
           const { default: pdfParse } = await import("pdf-parse");
           const parsed = await pdfParse(Buffer.from(pdfBytes.data));
-          const prompt = SUMMARY_PROMPT(parsed.text || "");
+          console.log(parsed.text);
+          const prompt = SUMMARY_PROMPT(resource.url || "");
           summary = await askGemini(prompt);
         } catch (err) {
           console.error("PDF parse failed. Falling back to title-based summary.", err);
