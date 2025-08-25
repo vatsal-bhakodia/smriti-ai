@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import "./accessibility.css";
 import Navbar from "@/components/navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import BackToTopButton from "@/components/ui/BackToTopButton";
+import { SkipLinks } from "@/components/accessibility/SkipLinks";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -30,6 +32,9 @@ export default function RootLayout({
           className={`${poppins.variable} antialiased`}
           suppressHydrationWarning
         >
+          {/* Skip Links for keyboard navigation */}
+          <SkipLinks />
+          
           {/* Google Analytics */}
           <Script
             src="https://www.googletagmanager.com/gtag/js?id=G-K0Q80X3Y6D"
@@ -45,7 +50,7 @@ export default function RootLayout({
           </Script>
 
           <Navbar />
-          <main className="pt-32">{children}</main>
+          <main id="main-content" className="pt-32">{children}</main>
           <Toaster />
           <BackToTopButton />
         </body>

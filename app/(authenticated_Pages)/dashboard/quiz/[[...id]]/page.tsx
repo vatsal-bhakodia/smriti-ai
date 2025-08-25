@@ -3,6 +3,8 @@ import { useRef, use, useState, useEffect } from "react";
 import QuizQuestion from "@/components/quiz/QuizQuestion";
 import QuizFinalResult from "@/components/quiz/QuizResult";
 import QuizReview from "@/components/quiz/QuizReview";
+import { AccessibleProgressBar } from "@/components/accessibility/AccessibleProgressBar";
+import { AriaLiveRegion } from "@/components/accessibility/AriaLiveRegion";
 import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import axios from "axios";
 
@@ -27,6 +29,9 @@ export default function QuizPage({ params }: { params: any }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [userAnswers, setUserAnswers] = useState<(string | null)[]>([]);
   const [showWarning, setShowWarning] = useState(false);
+
+  // Accessibility state
+  const [ariaMessage, setAriaMessage] = useState("");
 
   // Display state
   const [quizState, setQuizState] = useState<"quiz" | "results" | "review">(
@@ -123,17 +128,23 @@ export default function QuizPage({ params }: { params: any }) {
     setUserAnswers(updatedAnswers);
 
     let finalScore = score;
-    if (selected === quizData[currentQ].answer) {
+    const isCorrect = selected === quizData[currentQ].answer;
+    if (isCorrect) {
       finalScore = score + 1;
       setScore(finalScore);
+      setAriaMessage("Correct answer!");
+    } else {
+      setAriaMessage("Incorrect answer.");
     }
 
     // Move to next or end
     if (currentQ < total - 1) {
       setCurrentQ((prev) => prev + 1);
       setSelected(null);
+      setAriaMessage(`Moving to question ${currentQ + 2} of ${total}`);
     } else {
       // Quiz completed - save result to database
+      setAriaMessage(`Quiz completed! Your final score is ${finalScore} out of ${total}`);
       if (quizId) {
         try {
           await axios.post("/api/quiz-result", {
@@ -155,6 +166,7 @@ export default function QuizPage({ params }: { params: any }) {
     setCurrentQ((prev) => prev - 1);
     setSelected(userAnswers[currentQ - 1]);
     setShowWarning(false);
+    setAriaMessage(`Going back to question ${currentQ} of ${total}`);
   };
 
   const resetQuiz = () => {
@@ -175,38 +187,36 @@ export default function QuizPage({ params }: { params: any }) {
 
   return (
     <div className="mt-10 min-h-[90vh] h-full px-6 max-w-3xl mx-auto flex flex-col items-center justify-center">
+      {/* ARIA Live Region for announcements */}
+      <AriaLiveRegion message={ariaMessage} priority="polite" clearAfter={3000} />
+      
       {quizState !== "results" && (
-        <div className="py-8 space-y-4 text-center">
+        <header className="py-8 space-y-4 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-lime-400">
             Quiz On
           </h1>
           <h2 className="text-xl sm:text-xl font-medium text-white px-4">
             {resourceTopic}
           </h2>
-        </div>
+        </header>
       )}
 
       {isLoading ? (
-        <div className="h-[50vh] flex flex-col items-center justify-center text-white text-lg gap-4">
-          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" />
-          <span>Loading...</span>
+        <div className="h-[50vh] flex flex-col items-center justify-center text-white text-lg gap-4" role="status" aria-live="polite">
+          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+          <span>Loading quiz questions...</span>
         </div>
       ) : (
-        <div className="bg-zinc-900 rounded-xl p-6 shadow-xl">
+        <main className="bg-zinc-900 rounded-xl p-6 shadow-xl" id="main-content">
           {quizState === "quiz" && (
             <>
-              {/* Progress Bar */}
-              <div className="w-full mb-6">
-                <div className="w-full h-2 bg-zinc-700 rounded-full">
-                  <div
-                    className="h-2 bg-primary rounded-full transition-all duration-300"
-                    style={{ width: `${(currentQ / total) * 100}%` }}
-                  />
-                </div>
-                <p className="text-sm text-right mt-1 text-gray-400">
-                  Question {currentQ + 1} of {total}
-                </p>
-              </div>
+              {/* Accessible Progress Bar */}
+              <AccessibleProgressBar
+                current={currentQ + 1}
+                total={total}
+                label="Quiz Progress"
+                className="mb-6"
+              />
 
               <QuizQuestion
                 question={quizData[currentQ].question}
@@ -216,6 +226,8 @@ export default function QuizPage({ params }: { params: any }) {
                   setSelected(value);
                   setShowWarning(false);
                 }}
+                questionNumber={currentQ + 1}
+                totalQuestions={total}
               />
 
               {showWarning && (
@@ -227,14 +239,15 @@ export default function QuizPage({ params }: { params: any }) {
                 </div>
               )}
 
-              <div className="flex items-center justify-between mt-6">
+              <nav className="flex items-center justify-between mt-6" aria-label="Quiz navigation">
                 <div>
                   {currentQ > 0 && (
                     <button
                       onClick={handlePrevious}
-                      className="flex items-center gap-2 bg-zinc-700 text-white px-4 py-2 rounded hover:bg-zinc-600 transition-colors"
+                      className="flex items-center gap-2 bg-zinc-700 text-white px-4 py-2 rounded hover:bg-zinc-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      aria-label={`Go to previous question (${currentQ} of ${total})`}
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={16} aria-hidden="true" />
                       Previous
                     </button>
                   )}
@@ -243,15 +256,21 @@ export default function QuizPage({ params }: { params: any }) {
                 <div>
                   <button
                     onClick={handleSubmit}
-                    className={`bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 flex items-center gap-2 transition-colors ${
+                    className={`bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 flex items-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                       !selected && currentQ < total - 1 ? "opacity-70" : ""
                     }`}
+                    aria-label={
+                      currentQ === total - 1 
+                        ? `Finish quiz and see results (${selected ? 'Answer selected' : 'No answer selected'})` 
+                        : `Go to next question (${selected ? 'Answer selected' : 'No answer selected'})`
+                    }
+                    disabled={!selected && currentQ < total - 1}
                   >
                     {currentQ === total - 1 ? "Finish Quiz" : "Next"}
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
-              </div>
+              </nav>
             </>
           )}
 
@@ -273,7 +292,7 @@ export default function QuizPage({ params }: { params: any }) {
               returnToResults={returnToResults}
             />
           )}
-        </div>
+        </main>
       )}
     </div>
   );
