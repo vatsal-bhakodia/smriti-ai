@@ -14,6 +14,9 @@ import SearchBar from "@/components/topic/SearchBar";
 import { useTopic } from "@/hooks/useTopic";
 import { useResources } from "@/hooks/useResources";
 import dynamic from "next/dynamic";
+import TopicQuizProgress from "@/components/topic/TopicQuizProgress";
+
+// Dynamically import the RichTextEditor for performance
 const RichTextEditor = dynamic(() => import("@/components/notes/RichTextEditor"), { ssr: false });
 
 export default function TopicPage({ params }: { params: any }) {
@@ -21,7 +24,6 @@ export default function TopicPage({ params }: { params: any }) {
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   const router = useRouter();
 
-  // Topic state management
   const {
     topicId,
     topicName,
@@ -33,7 +35,6 @@ export default function TopicPage({ params }: { params: any }) {
     isLoading: isTopicLoading,
   } = useTopic(id);
 
-  // Resource state management
   const {
     media,
     filteredMedia,
@@ -78,7 +79,6 @@ export default function TopicPage({ params }: { params: any }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
-      {/* Topic Modal */}
       <TopicModal
         open={topicModalOpen}
         setOpen={setTopicModalOpen}
@@ -88,8 +88,6 @@ export default function TopicPage({ params }: { params: any }) {
         onSave={handleSaveTopic}
         onCancel={handleCancelModal}
       />
-
-      {/* Topic Header */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <TopicHeader
           topicName={topicName}
@@ -100,16 +98,14 @@ export default function TopicPage({ params }: { params: any }) {
           Add Resource
         </Button>
       </div>
-
-      {/* --- ADD TABS TO ORGANIZE CONTENT --- */}
       <Tabs defaultValue="resources" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
+        <TabsList className="grid w-full grid-cols-3 max-w-md">
           <TabsTrigger value="resources">Resources</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
+          <TabsTrigger value="quiz-progress">Quiz Progress</TabsTrigger>
         </TabsList>
 
         <TabsContent value="resources" className="mt-4">
-          {/* Resource Modal */}
           <ResourceModal
             open={resourceModalOpen}
             setOpen={setResourceModalOpen}
@@ -128,8 +124,6 @@ export default function TopicPage({ params }: { params: any }) {
             isLoading={isLoading}
             pdfFile={pdfFile}
           />
-
-          {/* Delete Confirmation Dialog */}
           <DeleteDialog
             open={deleteDialogOpen}
             onOpenChange={setDeleteDialogOpen}
@@ -137,13 +131,9 @@ export default function TopicPage({ params }: { params: any }) {
             onDelete={handleDeleteResource}
             isDeleting={isDeleting}
           />
-
-          {/* Search Bar */}
           {media.length > 0 && (
             <SearchBar value={search} onChange={setSearch} />
           )}
-
-          {/* Resource Grid */}
           <ResourceGrid
             isLoading={isLoading}
             media={filteredMedia}
@@ -155,13 +145,23 @@ export default function TopicPage({ params }: { params: any }) {
           />
         </TabsContent>
 
-        {/* Notes Tab Content (New Feature) */}
         <TabsContent value="notes" className="mt-4">
            {id ? (
             <RichTextEditor topicId={id} />
             ) : (
               <p className="text-muted-foreground">Open a topic to write notes.</p>
             )}
+        </TabsContent>
+
+        {/* CHANGE: Added a guard to prevent rendering when id is missing */}
+        <TabsContent value="quiz-progress" className="mt-4">
+          {id ? (
+            <TopicQuizProgress topicId={id} />
+          ) : (
+            <p className="text-center text-muted-foreground">
+              Select a topic to view your quiz progress.
+            </p>
+          )}
         </TabsContent>
       </Tabs>
     </div>

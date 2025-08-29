@@ -1,299 +1,298 @@
 "use client";
-import { useRef, use, useState, useEffect } from "react";
+
+import { useState, useEffect, useMemo, useRef, use } from "react";
+import { toast } from "sonner";
+import { Loader2, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import QuizQuestion from "@/components/quiz/QuizQuestion";
 import QuizFinalResult from "@/components/quiz/QuizResult";
 import QuizReview from "@/components/quiz/QuizReview";
 import { AccessibleProgressBar } from "@/components/accessibility/AccessibleProgressBar";
 import { AriaLiveRegion } from "@/components/accessibility/AriaLiveRegion";
-import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import axios from "axios";
 
-export default function QuizPage({ params }: { params: any }) {
-  const rawId = (use(params) as { id: string | string[] }).id;
-  const id = Array.isArray(rawId) ? rawId[0] : rawId;
+// Define the shape of the resolved params object
+type QuizPageParams = {
+  id: string | string[];
+};
+
+// Define the props for the Page component
+type QuizPageProps = {
+  params: Promise<QuizPageParams>;
+};
+
+type QuizQA = {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+  difficulty: string;
+};
+
+type ResourceResponse = {
+  resource?: { id: string; title: string };
+};
+
+type QuizResponse = {
+  message: string;
+  quiz: { id:string; resourceId: string };
+  quizQAs: QuizQA[];
+};
+
+type FinalAnswer = {
+  quizQAId: string;
+  selectedOption: string;
+  isCorrect: boolean;
+};
+
+export default function QuizPage({ params }: QuizPageProps) {
+  const resolvedParams = use(params);
+  const id = Array.isArray(resolvedParams.id) ? resolvedParams.id[0] : resolvedParams.id;
+  const hasFetched = useRef(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [resourceTopic, setResourceTopic] = useState("");
-  const [quizData, setQuizData] = useState<
-    {
-      question: string;
-      options: string[];
-      answer: string;
-      explanation: string;
-    }[]
-  >([]);
-
-  // Quiz state
-  const [currentQ, setCurrentQ] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [userAnswers, setUserAnswers] = useState<(string | null)[]>([]);
-  const [showWarning, setShowWarning] = useState(false);
-
-  // Accessibility state
-  const [ariaMessage, setAriaMessage] = useState("");
-
-  // Display state
-  const [quizState, setQuizState] = useState<"quiz" | "results" | "review">(
-    "quiz"
-  );
+  const [quizData, setQuizData] = useState<QuizQA[]>([]);
   const [quizId, setQuizId] = useState<string | null>(null);
+  
+  const [askedQuestions, setAskedQuestions] = useState<string[]>([]);
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [userSelections, setUserSelections] = useState<(string | null)[]>([]);
 
-  const resourceAPI = "/api/resource";
+  const [quizState, setQuizState] = useState<"quiz" | "results" | "review">("quiz");
+  const [ariaMessage, setAriaMessage] = useState("");
+  const totalQuestionsToAsk = 5;
 
-  type QuizQA = {
-    id: string;
-    quizId: string;
-    question: string;
-    options: string[];
-    correctAnswer: string;
-    explanation: string;
+  const currentQuestion = useMemo(() => {
+    if (askedQuestions.length === 0 || currentQIndex >= askedQuestions.length) return null;
+    return quizData.find(q => q.id === askedQuestions[currentQIndex]);
+  }, [currentQIndex, askedQuestions, quizData]);
+
+  const initializeQuiz = (questions: QuizQA[]) => {
+    if (questions.length > 0) {
+      const mediumQuestions = questions.filter(q => q.difficulty === "Medium");
+      const firstQuestion = mediumQuestions.length > 0 
+        ? mediumQuestions[Math.floor(Math.random() * mediumQuestions.length)]
+        : questions[Math.floor(Math.random() * questions.length)];
+      
+      setAskedQuestions([firstQuestion.id]);
+      setUserSelections(Array(totalQuestionsToAsk).fill(null));
+      setCurrentQIndex(0);
+      setSelectedOption(null);
+      setQuizState("quiz");
+    }
   };
-
-  type QuizResponse = {
-    message: string;
-    quiz: { id: string; resourceId: string };
-    quizQAs: QuizQA[];
-  };
-
-  const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (hasFetched.current) return;
+    if (hasFetched.current || !id) return;
     hasFetched.current = true;
 
     async function Datafetcher() {
-      // Fetch resource title
-      const res = await axios.get<{ resource?: { title: string } }>(
-        resourceAPI,
-        {
-          params: { id },
-        }
-      );
-      if (res.data.resource) {
-        setResourceTopic(res.data.resource.title);
-      } else {
-        console.error("Resource not found");
-      }
-
-      // Call quiz API
-      const payload = {
-        resourceId: id,
-        task: "quiz",
-      };
-
+      setIsLoading(true);
       try {
-        const resQuiz = await axios.post<QuizResponse>(
-          "/api/resource-ai",
-          payload
-        );
-        console.log("Quiz response:", resQuiz.data);
+        const res = await axios.get<ResourceResponse>(`/api/resource`, { params: { id } });
+        if (res.data.resource) setResourceTopic(res.data.resource.title);
 
-        const quizItems = resQuiz.data.quizQAs.map((qa) => ({
-          question: qa.question,
-          options: qa.options,
-          answer: qa.correctAnswer,
-          explanation: qa.explanation,
-        }));
+        const payload = { resourceId: id, task: "quiz" };
+        const resQuiz = await axios.post<QuizResponse>(`/api/resource-ai`, payload);
 
-        setQuizData(quizItems);
-        // Store the quiz ID for saving results later
+        setQuizData(resQuiz.data.quizQAs);
         setQuizId(resQuiz.data.quiz.id);
-        // Initialize userAnswers array with null values
-        setUserAnswers(Array(quizItems.length).fill(null));
+        initializeQuiz(resQuiz.data.quizQAs);
       } catch (error) {
         console.error("Error fetching quiz:", error);
+        toast.error("Failed to load quiz. Please try again.");
       } finally {
         setIsLoading(false);
       }
     }
-
     Datafetcher();
   }, [id]);
+  
+  const getNextQuestion = (isCorrect: boolean) => {
+    if (!currentQuestion) return undefined;
 
-  const total = quizData.length;
+    const difficultyHierarchy = ["Easy", "Medium", "Hard"];
+    const currentDifficultyIndex = difficultyHierarchy.indexOf(currentQuestion.difficulty);
 
-  const handleSubmit = async () => {
-    if (!selected && currentQ === total - 1) {
-      // On last question, show warning if no answer selected
-      setShowWarning(true);
-      return;
+    let nextDifficultyIndex = currentDifficultyIndex;
+    if (isCorrect && currentDifficultyIndex < difficultyHierarchy.length - 1) {
+      nextDifficultyIndex++;
+    } else if (!isCorrect && currentDifficultyIndex > 0) {
+      nextDifficultyIndex--;
     }
 
-    setShowWarning(false);
+    const availableQuestions = quizData.filter(q => !askedQuestions.includes(q.id));
 
-    // Update user answers array
-    const updatedAnswers = [...userAnswers];
-    updatedAnswers[currentQ] = selected;
-    setUserAnswers(updatedAnswers);
-
-    let finalScore = score;
-    const isCorrect = selected === quizData[currentQ].answer;
-    if (isCorrect) {
-      finalScore = score + 1;
-      setScore(finalScore);
-      setAriaMessage("Correct answer!");
-    } else {
-      setAriaMessage("Incorrect answer.");
-    }
-
-    // Move to next or end
-    if (currentQ < total - 1) {
-      setCurrentQ((prev) => prev + 1);
-      setSelected(null);
-      setAriaMessage(`Moving to question ${currentQ + 2} of ${total}`);
-    } else {
-      // Quiz completed - save result to database
-      setAriaMessage(`Quiz completed! Your final score is ${finalScore} out of ${total}`);
-      if (quizId) {
-        try {
-          await axios.post("/api/quiz-result", {
-            quizId,
-            score: finalScore,
-          });
-          console.log("Quiz result saved successfully");
-        } catch (error) {
-          console.error("Error saving quiz result:", error);
-          // Don't prevent showing results even if saving fails
+    for (let i = 0; i < difficultyHierarchy.length; i++) {
+        const searchIndex = isCorrect ? nextDifficultyIndex - i : nextDifficultyIndex + i;
+        if (searchIndex >= 0 && searchIndex < difficultyHierarchy.length) {
+            const targetDifficulty = difficultyHierarchy[searchIndex];
+            const pool = availableQuestions.filter(q => q.difficulty === targetDifficulty);
+            if (pool.length > 0) {
+                return pool[Math.floor(Math.random() * pool.length)].id;
+            }
         }
-      }
-      // Change to results view
-      setQuizState("results");
     }
+
+    if (availableQuestions.length > 0) {
+      return availableQuestions[Math.floor(Math.random() * availableQuestions.length)].id;
+    }
+    
+    console.warn("No more questions available for adaptive selection.");
+    return undefined;
   };
 
+  const handleNext = async () => {
+    if (!selectedOption || !currentQuestion) return;
+
+    const newSelections = [...userSelections];
+    newSelections[currentQIndex] = selectedOption;
+    setUserSelections(newSelections);
+
+    const isCorrect = selectedOption === currentQuestion.correctAnswer;
+    setAriaMessage(isCorrect ? "Correct answer!" : "Incorrect answer.");
+
+    if (currentQIndex === totalQuestionsToAsk - 1) {
+        setQuizState("results");
+        setAriaMessage(`Quiz completed!`);
+        
+        const finalAnswersPayload = askedQuestions.map((qaId, index) => ({
+            quizQAId: qaId,
+            selectedOption: newSelections[index],
+        }));
+
+        // CHANGE 1: More robust check to prevent saving incomplete results
+        const allQuestionsAnswered = finalAnswersPayload.every(a => a.selectedOption);
+
+        if (quizId && allQuestionsAnswered) {
+            // CHANGE 2: Cleaner way to handle toast.promise
+            const saveResults = async () => {
+                await axios.post("/api/quiz-result", { quizId, answers: finalAnswersPayload });
+            };
+
+            toast.promise(saveResults(), {
+                loading: "Saving your results...",
+                success: "Results saved successfully!",
+                error: (err) => `Error: ${err.message || "Could not save results."}`,
+            });
+        } else if (!allQuestionsAnswered) {
+            toast.error("Could not save results: Not all questions were answered.");
+            console.error("Attempted to save quiz with incomplete answers.", finalAnswersPayload);
+        }
+    } else {
+        if (currentQIndex === askedQuestions.length - 1) {
+            const nextQuestionId = getNextQuestion(isCorrect);
+            if (nextQuestionId) {
+                setAskedQuestions([...askedQuestions, nextQuestionId]);
+            }
+        }
+        setCurrentQIndex(currentQIndex + 1);
+        setSelectedOption(newSelections[currentQIndex + 1] || null);
+        setAriaMessage(`Moving to question ${currentQIndex + 2}`);
+    }
+  };
+  
   const handlePrevious = () => {
-    setCurrentQ((prev) => prev - 1);
-    setSelected(userAnswers[currentQ - 1]);
-    setShowWarning(false);
-    setAriaMessage(`Going back to question ${currentQ} of ${total}`);
+    setCurrentQIndex(currentQIndex - 1);
+    setSelectedOption(userSelections[currentQIndex - 1]);
+    setAriaMessage(`Going back to question ${currentQIndex}`);
   };
 
   const resetQuiz = () => {
-    setCurrentQ(0);
-    setScore(0);
-    setSelected(null);
-    setUserAnswers(Array(quizData.length).fill(null));
-    setQuizState("quiz");
+    initializeQuiz(quizData);
   };
 
-  const startReview = () => {
-    setQuizState("review");
-  };
+  const startReview = () => setQuizState("review");
+  const returnToResults = () => setQuizState("results");
+  
+  if (isLoading || askedQuestions.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <p className="mt-4 text-muted-foreground">Generating your quiz...</p>
+      </div>
+    );
+  }
 
-  const returnToResults = () => {
-    setQuizState("results");
-  };
+  if (!currentQuestion) {
+     return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-center">
+        <AlertCircle className="h-10 w-10 text-red-500" />
+        <p className="text-xl font-semibold mt-4">Could not load the current question.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-10 min-h-[90vh] h-full px-6 max-w-3xl mx-auto flex flex-col items-center justify-center">
-      {/* ARIA Live Region for announcements */}
       <AriaLiveRegion message={ariaMessage} priority="polite" clearAfter={3000} />
-      
       {quizState !== "results" && (
         <header className="py-8 space-y-4 text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-lime-400">
-            Quiz On
-          </h1>
-          <h2 className="text-xl sm:text-xl font-medium text-white px-4">
-            {resourceTopic}
-          </h2>
+          <h1 className="text-3xl sm:text-4xl font-bold text-lime-400">Quiz On</h1>
+          <h2 className="text-xl sm:text-xl font-medium text-white px-4">{resourceTopic}</h2>
         </header>
       )}
-
-      {isLoading ? (
-        <div className="h-[50vh] flex flex-col items-center justify-center text-white text-lg gap-4" role="status" aria-live="polite">
-          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" aria-hidden="true" />
-          <span>Loading quiz questions...</span>
-        </div>
-      ) : (
-        <main className="bg-zinc-900 rounded-xl p-6 shadow-xl" id="main-content">
-          {quizState === "quiz" && (
-            <>
-              {/* Accessible Progress Bar */}
-              <AccessibleProgressBar
-                current={currentQ + 1}
-                total={total}
-                label="Quiz Progress"
-                className="mb-6"
-              />
-
-              <QuizQuestion
-                question={quizData[currentQ].question}
-                options={quizData[currentQ].options}
-                selected={selected}
-                setSelected={(value) => {
-                  setSelected(value);
-                  setShowWarning(false);
-                }}
-                questionNumber={currentQ + 1}
-                totalQuestions={total}
-              />
-
-              {showWarning && (
-                <div className="mt-4 p-3 bg-red-900/30 border border-red-500/50 rounded-lg flex items-center gap-2 text-red-200">
-                  <AlertCircle size={18} />
-                  <p className="text-sm">
-                    Please select an answer before proceeding to results.
-                  </p>
-                </div>
-              )}
-
-              <nav className="flex items-center justify-between mt-6" aria-label="Quiz navigation">
-                <div>
-                  {currentQ > 0 && (
-                    <button
-                      onClick={handlePrevious}
-                      className="flex items-center gap-2 bg-zinc-700 text-white px-4 py-2 rounded hover:bg-zinc-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                      aria-label={`Go to previous question (${currentQ} of ${total})`}
-                    >
-                      <ArrowLeft size={16} aria-hidden="true" />
-                      Previous
-                    </button>
-                  )}
-                </div>
-
-                <div>
-                  <button
-                    onClick={handleSubmit}
-                    className={`bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 flex items-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                      !selected && currentQ < total - 1 ? "opacity-70" : ""
-                    }`}
-                    aria-label={
-                      currentQ === total - 1 
-                        ? `Finish quiz and see results (${selected ? 'Answer selected' : 'No answer selected'})` 
-                        : `Go to next question (${selected ? 'Answer selected' : 'No answer selected'})`
-                    }
-                    disabled={!selected && currentQ < total - 1}
-                  >
-                    {currentQ === total - 1 ? "Finish Quiz" : "Next"}
-                    <ArrowRight className="w-4 h-4" aria-hidden="true" />
+      <main className="bg-zinc-900 rounded-xl p-6 shadow-xl w-full" id="main-content">
+        {quizState === "quiz" && (
+          <>
+            <AccessibleProgressBar current={currentQIndex + 1} total={totalQuestionsToAsk} label="Quiz Progress" className="mb-6" />
+            <QuizQuestion
+              question={currentQuestion.question}
+              options={currentQuestion.options}
+              selected={selectedOption}
+              setSelected={setSelectedOption}
+              questionNumber={currentQIndex + 1}
+              totalQuestions={totalQuestionsToAsk}
+            />
+            <nav className="flex items-center justify-between mt-6" aria-label="Quiz navigation">
+              <div>
+                {currentQIndex > 0 && (
+                  <button onClick={handlePrevious} className="flex items-center gap-2 bg-zinc-700 text-white px-4 py-2 rounded hover:bg-zinc-600 transition-colors">
+                    <ArrowLeft size={16} aria-hidden="true" /> Previous
                   </button>
-                </div>
-              </nav>
-            </>
-          )}
+                )}
+              </div>
+              <button onClick={handleNext} disabled={!selectedOption} className="bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 flex items-center gap-2 transition-colors disabled:opacity-50">
+                {currentQIndex === totalQuestionsToAsk - 1 ? "Finish Quiz" : "Next"}
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </nav>
+          </>
+        )}
 
-          {quizState === "results" && (
-            <QuizFinalResult
-              score={score}
-              total={total}
-              userAnswers={userAnswers}
-              quizData={quizData}
-              resetQuiz={resetQuiz}
-              startReview={startReview}
-            />
-          )}
-
-          {quizState === "review" && (
-            <QuizReview
-              quizData={quizData}
-              userAnswers={userAnswers}
-              returnToResults={returnToResults}
-            />
-          )}
-        </main>
-      )}
+        {quizState === "results" && (
+           <QuizFinalResult
+            userAnswers={askedQuestions.map((qaId, index) => {
+              const question = quizData.find(q => q.id === qaId)!;
+              return {
+                quizQAId: qaId,
+                selectedOption: userSelections[index]!,
+                isCorrect: userSelections[index] === question.correctAnswer,
+              };
+            })}
+            quizData={quizData}
+            resetQuiz={resetQuiz}
+            startReview={startReview}
+          />
+        )}
+        
+        {quizState === "review" && (
+          <QuizReview
+            userAnswers={askedQuestions.map((qaId, index) => {
+              const question = quizData.find(q => q.id === qaId)!;
+              return {
+                quizQAId: qaId,
+                selectedOption: userSelections[index]!,
+                isCorrect: userSelections[index] === question.correctAnswer,
+              };
+            })}
+            quizData={quizData}
+            returnToResults={returnToResults}
+          />
+        )}
+      </main>
     </div>
   );
 }

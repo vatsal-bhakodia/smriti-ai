@@ -1,3 +1,7 @@
+// MERGE NOTE: This schema combines both your changes and the original repo's changes.
+// It includes the new Flashcard and updated Note models from upstream,
+// and your UserAnswer model and QuizQA difficulty field.
+
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -10,17 +14,18 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  username      String   @unique
-  email         String   @unique
+  id            String       @id @default(uuid())
+  username      String       @unique
+  email         String       @unique
   mobile        String
   dob           String
-  lastLogin     DateTime @default(now())
-  currentStreak Int      @default(0)
+  lastLogin     DateTime     @default(now())
+  currentStreak Int          @default(0)
   topics        Topic[]
-  notes         Note[]   // Added this relation
-  level         Int      @default(1)
-  experience    Int      @default(0)
+  notes         Note[]
+  userAnswers   UserAnswer[] // Your addition
+  level         Int          @default(1)
+  experience    Int          @default(0)
 }
 
 model Topic {
@@ -56,33 +61,52 @@ model Resource {
 
 model Quiz {
   id          String       @id @default(uuid())
-  resourceId  String       @unique
+  resourceId  String
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   resource    Resource     @relation(fields: [resourceId], references: [id], onDelete: Cascade)
   quizQAs     QuizQA[]
   quizResults QuizResult[]
+  userAnswers UserAnswer[] // Your addition
 }
 
 model QuizQA {
-  id            String   @id @default(uuid())
+  id            String       @id @default(uuid())
   quizId        String
   question      String
   options       String[]
   correctAnswer String
   explanation   String?
-  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  difficulty    String       @default("Medium") // Your addition
+  userAnswers   UserAnswer[] // Your addition
+  quiz          Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
 model QuizResult {
-  id        String   @id @default(uuid())
-  quizId    String
-  score     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  quiz      Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  id             String   @id @default(uuid())
+  quizId         String
+  score          Int
+  totalQuestions Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
 
+// Your UserAnswer model
+model UserAnswer {
+  id             String   @id @default(uuid())
+  userId         String
+  quizId         String
+  quizQAId       String
+  selectedOption String
+  isCorrect      Boolean
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz           Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizQA         QuizQA   @relation(fields: [quizQAId], references: [id], onDelete: Cascade)
+}
+
+// Models from original repo
 model FlashcardDeck {
   id         String      @id @default(uuid())
   resourceId String      @unique
@@ -107,7 +131,7 @@ model Flashcard {
 model FlashcardReview {
   id         String    @id @default(uuid())
   cardId     String
-  difficulty Int       // 1-5 scale (1=easy, 5=hard)
+  difficulty Int // 1-5 scale (1=easy, 5=hard)
   nextReview DateTime
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt

@@ -3,6 +3,15 @@ import { getAuth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { getLevelAndTtile } from "@/lib/levelUtils";
 
+// Define a type for the data we expect from the frontend
+type QuizSubmission = {
+  quizId: string;
+  answers: {
+    quizQAId: string;
+    selectedOption: string;
+  }[];
+};
+
 // POST: Save quiz result
 export async function POST(req: NextRequest) {
   const { userId } = getAuth(req);
@@ -11,55 +20,98 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { quizId, score } = await req.json();
+    const { quizId, answers }: QuizSubmission = await req.json();
 
-    if (!quizId || score === undefined || score === null) {
+    if (!quizId || !answers || !Array.isArray(answers) || answers.length === 0) {
       return NextResponse.json(
-        { message: "Missing required fields: quizId and score" },
+        { message: "Invalid submission data" },
         { status: 400 }
       );
     }
 
-    // Verify that the quiz exists
-    const quiz = await prisma.quiz.findUnique({
-      where: { id: quizId },
-    });
+    // CHANGE 2: More efficient answer fetching.
+    // 1. Get all question IDs from the submission.
+    const questionIds = answers.map((answer) => answer.quizQAId);
 
-    if (!quiz) {
-      return NextResponse.json({ message: "Quiz not found" }, { status: 404 });
-    }
-
-    // Create the quiz result
-    const quizResult = await prisma.quizResult.create({
-      data: {
-        quizId,
-        score,
+    // 2. Fetch all correct answers for those questions in a single database call.
+    const correctAnswersData = await prisma.quizQA.findMany({
+      where: {
+        id: { in: questionIds },
+        quizId: quizId, // Ensure questions belong to the correct quiz
+      },
+      select: {
+        id: true,
+        correctAnswer: true,
       },
     });
 
-    let xpGain = 10;
-    if(score === 100) xpGain += 20;
+    // 3. Create a Map for instant O(1) lookups.
+    const answerMap = new Map(
+      correctAnswersData.map((qa) => [qa.id, qa.correctAnswer])
+    );
 
-    const user = await prisma.user.update({
-      where: {id: userId},
-      data: {
-        experience: {
-          increment: xpGain
-        }
-      }
-    })
+    let correctAnswersCount = 0;
+    const userAnswersToCreate = answers.map((submittedAnswer) => {
+      const correctAnswer = answerMap.get(submittedAnswer.quizQAId);
+      const isCorrect = correctAnswer !== undefined && submittedAnswer.selectedOption === correctAnswer;
 
-    const {level} = getLevelAndTtile(user.experience);
-    await prisma.user.update({
-      where: {id: userId},
-      data: {
-        level
+      if (isCorrect) {
+        correctAnswersCount++;
       }
-    })
+
+      return {
+        userId,
+        quizId,
+        quizQAId: submittedAnswer.quizQAId,
+        selectedOption: submittedAnswer.selectedOption,
+        isCorrect,
+      };
+    });
+    
+    // CHANGE 1: Using a Prisma transaction to ensure all database writes succeed or none do.
+    const xpGain = correctAnswersCount * 5; // 5 XP per correct answer
+
+    const [_, quizResult, updatedUser] = await prisma.$transaction(async (tx) => {
+      // Operation 1: Save all the detailed user answers
+      const userAnswerCreation = tx.userAnswer.createMany({
+        data: userAnswersToCreate,
+      });
+
+      // Operation 2: Create the final quiz result summary
+      const quizResultCreation = tx.quizResult.create({
+        data: {
+          quizId,
+          score: correctAnswersCount,
+          totalQuestions: answers.length, 
+        },
+      });
+
+      // Operation 3: Award XP to the user
+      const userUpdate = tx.user.update({
+        where: { id: userId },
+        data: {
+          experience: {
+            increment: xpGain,
+          },
+        },
+      });
+
+      // All three operations are executed together
+      return Promise.all([userAnswerCreation, quizResultCreation, userUpdate]);
+    });
+    
+    // After the transaction, update the user's level based on their new XP
+    const { level } = getLevelAndTtile(updatedUser.experience);
+    if (updatedUser.level !== level) {
+        await prisma.user.update({
+            where: { id: userId },
+            data: { level },
+        });
+    }
 
     return NextResponse.json(
       {
-        message: "Quiz result saved successfully",
+        message: "Quiz result and answers saved successfully",
         quizResult,
       },
       { status: 201 }
@@ -73,7 +125,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET: Retrieve quiz results for a specific quiz
+// GET handler remains unchanged as it was already well-written.
 export async function GET(req: NextRequest) {
   const { userId } = getAuth(req);
   if (!userId) {
@@ -92,7 +144,15 @@ export async function GET(req: NextRequest) {
     }
 
     const quizResults = await prisma.quizResult.findMany({
-      where: { quizId },
+      where: { quizId,
+        quiz: {
+            resource: {
+                topic: {
+                    userId: userId
+                }
+            }
+        }
+      },
       orderBy: { createdAt: "desc" },
     });
 

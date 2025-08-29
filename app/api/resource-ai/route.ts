@@ -1,3 +1,4 @@
+// app/api/resource-ai/route.ts
 import {
   FALLBACK_PROMPT,
   SUMMARY_PROMPT,
@@ -12,7 +13,8 @@ import prisma from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getYoutubeTranscript } from "@/utils/youtube";
-import axios from "axios";
+import axios from "axios"; // CHANGE: Kept from original repo for PDF handling
+import { QuizQA as PrismaQuizQA } from "@prisma/client"; // CHANGE: Kept from your version for quiz logic
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -56,32 +58,24 @@ export async function POST(req: NextRequest) {
     }
 
     let summary = resource.summary;
-
     if (!summary || summary.length === 0) {
+      // CHANGE: Integrated summary logic for VIDEO, PDF, and ARTICLE from original repo
       if (resource.type === "VIDEO") {
         try {
           const transcript = await getYoutubeTranscript(resource.url);
           const prompt = SUMMARY_PROMPT(transcript);
           summary = await askGemini(prompt);
         } catch (err) {
-          console.error(
-            "Transcript fetch failed. Falling back to title-based summary.",
-            err
-          );
-
+          console.error("Transcript fetch failed. Falling back to title-based summary.", err);
           const fallbackPrompt = FALLBACK_PROMPT(resource.title);
           summary = await askGemini(fallbackPrompt);
         }
       } else if (resource.type === "PDF") {
         try {
-          // Download PDF bytes from Cloudinary (or any URL) and extract text
-          const pdfBytes = await axios.get<ArrayBuffer>(resource.url, {
-            responseType: "arraybuffer",
-          });
+          const pdfBytes = await axios.get<ArrayBuffer>(resource.url, { responseType: "arraybuffer" });
           const { default: pdfParse } = await import("pdf-parse");
           const parsed = await pdfParse(Buffer.from(pdfBytes.data));
-          console.log(parsed.text);
-          const prompt = SUMMARY_PROMPT(resource.url || "");
+          const prompt = SUMMARY_PROMPT(parsed.text);
           summary = await askGemini(prompt);
         } catch (err) {
           console.error("PDF parse failed. Falling back to title-based summary.", err);
@@ -89,8 +83,6 @@ export async function POST(req: NextRequest) {
           summary = await askGemini(fallbackPrompt);
         }
       } else if (resource.type === "ARTICLE") {
-        // For notes/text resources, we treat current resource.summary (if provided during creation)
-        // as the raw content to summarize. If empty, fall back to the title.
         const baseText = resource.summary && resource.summary.length > 0 ? resource.summary : resource.title;
         try {
           const prompt = SUMMARY_PROMPT(baseText);
@@ -102,7 +94,6 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Persist computed summary back to the resource for future reuse
       if (summary && summary.length > 0) {
         await prisma.resource.update({
           where: { id: resourceId },
@@ -111,94 +102,110 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // --- The rest of the AI tasks ---
+
     if (task === "summary") {
-      return NextResponse.json({
-        message: "Summary generated",
-        summary,
-      });
+      return NextResponse.json({ message: "Summary generated", summary });
     }
 
     if (task === "roadmap") {
       const prompt = ROADMAP_PROMPT(summary);
-
       const answer = await askGemini(prompt);
       return NextResponse.json({ message: "Roadmap generated", answer });
     }
 
     if (task === "qa") {
       if (!question) {
-        return NextResponse.json(
-          { message: "Question is required for Q&A" },
-          { status: 400 }
-        );
+        return NextResponse.json({ message: "Question is required for Q&A" }, { status: 400 });
       }
-
       const prompt = QA_PROMPT(summary, question);
-
       const answer = await askGemini(prompt);
       return NextResponse.json({ message: "Answer generated", answer });
     }
 
     if (task === "mindmap") {
       const prompt = MINDMAP_PROMPT(summary);
-
       const mindmap = await askGemini(prompt);
       return NextResponse.json({ message: "Mindmap code generated", mindmap });
     }
 
+    // CHANGE: This is YOUR advanced quiz logic, fully preserved.
     if (task === "quiz") {
-      // Step 1: Check if a quiz already exists for this resourceId
-      const existingQuiz = await prisma.quiz.findUnique({
+      let existingQuizzes = await prisma.quiz.findMany({
         where: { resourceId: resource.id },
-        include: {
-          quizQAs: true, // Include related questions and answers
-        },
+        include: { quizQAs: true },
+        orderBy: { createdAt: 'desc' }
       });
 
-      if (existingQuiz) {
+      let quizToServe = null;
+      for (const quiz of existingQuizzes) {
+        if (quiz.quizQAs.length > 0) {
+          const quizQAIds = quiz.quizQAs.map(q => q.id);
+          const userAnswersCount = await prisma.userAnswer.count({
+            where: {
+              userId: userId,
+              quizQAId: { in: quizQAIds }
+            }
+          });
+          // Check if the user has completed this specific quiz less than twice.
+          if (userAnswersCount < quiz.quizQAs.length * 2) {
+            quizToServe = quiz;
+            break;
+          }
+        }
+      }
+
+      if (quizToServe) {
         return NextResponse.json({
-          message: "Quiz already exists for this resource",
-          quiz: existingQuiz,
-          quizQAs: existingQuiz.quizQAs,
+          message: "Existing quiz found",
+          quiz: quizToServe,
+          quizQAs: quizToServe.quizQAs,
         });
       } else {
-        // Step 2: Generate new quiz questions
-        const prompt = QUIZ_PROMPT(summary);
-
-        const mcqText = await askGemini(prompt);
-        const mcqs = extractJSON(mcqText);
+        // No suitable quiz found, generate a new one.
+        let mcqText, mcqs;
+        try {
+          const prompt = QUIZ_PROMPT(summary);
+          mcqText = await askGemini(prompt);
+          mcqs = extractJSON(mcqText);
+        } catch (genError) {
+          console.error("AI quiz generation failed:", genError);
+          return NextResponse.json({ message: "Failed to generate a quiz from this resource." }, { status: 400 });
+        }
 
         interface QuizQuestion {
           question: string;
           options: string[];
-          answer: string;
+          correctAnswer: string;
           explanation: string;
+          difficulty: string;
         }
 
-        // Step 3: Create a new quiz record
-        const quizRecord = await prisma.quiz.create({
-          data: {
-            resourceId: resource.id,
-          },
+        if (!Array.isArray(mcqs) || mcqs.length === 0) {
+          return NextResponse.json({ message: "AI failed to generate quiz questions." }, { status: 400 });
+        }
+
+        const [quizRecord, quizQAs] = await prisma.$transaction(async (tx) => {
+          const newQuizRecord = await tx.quiz.create({ data: { resourceId: resource.id } });
+          const newQuizQAs = await Promise.all(
+            mcqs.map((q: QuizQuestion) =>
+              tx.quizQA.create({
+                data: {
+                  quizId: newQuizRecord.id,
+                  question: q.question,
+                  options: q.options,
+                  correctAnswer: q.correctAnswer,
+                  explanation: q.explanation,
+                  difficulty: q.difficulty,
+                },
+              })
+            )
+          );
+          return [newQuizRecord, newQuizQAs];
         });
 
-        // Step 4: Add the questions and answers to the QuizQA model
-        const quizQAs = await Promise.all(
-          mcqs.map((q: QuizQuestion) =>
-            prisma.quizQA.create({
-              data: {
-                quizId: quizRecord.id,
-                question: q.question,
-                options: q.options,
-                correctAnswer: q.answer,
-                explanation: q.explanation,
-              },
-            })
-          )
-        );
-
         return NextResponse.json({
-          message: "Quiz created with questions",
+          message: "New quiz created with questions",
           quiz: quizRecord,
           quizQAs,
         });
@@ -206,12 +213,9 @@ export async function POST(req: NextRequest) {
     }
 
     if (task === "flashcards") {
-      // Step 1: Check if a flashcard deck already exists for this resourceId
       const existingDeck = await prisma.flashcardDeck.findUnique({
         where: { resourceId: resource.id },
-        include: {
-          cards: true, // Include related flashcards
-        },
+        include: { cards: true },
       });
 
       if (existingDeck) {
@@ -221,9 +225,7 @@ export async function POST(req: NextRequest) {
           cards: existingDeck.cards,
         });
       } else {
-        // Step 2: Generate new flashcards
         const prompt = FLASHCARD_PROMPT(summary);
-
         const flashcardText = await askGemini(prompt);
         const flashcards = extractJSON(flashcardText);
 
@@ -232,7 +234,6 @@ export async function POST(req: NextRequest) {
           definition: string;
         }
 
-        // Step 3: Create a new flashcard deck record
         const deckRecord = await prisma.flashcardDeck.create({
           data: {
             resourceId: resource.id,
@@ -240,7 +241,6 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Step 4: Add the flashcards to the Flashcard model
         const cards = await Promise.all(
           flashcards.map((card: Flashcard) =>
             prisma.flashcard.create({
@@ -262,9 +262,6 @@ export async function POST(req: NextRequest) {
     }
   } catch (error) {
     console.error("Error in resource AI task:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }

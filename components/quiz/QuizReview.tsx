@@ -1,15 +1,21 @@
+// components/quiz/QuizReview.tsx
+
 "use client";
 import { useState } from "react";
 import { Eye, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
 
+export type QuizQA = {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+  difficulty: string;
+};
+
 type ReviewQuestionProps = {
-  quizData: {
-    question: string;
-    options: string[];
-    answer: string;
-    explanation: string;
-  }[];
-  userAnswers: (string | null)[];
+  quizData: QuizQA[];
+  userAnswers: { quizQAId: string; selectedOption: string; isCorrect: boolean }[];
   returnToResults: () => void;
 };
 
@@ -18,22 +24,38 @@ export default function QuizReview({
   userAnswers,
   returnToResults,
 }: ReviewQuestionProps) {
-  // Find indexes of questions answered incorrectly
+  // Find questions answered incorrectly
   const incorrectQuestions = userAnswers
-    .map((answer, index) => ({
-      index,
-      isCorrect: answer === quizData[index].answer,
+    .filter((answer) => !answer.isCorrect)
+    .map((item) => ({
+      ...item,
+      quizQA: quizData.find((q) => q.id === item.quizQAId),
     }))
-    .filter((item) => !item.isCorrect)
-    .map((item) => item.index);
+    .filter((item) => item.quizQA); // Filter out any items where quizQA is undefined
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
 
-  // Get the current question index from the list of incorrect questions
-  const currentQuestionIndex = incorrectQuestions[currentIndex];
-  const currentQuestion = quizData[currentQuestionIndex];
-  const userAnswer = userAnswers[currentQuestionIndex];
+  if (incorrectQuestions.length === 0) {
+    return (
+      <div className="text-center space-y-4">
+        <h2 className="text-2xl font-bold">Great job!</h2>
+        <p className="text-lg text-muted-foreground">You got all the questions right.</p>
+        <button
+          onClick={returnToResults}
+          className="bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 transition-colors"
+        >
+          Back to Results
+        </button>
+      </div>
+    );
+  }
+
+  // Get the current question from the list of incorrect questions
+  const currentIncorrectQuestion = incorrectQuestions[currentIndex];
+  const currentQuestion = currentIncorrectQuestion?.quizQA;
+  const userAnswer = currentIncorrectQuestion?.selectedOption;
+  const originalQuestionIndex = quizData.findIndex(q => q.id === currentQuestion?.id);
 
   const handlePrevious = () => {
     setCurrentIndex((prev) => Math.max(0, prev - 1));
@@ -81,14 +103,14 @@ export default function QuizReview({
       </div>
       <div>
         <h3 className="text-base md:text-lg font-semibold mb-4">
-          {currentQuestionIndex + 1}&#41; {currentQuestion.question}
+          {originalQuestionIndex + 1}&#41; {currentQuestion?.question}
         </h3>
         <div className="space-y-3">
-          {currentQuestion.options.map((opt) => (
+          {currentQuestion?.options.map((opt) => (
             <div key={opt}>
               <div
                 className={`p-3 text-sm rounded border ${
-                  showAnswer && opt === currentQuestion.answer
+                  showAnswer && opt === currentQuestion?.correctAnswer
                     ? "bg-lime-500/20 border-lime-500 text-white font-bold"
                     : opt === userAnswer
                     ? "bg-red-500/20 border-red-500 text-white"
@@ -97,13 +119,13 @@ export default function QuizReview({
               >
                 <div>{opt}</div>
                 {/* Show explanation below the correct answer only */}
-                {showAnswer && opt === currentQuestion.answer && (
+                {showAnswer && opt === currentQuestion?.correctAnswer && (
                   <div className="mt-4 p-4 bg-zinc-800 rounded border-l-4 border-primary">
                     <h4 className="font-semibold text-primary mb-2">
                       Explanation:
                     </h4>
                     <p className="text-xs font-medium">
-                      {currentQuestion.explanation}
+                      {currentQuestion?.explanation}
                     </p>
                   </div>
                 )}

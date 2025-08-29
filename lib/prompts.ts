@@ -68,14 +68,14 @@ Summary:
 ${summary}
 `;
 
+// CHANGE: This is YOUR version of QUIZ_PROMPT, which is essential for the adaptive quiz.
 export const QUIZ_PROMPT = (summary: string) => `
-You are an AI quiz generator. Based on the summary below, create 5 multiple choice questions (MCQs) that test understanding of the key concepts.
-
-Each MCQ must include:
-- "question": a well-structured, clear question.
-- "options": an array of exactly 4 plausible options.
-- "answer": the correct option from the list.
-- "explanation": a brief 1-2 sentence explanation that justifies the correct answer.
+Based on the following summary, generate up to 15 multiple-choice questions. Each question must have:
+- a "question" key.
+- an "options" key with an array of exactly 4 plausible options.
+- a "correctAnswer" key with the correct option as a string.
+- an "explanation" key with a brief 1-2 sentence explanation that justifies the correct answer.
+- a "difficulty" key with a value of 'Easy', 'Medium', or 'Hard'.
 
 Rules:
 - Do NOT include introductory or closing text.
@@ -87,16 +87,17 @@ Example format:
   {
     "question": "What is 2 + 2?",
     "options": ["1", "2", "3", "4"],
-    "answer": "4",
-    "explanation": "2 + 2 equals 4."
-  },
-  ...
+    "correctAnswer": "4",
+    "explanation": "2 + 2 equals 4.",
+    "difficulty": "Easy"
+  }
 ]
 
 Summary:
 ${summary}
 `;
 
+// CHANGE: Added new FLASHCARD_PROMPT from the original repo.
 export const FLASHCARD_PROMPT = (summary: string) => `
 You are an AI flashcard generator. Based on the summary below, create 10-15 flashcards in Term → Definition format that cover the most important concepts, definitions, and key points.
 
@@ -121,18 +122,14 @@ Example format:
   {
     "term": "Mitochondria",
     "definition": "Organelles in cells that produce energy through cellular respiration."
-  },
-  ...
+  }
 ]
 
 Summary:
 ${summary}
 `;
 
-
-// PDF-specific prompts
-
-
+// CHANGE: Added all new PDF-specific prompts from the original repo.
 export const FALLBACK_PROMPT_PDF = (title: string) => `
 You are a smart learning assistant that helps users understand educational content.
 
