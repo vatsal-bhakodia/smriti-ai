@@ -1,8 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
 @custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -47,7 +45,6 @@
   --color-color-2: var(----color-2);
   --color-color-1: var(----color-1);
   --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
-
   @keyframes rainbow {
     0% {
       background-position: 0%;
@@ -56,9 +53,7 @@
       background-position: 200%;
     }
   }
-
   --animate-marquee: marquee var(--duration) infinite linear;
-
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite
 ;
   @keyframes marquee {
@@ -71,7 +66,6 @@
     transform: translateY(0);}
   to {
     transform: translateY(calc(-100% - var(--gap)));}}}
-
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -111,7 +105,6 @@
   --color-4: hsl(195 100% 63%);
   --color-5: hsl(90 100% 63%);
 }
-
 .dark {
   --background: #000;
   --foreground: oklch(0.985 0 0);
@@ -150,7 +143,6 @@
   --color-4: hsl(195 100% 63%);
   --color-5: hsl(90 100% 63%);
 }
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -159,47 +151,38 @@
     @apply bg-background text-foreground;
   }
 }
-
 body {
   font-family: var(--font-poppins);
 }
-
 @theme {
   --color-primary: #adff2f;
 }
-
 /* Webkit-based browsers (Chrome, Edge, Safari) */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-
 ::-webkit-scrollbar-track {
   background: transparent; /* Invisible track */
 }
-
 ::-webkit-scrollbar-thumb {
   background: rgba(100, 100, 100, 0.4); /* Subtle dark gray */
   border-radius: 4px;
   transition: background 0.3s;
 }
-
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(100, 100, 100, 0.6); /* Slightly darker on hover */
 }
-
 /* Firefox */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
 }
-
 .markdown-body {
   line-height: 1.7;
   font-size: 1rem;
   color: #e4e4e7; /* Tailwind zinc-200 */
 }
-
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3 {
@@ -208,7 +191,6 @@ body {
   margin-bottom: 0.75rem;
   color: #fff;
 }
-
 .markdown-body h1 {
   font-size: 1.875rem; /* ~text-3xl */
 }
@@ -218,26 +200,21 @@ body {
 .markdown-body h3 {
   font-size: 1.25rem; /* ~text-xl */
 }
-
 .markdown-body p {
   margin-bottom: 1rem;
   color: #d4d4d8; /* Tailwind zinc-300 */
 }
-
 .markdown-body ul,
 .markdown-body ol {
   padding-left: 1.25rem;
   margin-bottom: 1rem;
 }
-
 .markdown-body ul {
   list-style-type: disc;
 }
-
 .markdown-body li {
   margin-bottom: 0.5rem;
 }
-
 .markdown-body code {
   background-color: #27272a; /* Tailwind zinc-800 */
   padding: 0.2rem 0.4rem;
@@ -246,7 +223,6 @@ body {
   font-size: 0.875rem;
   color: var(--color-primary);
 }
-
 .markdown-body pre {
   background-color: #1e1e1e;
   padding: 1rem;
@@ -255,7 +231,6 @@ body {
   font-family: monospace;
   font-size: 0.875rem;
 }
-
 .markdown-body blockquote {
   border-left: 4px solid var(--color-primary);
   padding-left: 1rem;
@@ -263,30 +238,24 @@ body {
   margin: 1rem 0;
   font-style: italic;
 }
-
 .markdown-body {
   transition: color 0.2s ease, background-color 0.2s ease;
 }
-
 /* ===== PHONE INPUT STYLES ===== */
 .phone-input-container {
   width: 100% !important;
   position: relative !important;
 }
-
 .phone-input-container .react-tel-input {
   width: 100% !important;
   position: relative !important;
 }
-
 /* Phone input field and button styles now handled via inline styles in component */
-
 /* React Tel Input component specific styles */
 .react-tel-input {
   width: 100% !important;
   position: relative !important;
 }
-
 .react-tel-input .form-control {
   width: 100% !important;
   background-color: #27272a !important;
@@ -299,16 +268,13 @@ body {
   outline: none !important;
   box-sizing: border-box !important;
 }
-
 .react-tel-input .form-control:focus {
   border-color: var(--color-primary) !important;
   box-shadow: 0 0 0 2px var(--color-primary) !important;
 }
-
 .react-tel-input .form-control::placeholder {
   color: #9ca3af !important;
 }
-
 .react-tel-input .flag-dropdown {
   background-color: transparent !important;
   border: none !important;
@@ -323,11 +289,9 @@ body {
   justify-content: center !important;
   border-radius: 8px 0 0 8px !important;
 }
-
 .react-tel-input .flag-dropdown:hover {
   background-color: rgba(82, 82, 91, 0.3) !important;
 }
-
 .react-tel-input .selected-flag {
   background: transparent !important;
   border: none !important;
@@ -339,17 +303,14 @@ body {
   align-items: center !important;
   justify-content: center !important;
 }
-
 .react-tel-input .selected-flag:hover,
 .react-tel-input .selected-flag:focus {
   background-color: transparent !important;
   outline: none !important;
 }
-
 .react-tel-input .flag-dropdown.open .selected-flag {
   background-color: rgba(82, 82, 91, 0.3) !important;
 }
-
 .react-tel-input .country-list {
   background-color: #27272a !important;
   border: 1px solid #3f3f46 !important;
@@ -360,14 +321,12 @@ body {
   overflow-y: auto !important;
   margin-top: 4px !important;
 }
-
 .react-tel-input .country-list .search {
   background-color: #27272a !important;
   color: white !important;
   border-bottom: 1px solid #3f3f46 !important;
   padding: 8px !important;
 }
-
 .react-tel-input .country-list .search-box {
   background-color: #27272a !important;
   color: white !important;
@@ -377,54 +336,43 @@ body {
   outline: none !important;
   width: 100% !important;
 }
-
 .react-tel-input .country-list .search-box:focus {
   border-color: var(--color-primary) !important;
 }
-
 .react-tel-input .country-list .country {
   background-color: #27272a !important;
   color: white !important;
   padding: 8px 12px !important;
   border-bottom: 1px solid #3f3f46 !important;
 }
-
 .react-tel-input .country-list .country:hover {
   background-color: #3f3f46 !important;
 }
-
 .react-tel-input .country-list .country.highlight {
   background-color: var(--color-primary) !important;
 }
-
 .react-tel-input .country-list .country:last-child {
   border-bottom: none !important;
 }
-
 .react-tel-input .country-list .country .dial-code {
   color: #9ca3af !important;
 }
-
 .react-tel-input .country-list .country .country-name {
   color: white !important;
 }
-
 .cl-socialButtonsBlockButton__google:hover {
   background: #222 !important;
   color: #222 !important;
   border: 1px solid #484847 !important;
   transition: all 0.2s;
 }
-
 .dark-time-picker {
   color-scheme: dark;
 }
-
 /* Flashcard flip animation */
 .flashcard-container {
   perspective: 1000px;
 }
-
 .flashcard {
   position: relative;
   width: 100%;
@@ -432,11 +380,9 @@ body {
   transform-style: preserve-3d;
   transition: transform 0.6s;
 }
-
 .flashcard.flipped {
   transform: rotateY(180deg);
 }
-
 .flashcard-front,
 .flashcard-back {
   position: absolute;
@@ -449,7 +395,25 @@ body {
   padding: 2rem;
   border-radius: 0.5rem;
 }
-
 .flashcard-back {
   transform: rotateY(180deg);
+}
+
+/* ===== NEW STYLES FOR HOW SMriti AI WORKS SECTION ===== */
+.step-card-shadow {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.hover\:glow:hover {
+  box-shadow: 0 0 8px rgba(74, 224, 142, 0.3);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.hover\:animate-pulse:hover {
+  animation: pulse 0.5s ease-in-out;
 }
