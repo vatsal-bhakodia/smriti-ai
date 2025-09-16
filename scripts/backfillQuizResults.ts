@@ -19,7 +19,7 @@
  *
  * Safety:
  *  - Default is DRY_RUN=true to avoid accidental writes
- *  - Idempotent: only updates rows where userId IS NULL
+ *  - Idempotent: updates are guarded so they only apply when userId IS NULL
  */
 
 import { PrismaClient } from '@prisma/client';
@@ -110,19 +110,25 @@ async function applyBatch(rows: Row[], batchNo: number) {
     return { fetched, updated: 0, lastId };
   }
 
-  // Build transactional update operations
+  // Use updateMany with guard on userId=null to avoid overwriting concurrent writes
   const ops = updates.map(u =>
-    prisma.quizResult.update({
-      where: { id: u.id },
+    prisma.quizResult.updateMany({
+      where: { id: u.id, userId: null },
       data: { userId: u.userId },
     }),
   );
 
-  const tx = await prisma.$transaction(ops, { timeout: 120000 });
+  const tx = (await prisma.$transaction(ops, { timeout: 120000 })) as Array<{ count: number }>;
 
-  console.log(`Batch #${batchNo}: applied ${tx.length} updates. IDs: ${updates.map(u => u.id).join(', ')}`);
+  const totalApplied = tx.reduce((sum, r) => sum + (r.count ?? 0), 0);
 
-  return { fetched, updated: tx.length, lastId };
+  console.log(
+    `Batch #${batchNo}: attempted ${updates.length} conditional updates, applied ${totalApplied} updates. IDs: ${updates
+      .map(u => u.id)
+      .join(', ')}`,
+  );
+
+  return { fetched, updated: totalApplied, lastId };
 }
 
 async function main() {
