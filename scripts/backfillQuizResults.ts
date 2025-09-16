@@ -28,6 +28,7 @@ const prisma = new PrismaClient();
 
 const DRY_RUN = (process.env.DRY_RUN ?? 'true').toLowerCase() === 'true';
 const BATCH_SIZE = Number(process.env.BATCH_SIZE ?? 200);
+const MAX_LOG_IDS = 50; // limit IDs printed per batch to avoid huge logs
 
 type Row = {
   id: string;
@@ -110,7 +111,7 @@ async function applyBatch(rows: Row[], batchNo: number) {
     return { fetched, updated: 0, lastId };
   }
 
-  // Use updateMany with guard on userId=null to avoid overwriting concurrent writes
+  // Build transactional updateMany operations guarded by userId === null
   const ops = updates.map(u =>
     prisma.quizResult.updateMany({
       where: { id: u.id, userId: null },
@@ -118,17 +119,36 @@ async function applyBatch(rows: Row[], batchNo: number) {
     }),
   );
 
-  const tx = (await prisma.$transaction(ops, { timeout: 120000 })) as Array<{ count: number }>;
+  // Run transaction: results will be an array of { count: number }
+  const results = (await prisma.$transaction(ops, { timeout: 120000 })) as Array<{ count: number }>;
 
-  const totalApplied = tx.reduce((sum, r) => sum + (r.count ?? 0), 0);
+  // Determine which updates applied
+  const appliedIds: string[] = [];
+  for (let i = 0; i < results.length; i++) {
+    if ((results[i]?.count ?? 0) > 0) {
+      appliedIds.push(updates[i].id);
+    }
+  }
 
-  console.log(
-    `Batch #${batchNo}: attempted ${updates.length} conditional updates, applied ${totalApplied} updates. IDs: ${updates
-      .map(u => u.id)
-      .join(', ')}`,
-  );
+  const applied = appliedIds.length;
+  const skipped = updates.length - applied;
 
-  return { fetched, updated: totalApplied, lastId };
+  // Log summary of the batch (concise)
+  let summaryMsg = `Batch #${batchNo}: applied ${applied}/${updates.length} updates`;
+  if (skipped) summaryMsg += `, skipped ${skipped} (likely concurrent changes)`;
+  summaryMsg += '.';
+  console.log(summaryMsg);
+
+  if (applied > 0) {
+    const idsToLog = appliedIds.slice(0, MAX_LOG_IDS);
+    console.log(
+      `IDs updated (first ${idsToLog.length}${applied > MAX_LOG_IDS ? ` of ${applied}` : ''}): ${idsToLog.join(
+        ', ',
+      )}${applied > MAX_LOG_IDS ? ' ...' : ''}`,
+    );
+  }
+
+  return { fetched, updated: applied, lastId };
 }
 
 async function main() {
