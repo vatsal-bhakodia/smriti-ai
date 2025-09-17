@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React,{ useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRightIcon } from "lucide-react";
@@ -28,6 +28,20 @@ const itemVariants = {
 
 const Hero = () => {
   const { isSignedIn } = useUser();
+  const headlines = [
+    "Phadlo Chahe Kahi se, Yaad Hoga Yahi se.", // Hindi
+    "Study Anywhere, Remember Everything Here.", // English
+  ];
+
+  const [currentHeadline, setCurrentHeadline] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHeadline((prev) => (prev + 1) % headlines.length);
+    }, 4000); // switch every 4s
+
+    return () => clearInterval(interval);
+  }, []);
 
   const linkHref = isSignedIn ? "/dashboard" : "/sign-up";
   return (
@@ -46,13 +60,13 @@ const Hero = () => {
       <OpenSourceBtn />
 
       <motion.div variants={itemVariants}>
-        <TextAnimate
+         <TextAnimate
           animation="blurIn"
           as="h1"
           duration={1}
           className="font-display text-center text-3xl md:text-7xl font-bold w-full lg:w-auto max-w-4xl mx-auto"
         >
-          Phadlo Chahe Kahi se, Yaad Hoga Yahi se.
+          {headlines[currentHeadline]}
         </TextAnimate>
       </motion.div>
       <motion.h2
@@ -86,4 +100,4 @@ const Hero = () => {
   );
 };
 
-export default Hero;
+export default Hero;
