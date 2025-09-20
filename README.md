@@ -80,6 +80,88 @@ Here’s a quick look at **Smriti AI in action** 👇
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
+
+📂 Project Folder Structure
+```
+📂 smriti-ai
+│
+├─ 📂 .github/
+│   ├─ 📂 workflows/
+│
+├─ 📂 app/
+│   ├─ 📂 (authenticated_Pages)/
+│   ├─ 📂 (public)/
+│   ├─ 📂 api/
+│   ├─ 📄 accessibility.css
+│   ├─ 📄 favicon.ico
+│   ├─ 📄 globals.css
+│   ├─ 📄 layout.tsx
+│   ├─ 📄 robots.ts
+│   └─ 📄 sitemap.ts
+│
+├─ 📂 components/
+│   ├─ 📂 accessibility/
+│   ├─ 📂 auth/
+│   ├─ 📂 blog/
+│   ├─ 📂 dashboard/
+│   ├─ 📂 flashcard/
+│   ├─ 📂 landing/
+│   ├─ 📂 magicui/
+│   ├─ 📂 mermaid/
+│   ├─ 📂 notes/
+│   ├─ 📂 quiz/
+│   ├─ 📂 topic/
+│   ├─ 📂 ui/
+│   │
+│   ├─ 📄 AuthGate.tsx
+│   ├─ 📄 Contact.tsx
+│   ├─ 📄 Footer.tsx
+│   ├─ 📄 authLeftPanel.tsx
+│   └─ 📄 navbar.tsx
+│
+├─ 📂 hooks/
+├─ 📂 lib/
+├─ 📂 prisma/
+│
+├─ 📂 public/
+│   ├─ 📂 about/
+│   ├─ 📂 blogs/
+│   ├─ 📂 contact/
+│   ├─ 📂 contributors/
+│   ├─ 📂 privacy-policy/
+│   ├─ 📂 sign-in/[[...sign-in]]/
+│   ├─ 📂 sign-up/[[...sign-up]]/
+│   ├─ 📂 terms-of-use/
+│   ├─ 📄 layout.tsx
+│   └─ 📄 page.tsx
+│
+├─ 📂 screenshots/
+├─ 📂 scripts/
+├─ 📂 testimonials/
+├─ 📂 types/
+├─ 📂 utils/
+│
+├─ 📄 .dockerignore
+├─ 📄 .env.sample
+├─ 📄 .gitignore
+├─ 📄 CODE_OF_CONDUCT.md
+├─ 📄 CONTRIBUTING.md
+├─ 📄 Contributors data.md
+├─ 📄 Dockerfile
+├─ 📄 docker-compose.yml
+├─ 📄 LEARN.md
+├─ 📄 LICENSE
+├─ 📄 README.md
+├─ 📄 components.json
+├─ 📄 eslint.config.mjs
+├─ 📄 middleware.ts
+├─ 📄 next.config.ts
+├─ 📄 package.json
+├─ 📄 package-lock.json
+├─ 📄 postcss.config.mjs
+└─ 📄 tsconfig.json
+
+```
 ## 🚀 Getting Started (Developer Mode)
 
 Follow these steps to set up Smriti AI locally:
