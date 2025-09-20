@@ -41,7 +41,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 40
+    "contributions": 41
   },
   {
     "login": "git-lakshy",
@@ -151,7 +151,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 6
+    "contributions": 7
   },
   {
     "login": "jainabhishek2004",
@@ -372,6 +372,28 @@
     "user_view_type": "public",
     "site_admin": false,
     "contributions": 3
+  },
+  {
+    "login": "Vandana-Ss",
+    "id": 101133391,
+    "node_id": "U_kgDOBgcsTw",
+    "avatar_url": "https://avatars.githubusercontent.com/u/101133391?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Vandana-Ss",
+    "html_url": "https://github.com/Vandana-Ss",
+    "followers_url": "https://api.github.com/users/Vandana-Ss/followers",
+    "following_url": "https://api.github.com/users/Vandana-Ss/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Vandana-Ss/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Vandana-Ss/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Vandana-Ss/subscriptions",
+    "organizations_url": "https://api.github.com/users/Vandana-Ss/orgs",
+    "repos_url": "https://api.github.com/users/Vandana-Ss/repos",
+    "events_url": "https://api.github.com/users/Vandana-Ss/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Vandana-Ss/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false,
+    "contributions": 2
   },
   {
     "login": "the-ayushm",
@@ -632,28 +654,6 @@
     "repos_url": "https://api.github.com/users/kushalnayakm/repos",
     "events_url": "https://api.github.com/users/kushalnayakm/events{/privacy}",
     "received_events_url": "https://api.github.com/users/kushalnayakm/received_events",
-    "type": "User",
-    "user_view_type": "public",
-    "site_admin": false,
-    "contributions": 1
-  },
-  {
-    "login": "Sejal-collection",
-    "id": 187588842,
-    "node_id": "U_kgDOCy5g6g",
-    "avatar_url": "https://avatars.githubusercontent.com/u/187588842?v=4",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/Sejal-collection",
-    "html_url": "https://github.com/Sejal-collection",
-    "followers_url": "https://api.github.com/users/Sejal-collection/followers",
-    "following_url": "https://api.github.com/users/Sejal-collection/following{/other_user}",
-    "gists_url": "https://api.github.com/users/Sejal-collection/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/Sejal-collection/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/Sejal-collection/subscriptions",
-    "organizations_url": "https://api.github.com/users/Sejal-collection/orgs",
-    "repos_url": "https://api.github.com/users/Sejal-collection/repos",
-    "events_url": "https://api.github.com/users/Sejal-collection/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/Sejal-collection/received_events",
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
