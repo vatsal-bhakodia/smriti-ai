@@ -98,12 +98,12 @@ const Footer = () => {
     product: [
       { name: "Features", href: "#features" },
       { name: "Pricing", href: "#pricing" },
-      { name: "Study Tools", href: "#" },
-      { name: "Mind Maps", href: "#" },
+      { name: "Study Tools", href: "/sign-in" },
+      { name: "Mind Maps", href: "/sign-in" },
     ],
     company: [
       { name: "About Us", href: "/about" },
-      { name: "Blog", href: "#" },
+      { name: "Blog", href: "/blogs" },
       { name: "Contact", href: "/contact" },
       {
         name: "Our Contributors",
