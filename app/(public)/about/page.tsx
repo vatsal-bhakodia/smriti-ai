@@ -83,6 +83,7 @@ export default function AboutPage() {
       highlight: "Global Impact",
     },
   ];
+  
 
   const stats = [
     { number: 1000, label: "Active Learners", suffix: "+" },
@@ -136,22 +137,25 @@ export default function AboutPage() {
       </div>
       {/* Stats Section */}
       <div className="max-w-7xl mx-auto px-6 md:px-20 mb-20">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
-          {stats.map((stat, index) => (
-            <div key={index} className="text-center group">
-              <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 hover:bg-primary/10 transition-colors">
-                <div className="text-4xl md:text-5xl font-bold text-primary mb-3">
-                  <NumberTicker value={stat.number} />
-                  {stat.suffix}
-                </div>
-                <p className="text-white/60 text-sm md:text-base font-medium">
-                  {stat.label}
-                </p>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
+        {stats.map((stat, index) => (
+          <div key={index} className="text-center group">
+            <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 hover:bg-primary/10 transition-colors">
+              <div className="text-4xl md:text-5xl font-bold text-primary mb-3">
+                <NumberTicker 
+                  value={stat.number}
+                  suffix={stat.suffix}
+                  enableKFormat={stat.suffix === "+"}
+                />
               </div>
+              <p className="text-white/60 text-sm md:text-base font-medium">
+                {stat.label}
+              </p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
+    </div>
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-6 md:px-20 mb-20">
         <div className="text-center mb-12">

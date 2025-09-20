@@ -11,6 +11,8 @@ interface NumberTickerProps extends ComponentPropsWithoutRef<"span"> {
   direction?: "up" | "down";
   delay?: number;
   decimalPlaces?: number;
+  suffix?: string; 
+  enableKFormat?: boolean; 
 }
 
 export function NumberTicker({
@@ -20,6 +22,8 @@ export function NumberTicker({
   delay = 0,
   className,
   decimalPlaces = 0,
+  suffix = "",
+  enableKFormat = false,
   ...props
 }: NumberTickerProps) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -29,6 +33,20 @@ export function NumberTicker({
     stiffness: 100,
   });
   const isInView = useInView(ref, { once: true, margin: "0px" });
+
+  // Internal formatting function
+  const formatNumber = (num: number) => {
+    if (enableKFormat && num >= 1000 && suffix === "+") {
+      const kValue = Math.floor(num / 1000);
+      return `${kValue}k+`;
+    }
+    
+    if (decimalPlaces > 0) {
+      return `${num.toFixed(decimalPlaces)}${suffix}`;
+    }
+    
+    return `${Math.floor(num)}${suffix}`;
+  };
 
   useEffect(() => {
     if (isInView) {
@@ -43,13 +61,11 @@ export function NumberTicker({
     () =>
       springValue.on("change", (latest) => {
         if (ref.current) {
-          ref.current.textContent = Intl.NumberFormat("en-US", {
-            minimumFractionDigits: decimalPlaces,
-            maximumFractionDigits: decimalPlaces,
-          }).format(Number(latest.toFixed(decimalPlaces)));
+          const numericValue = Number(latest.toFixed(decimalPlaces));
+          ref.current.textContent = formatNumber(numericValue);
         }
       }),
-    [springValue, decimalPlaces]
+    [springValue, decimalPlaces, suffix, enableKFormat, value]
   );
 
   return (
@@ -58,7 +74,7 @@ export function NumberTicker({
       className={cn("inline-block tabular-nums tracking-wide", className)}
       {...props}
     >
-      {startValue}
+      {formatNumber(startValue)}
     </span>
   );
 }

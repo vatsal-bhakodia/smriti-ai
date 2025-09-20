@@ -36,7 +36,7 @@
     "@types/canvas-confetti": "^1.9.0",
     "anki-apkg-export": "^4.0.3",
     "autoprefixer": "^10.4.21",
-    "axios": "^1.8.4",
+    "axios": "^1.12.2",
     "canvas-confetti": "^1.9.3",
     "chart.js": "^4.5.0",
     "class-variance-authority": "^0.7.1",
@@ -64,6 +64,7 @@
     "tailwind-merge": "^3.2.0",
     "tw-animate-css": "^1.2.5",
     "twilio": "^5.5.2",
+    "typed.js": "^2.1.0",
     "youtube-transcript": "^1.2.1"
   },
   "devDependencies": {
@@ -73,6 +74,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/typed.js": "^2.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
     "prisma": "^6.14.0",

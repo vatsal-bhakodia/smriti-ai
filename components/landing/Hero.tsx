@@ -1,20 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRightIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-
 import { Button } from "@/components/ui/button";
-import { TextAnimate } from "@/components/magicui/text-animate";
 import { DotPattern } from "@/components/magicui/dot-pattern";
 
 import AnimatedImage from "@/components/landing/AnimatedImage";
-
 import { useUser } from "@clerk/nextjs";
 import { OpenSourceBtn } from "@/components/landing/openSourceBtn";
+
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -26,10 +24,28 @@ const itemVariants = {
   visible: { opacity: 1 },
 };
 
+
+const sentences = [
+  "Phadlo Chahe Kahi se, Yaad Hoga Yahi se.",
+  "Where your learning transforms into lasting knowledge.",
+];
+
+
 const Hero = () => {
   const { isSignedIn } = useUser();
+  const [index, setIndex] = useState(0);
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((i) => (i + 1) % sentences.length);
+    }, 3000); 
+    return () => clearInterval(interval);
+  }, [])
+
 
   const linkHref = isSignedIn ? "/dashboard" : "/sign-up";
+
   return (
     <motion.div
       className="relative z-10 flex flex-col items-center justify-start min-h-screen space-y-4 px-4 pb-12"
@@ -46,14 +62,24 @@ const Hero = () => {
       <OpenSourceBtn />
 
       <motion.div variants={itemVariants}>
-        <TextAnimate
-          animation="blurIn"
-          as="h1"
-          duration={1}
-          className="font-display text-center text-3xl md:text-7xl font-bold w-full lg:w-auto max-w-4xl mx-auto"
-        >
-          Phadlo Chahe Kahi se, Yaad Hoga Yahi se.
-        </TextAnimate>
+        <h1 className="font-display text-center text-3xl md:text-7xl font-bold w-full lg:w-auto max-w-4xl mx-auto">
+          <div className="w-full flex items-center justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8 }}               // fade duration
+                className="h-[3em] flex items-center justify-center text-center overflow-hidden px-4 leading-[1]"
+              >
+                <span className="break-words">
+                  {sentences[index]}
+                </span>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </h1>
       </motion.div>
       <motion.h2
         className="mt-2 text-base md:text-xl text-gray-400 tracking-normal text-center max-w-2xl mx-auto z-10"
