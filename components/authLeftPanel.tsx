@@ -8,6 +8,8 @@ const LeftSidePanel = () => {
     <div className="hidden lg:block h-[600px] relative overflow-hidden ">
       <Image
         src="/brain.png"
+        width={500}
+        height={500}
         alt="AI Learning Brain"
         className="object-contain w-100 h-100 mx-auto mt-10 opacity-75 "
       />
