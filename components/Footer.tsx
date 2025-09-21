@@ -74,22 +74,18 @@ const Footer = () => {
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash) {
       const el = document.querySelector(window.location.hash);
-      if (el) {
-        // Scroll smoothly to the element
-        el.scrollIntoView({ behavior: "smooth" });
-      }
+      if (el) el.scrollIntoView({ behavior: "smooth" });
     }
   }, [pathname]);
 
   const handleNav = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#")) {
       e.preventDefault();
-
       if (pathname === "/") {
         const el = document.querySelector(href);
         if (el) el.scrollIntoView({ behavior: "smooth" });
       } else {
-        router.push("/" + href); // example: "/#pricing"
+        router.push("/" + href);
       }
     }
   };
@@ -105,45 +101,37 @@ const Footer = () => {
       { name: "About Us", href: "/about" },
       { name: "Blog", href: "#" },
       { name: "Contact", href: "/contact" },
-      {
-        name: "Our Contributors",
-        href: "https://github.com/vatsal-bhakodia/smriti-ai/graphs/contributors",
-      },
+      { name: "Our Contributors", href: "https://github.com/vatsal-bhakodia/smriti-ai/graphs/contributors" },
     ],
     support: [
       { name: "Privacy Policy", href: "/privacy-policy" },
       { name: "Terms of Service", href: "/terms-of-use" },
-      {
-        name: "Project Status",
-        href: "https://github.com/vatsal-bhakodia/smriti-ai/actions",
-      },
+      { name: "Project Status", href: "https://github.com/vatsal-bhakodia/smriti-ai/actions" },
     ],
   };
 
   return (
     <footer className="bg-black border-t border-neutral-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="flex items-center group">
-              <Link href="/" className="flex items-center">
-                <div className="relative">
-                  <Brain className="me-[5px] h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
-                  <div className="absolute inset-0 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-                <span className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
-                  Smriti AI
-                </span>
-              </Link>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8">
+          {/* Branding & Social Links */}
+          <div className="lg:col-span-2 flex flex-col items-center text-center space-y-6">
+            <Link href="/" className="flex items-center justify-center">
+              <div className="relative">
+                <Brain className="me-[5px] h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <span className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
+                Smriti AI
+              </span>
+            </Link>
+
             <p className="text-gray-400 text-sm max-w-md leading-relaxed">
-              Transform passive learning into active remembering. Smriti AI
-              helps you retain knowledge faster with AI-powered study tools and
-              spaced repetition.
+              Transform passive learning into active remembering. Smriti AI helps you retain knowledge faster with AI-powered study tools and spaced repetition.
             </p>
 
             {/* Social Links */}
-            <div className="flex space-x-4 mt-4">
+            <div className="flex justify-center space-x-4 mt-2">
               {socialLinks.map((link) => (
                 <a
                   key={link.name}
@@ -158,22 +146,18 @@ const Footer = () => {
               ))}
             </div>
           </div>
+
+          {/* Footer Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category} className="space-y-4">
-              <h3 className="text-white font-semibold text-sm uppercase tracking-wider">
-                {category}
-              </h3>
+            <div key={category} className="space-y-4 text-center sm:text-left">
+              <h3 className="text-white font-semibold text-sm uppercase tracking-wider">{category}</h3>
               <ul className="space-y-3">
                 {links.map((link, index) => (
                   <li key={index}>
                     <Link
                       href={link.href}
-                      onClick={
-                        link.href.startsWith("#")
-                          ? (e) => handleNav(e, link.href)
-                          : undefined
-                      }
-                      className="group flex items-center text-gray-400 hover:text-primary text-sm transition-all duration-300 hover:translate-x-1"
+                      onClick={link.href.startsWith("#") ? (e) => handleNav(e, link.href) : undefined}
+                      className="group flex items-center justify-center sm:justify-start text-gray-400 hover:text-primary text-sm transition-all duration-300 hover:translate-x-1"
                     >
                       <span>{link.name}</span>
                       <ArrowUpRight className="ml-1 h-3 w-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -186,18 +170,15 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="border-t border-neutral-900">
+      {/* Bottom Footer */}
+      <div className="border-t text-center border-neutral-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="md:flex md:items-center md:justify-between">
-            <div className="flex items-center space-x-4 text-sm text-gray-400">
-              <span>© {currentYear} Smriti AI. All rights reserved.</span>
-            </div>
-            <div className="mt-4 md:mt-0 text-sm text-gray-400 flex items-center space-x-2">
-              <div className="hidden md:flex items-center space-x-1">
-                <span>Made in India with</span>
-                <Heart className="h-3 w-3 text-red-500 animate-pulse" />
-                <span>for learners</span>
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-400 space-y-3 sm:space-y-0">
+            <span>© {currentYear} Smriti AI. All rights reserved.</span>
+            <div className="flex items-center space-x-1 justify-center sm:justify-start">
+              <span>Made in India with</span>
+              <Heart className="h-3 w-3 text-red-500 animate-pulse" />
+              <span>for learners</span>
             </div>
           </div>
         </div>
