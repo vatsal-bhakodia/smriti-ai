@@ -19,7 +19,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 166
+    "contributions": 168
   },
   {
     "login": "actions-user",
@@ -41,7 +41,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 42
+    "contributions": 43
   },
   {
     "login": "git-lakshy",
@@ -63,7 +63,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 18
+    "contributions": 20
   },
   {
     "login": "Ashish001sing",
@@ -506,6 +506,28 @@
     "contributions": 2
   },
   {
+    "login": "KartikeyaGupta05",
+    "id": 151367534,
+    "node_id": "U_kgDOCQWvbg",
+    "avatar_url": "https://avatars.githubusercontent.com/u/151367534?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/KartikeyaGupta05",
+    "html_url": "https://github.com/KartikeyaGupta05",
+    "followers_url": "https://api.github.com/users/KartikeyaGupta05/followers",
+    "following_url": "https://api.github.com/users/KartikeyaGupta05/following{/other_user}",
+    "gists_url": "https://api.github.com/users/KartikeyaGupta05/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/KartikeyaGupta05/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/KartikeyaGupta05/subscriptions",
+    "organizations_url": "https://api.github.com/users/KartikeyaGupta05/orgs",
+    "repos_url": "https://api.github.com/users/KartikeyaGupta05/repos",
+    "events_url": "https://api.github.com/users/KartikeyaGupta05/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/KartikeyaGupta05/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false,
+    "contributions": 2
+  },
+  {
     "login": "Indhuvanguru",
     "id": 191600123,
     "node_id": "U_kgDOC2uV-w",
@@ -632,28 +654,6 @@
     "repos_url": "https://api.github.com/users/revanthsaich/repos",
     "events_url": "https://api.github.com/users/revanthsaich/events{/privacy}",
     "received_events_url": "https://api.github.com/users/revanthsaich/received_events",
-    "type": "User",
-    "user_view_type": "public",
-    "site_admin": false,
-    "contributions": 1
-  },
-  {
-    "login": "kushalnayakm",
-    "id": 147125616,
-    "node_id": "U_kgDOCMT1cA",
-    "avatar_url": "https://avatars.githubusercontent.com/u/147125616?v=4",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/kushalnayakm",
-    "html_url": "https://github.com/kushalnayakm",
-    "followers_url": "https://api.github.com/users/kushalnayakm/followers",
-    "following_url": "https://api.github.com/users/kushalnayakm/following{/other_user}",
-    "gists_url": "https://api.github.com/users/kushalnayakm/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/kushalnayakm/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/kushalnayakm/subscriptions",
-    "organizations_url": "https://api.github.com/users/kushalnayakm/orgs",
-    "repos_url": "https://api.github.com/users/kushalnayakm/repos",
-    "events_url": "https://api.github.com/users/kushalnayakm/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/kushalnayakm/received_events",
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
