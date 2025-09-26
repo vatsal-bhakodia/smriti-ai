@@ -1,18 +1,31 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { Marquee } from "@/components/magicui/marquee";
-import { reviews } from "@/testimonals/reviews";
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+import AddTestimonial from "./AddTestimonial";
+import { Rating } from "react-simple-star-rating";
 
-const firstRow = reviews.slice(0, reviews.length / 2);
-const secondRow = reviews.slice(reviews.length / 2);
+interface Review {
+  id: string;
+  body: string;
+  name: string;
+  img: string;
+  rating: number;
+}
 
 const ReviewCard = ({
   img,
   name,
   body,
+  rating,
 }: {
   img: string;
   name: string;
   body: string;
+  rating: number;
 }) => {
   return (
     <figure
@@ -32,12 +45,78 @@ const ReviewCard = ({
           </figcaption>
         </div>
       </div>
+      <Rating
+          initialValue={rating}
+          readonly
+          size={20}
+          SVGstyle={{ display: "inline" }}
+      />
       <blockquote className="mt-2 text-sm">{body}</blockquote>
     </figure>
   );
 };
 
 export default function Testimonials() {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const supabase = createClient();
+
+  const handleNewReview = (newReview: Review) => {
+    setReviews((currentReviews) => [newReview, ...currentReviews]);
+  };
+
+  useEffect(() => {
+    const getTestimonials = async () => {
+      const { data, error } = await supabase
+        .from("testimonial")
+        .select('id, body, userId, username, rating');
+
+      if (error) {
+        console.error("Error fetching testimonials:", error);
+        return;
+      }
+      
+      if (data) {
+      const formattedReviews = data.map((t: { id: string; body: string; userId: string; username?: string, rating: number }) => ({
+        id: t.id,
+        body: t.body,
+        name: t.username || "SmritiAI User",
+        img: `https://i.pravatar.cc/100?u=${t.userId}`,
+        rating: t.rating,
+      }));
+        setReviews(formattedReviews);
+      }
+    };
+
+    getTestimonials();
+
+    const channel: RealtimeChannel = supabase
+      .channel('realtime-testimonials')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'testimonial' },
+        (payload: { new: { id: string; body: string; userId: string; username: string, rating: number } }) => {
+          const newReview = payload.new;
+        
+          const formattedNewReview: Review = {
+            id: newReview.id,
+            body: newReview.body,
+            name: newReview.username || "Anonymous",
+            img: `https://i.pravatar.cc/100?u=${newReview.userId}`,
+            rating: newReview.rating,
+          };
+          setReviews((currentReviews) => [formattedNewReview, ...currentReviews]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
+
+  const firstRow = reviews.slice(0, reviews.length / 2);
+  const secondRow = reviews.slice(reviews.length / 2);
+  
   return (
     <section id="testimonials" className="w-full text-white px-6 md:px-20 py-24 relative">
         <div className="text-center mb-16">
@@ -49,20 +128,25 @@ export default function Testimonials() {
             Discover how Smriti AI helps learners retain knowledge longer and faster.
             </p>
         </div>
+
+
+        {/* FIX 4: Added the Marquee display components back in */}
         <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
             <Marquee pauseOnHover className="[--duration:20s]">
                 {firstRow.map((review) => (
-                <ReviewCard key={review.username} {...review} />
+                <ReviewCard key={review.id} {...review} />
                 ))}
             </Marquee>
             <Marquee reverse pauseOnHover className="[--duration:20s]">
                 {secondRow.map((review) => (
-                <ReviewCard key={review.username} {...review} />
+                <ReviewCard key={review.id} {...review} />
                 ))}
             </Marquee>
             <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
             <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
         </div>
+
+        <AddTestimonial onReviewSubmit={handleNewReview}/>
     </section>
   );
 }
