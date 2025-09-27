@@ -64,7 +64,6 @@ export default function AddTestimonial({ onReviewSubmit }: { onReviewSubmit: (ne
     const supabase = createClient();
 
     const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
-    const normalizedRating = Math.round(rating / 20);
 
     const { data: newReview, error } = await supabase
       .from("testimonial")
@@ -72,7 +71,7 @@ export default function AddTestimonial({ onReviewSubmit }: { onReviewSubmit: (ne
         body: reviewText.trim(),
         userId: user.id,
         username: displayName || "SmritiAI User",
-        rating: normalizedRating,
+        rating: rating,
       })
       .select()
       .single();
@@ -91,7 +90,7 @@ export default function AddTestimonial({ onReviewSubmit }: { onReviewSubmit: (ne
         body: newReview.body,
         name: newReview.username || "SmritiAI User",
         img: `https://i.pravatar.cc/100?u=${newReview.userId}`,
-        rating: (newReview.rating ?? normalizedRating) * 20,
+        rating: newReview.rating,
       };
       onReviewSubmit(formattedReview);
     }
