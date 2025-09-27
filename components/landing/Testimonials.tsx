@@ -86,7 +86,7 @@ export default function Testimonials() {
         body: t.body,
         name: t.username || "SmritiAI User",
         img: `https://i.pravatar.cc/100?u=${t.userId}`,
-        rating: t.rating,
+        rating: (t.rating ?? 0) * 20,
       }));
         setReviews(formattedReviews);
       }
@@ -107,7 +107,7 @@ export default function Testimonials() {
             body: newReview.body,
             name: newReview.username || "Anonymous",
             img: `https://i.pravatar.cc/100?u=${newReview.userId}`,
-            rating: newReview.rating,
+            rating: (newReview.rating ?? 0) * 20,
           };
           
           setReviews((currentReviews) => {
