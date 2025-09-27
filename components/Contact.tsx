@@ -104,6 +104,9 @@ const Contact = () => {
 
         if (!validateForm() || !captcha) {
             toast.error("Please fix the errors in the form");
+            if (!captcha) {
+                refreshCaptcha();
+            }
             return;
         }
 
@@ -125,35 +128,60 @@ const Contact = () => {
                 }),
             });
 
-            const data = await response.json();
+            const rawBody = await response.text();
+            let data: Record<string, unknown> | null = null;
+
+            const isHtmlResponse = rawBody.trim().startsWith("<");
+
+            if (rawBody && !isHtmlResponse) {
+                try {
+                    data = JSON.parse(rawBody);
+                } catch (parseError) {
+                    data = null;
+                }
+            }
 
             if (!response.ok) {
-                if (
-                    response.status === 400 &&
-                    data.error === "Incorrect CAPTCHA answer."
-                ) {
+                const rawErrorMessage =
+                    (data?.error as string | undefined) ||
+                    (data?.message as string | undefined) ||
+                    rawBody ||
+                    "Failed to send message";
+
+                const errorMessage = rawErrorMessage.trim().startsWith("<")
+                    ? "The server sent an unexpected response. Please try again later or check your local setup."
+                    : rawErrorMessage;
+
+                if (response.status === 400 && errorMessage.toLowerCase().includes("captcha")) {
                     setCaptchaError("Wrong answer. Try again.");
                     refreshCaptcha();
                     setUserCaptcha("");
                     setIsSubmitting(false);
                     return;
                 }
-                if (data.message) {
-                    toast.error(data.message);
-                    setIsSubmitting(false);
-                    return;
-                }
+
                 if (response.status === 429) {
                     toast.error(
                         "You’ve reached the submission limit. Please try again later."
                     );
+                    refreshCaptcha();
+                    setUserCaptcha("");
                     setIsSubmitting(false);
                     return;
                 }
-                throw new Error(data.error || "Failed to send message");
+
+                toast.error(errorMessage);
+                refreshCaptcha();
+                setUserCaptcha("");
+                setIsSubmitting(false);
+                return;
             }
 
-            toast.success("Thank you for your message! We'll get back to you soon.");
+            const successMessage =
+                (data?.message as string | undefined) ||
+                (!isHtmlResponse && rawBody ? rawBody : "Thank you for your message! We'll get back to you soon.");
+
+            toast.success(successMessage);
 
             // Reset form
             setFormData({
@@ -164,7 +192,8 @@ const Contact = () => {
             });
             setErrors({});
             setUserCaptcha("");
-            setCaptcha(null);
+            setCaptchaError(null);
+            refreshCaptcha();
         } catch (error) {
             console.error("Error submitting contact form:", error);
             toast.error(
@@ -172,6 +201,8 @@ const Contact = () => {
                     ? error.message
                     : "Failed to send message. Please try again."
             );
+            refreshCaptcha();
+            setUserCaptcha("");
         } finally {
             setIsSubmitting(false);
         }
@@ -361,7 +392,7 @@ const Contact = () => {
                                     <motion.div variants={itemVariants}>
                                         <Button
                                             type="submit"
-                                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-full transition-all duration-200"
+                                            className=" cursor-pointer w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-full transition-all duration-200"
                                             disabled={isSubmitting}
                                             size="lg"
                                         >
@@ -372,7 +403,7 @@ const Contact = () => {
                                                 </>
                                             ) : (
                                                 <>
-                                                    <Send className="w-4 h-4 mr-2" />
+                                                    <Send className="w-4 h-4 mr-2 cursor-pointer" />
                                                     Send Message
                                                 </>
                                             )}
