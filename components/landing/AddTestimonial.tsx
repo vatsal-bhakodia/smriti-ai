@@ -49,10 +49,7 @@ export default function AddTestimonial({ onReviewSubmit }: { onReviewSubmit: (ne
 
     checkForReview();
   }, [user]);
-    };
-
-    checkForReview();
-  }, [user]);
+// (Removed duplicate hook tail)
 
   const handleRating = (rate: number) => {
     setRating(rate);
