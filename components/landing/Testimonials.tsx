@@ -140,8 +140,6 @@ export default function Testimonials() {
             </p>
         </div>
 
-
-        {/* FIX 4: Added the Marquee display components back in */}
         <div className="relative flex w-full flex-col items-center justify-center overflow-hidden">
             <Marquee pauseOnHover className="[--duration:20s]">
                 {firstRow.map((review) => (
