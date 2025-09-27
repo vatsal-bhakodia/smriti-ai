@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Marquee } from "@/components/magicui/marquee";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createClient } from "@/utils/supabase/client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import AddTestimonial from "./AddTestimonial";
@@ -58,10 +58,15 @@ const ReviewCard = ({
 
 export default function Testimonials() {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const handleNewReview = (newReview: Review) => {
-    setReviews((currentReviews) => [newReview, ...currentReviews]);
+    setReviews((currentReviews) => {
+      if (currentReviews.some((review) => review.id === newReview.id)) {
+        return currentReviews;
+      }
+      return [newReview, ...currentReviews];
+    });
   };
 
   useEffect(() => {
@@ -104,7 +109,13 @@ export default function Testimonials() {
             img: `https://i.pravatar.cc/100?u=${newReview.userId}`,
             rating: newReview.rating,
           };
-          setReviews((currentReviews) => [formattedNewReview, ...currentReviews]);
+          
+          setReviews((currentReviews) => {
+            if (currentReviews.some((review) => review.id === formattedNewReview.id)) {
+              return currentReviews;
+            }
+            return [formattedNewReview, ...currentReviews];
+          });
         }
       )
       .subscribe();

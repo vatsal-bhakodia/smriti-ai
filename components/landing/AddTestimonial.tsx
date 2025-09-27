@@ -31,7 +31,7 @@ export default function AddTestimonial({ onReviewSubmit }: { onReviewSubmit: (ne
     const checkForReview = async () => {
       setIsChecking(true);
       setHasSubmitted(false);
-
+      
       const supabase = createClient();
       const { count, error } = await supabase
         .from("testimonial")
