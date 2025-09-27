@@ -30,6 +30,8 @@ export default function AddTestimonial({ onReviewSubmit }: { onReviewSubmit: (ne
 
     const checkForReview = async () => {
       setIsChecking(true);
+      setHasSubmitted(false);
+
       const supabase = createClient();
       const { count, error } = await supabase
         .from("testimonial")
@@ -38,10 +40,15 @@ export default function AddTestimonial({ onReviewSubmit }: { onReviewSubmit: (ne
 
       if (error) {
         console.error("Error checking for existing review:", error);
-      } else if (count && count > 0) {
-        setHasSubmitted(true);
+      } else {
+        setHasSubmitted((count ?? 0) > 0);
       }
+
       setIsChecking(false);
+    };
+
+    checkForReview();
+  }, [user]);
     };
 
     checkForReview();
