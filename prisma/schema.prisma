@@ -24,6 +24,8 @@ model User {
   userAnswers   UserAnswer[]
   points        Int               @default(0)
   achievements  UserAchievement[]
+  interviewQuizzes InterviewQuiz[]
+  interviewResults InterviewResult[]
 }
 
 model Topic {
@@ -175,4 +177,43 @@ model UserAchievement {
   achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
 
   @@unique([userId, achievementId])
+}
+
+/// Interview Preparation: standalone quiz not tied to a Resource
+model InterviewQuiz {
+  id           String              @id @default(uuid())
+  userId       String
+  language     String              // e.g., "Python", "Java"
+  domain       String              // legacy single domain
+  domains      String[]            @default([]) // multiple domains (new)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  questions    InterviewQuestion[]
+  results      InterviewResult[]
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model InterviewQuestion {
+  id            String         @id @default(uuid())
+  quizId        String
+  question      String
+  options       String[]
+  correctAnswer String
+  explanation   String?
+  difficulty    String         @default("Medium")
+  createdAt     DateTime       @default(now())
+  quiz          InterviewQuiz  @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model InterviewResult {
+  id             String        @id @default(uuid())
+  quizId         String
+  userId         String
+  score          Int
+  totalQuestions Int           @default(0)
+  answers        Json?         // [{questionId, selectedOption}]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  quiz           InterviewQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
