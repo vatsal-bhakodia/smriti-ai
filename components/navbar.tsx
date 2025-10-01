@@ -15,6 +15,7 @@ const navigationLinks = [
   { href: "/contributors", label: "Contributors" },
   { href: "/blogs", label: "Blogs" },
   { href: "/contact", label: "Contact Us" },
+  { href: "/dashboard/interview", label: "Interview Prep" },
 ];
 
 // ---------------- Mobile Action Buttons ----------------
@@ -30,6 +31,12 @@ const mobileActionButtons: Array<{
     href: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
+    variant: "outline",
+    authRequired: true,
+  },
+  {
+    href: "/dashboard/interview",
+    label: "Interview Prep",
     variant: "outline",
     authRequired: true,
   },
