@@ -23,7 +23,7 @@ export default function InterviewQuizDetailPage({
     fetcher
   );
 
-  if (!quizId) return InterviewPrepPage;
+  if (!quizId) return <InterviewPrepPage />;
 
   const quiz = data?.quiz;
 
