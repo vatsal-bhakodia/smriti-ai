@@ -17,14 +17,10 @@ export default function SignInForm() {
   }, []);
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-neutral-900 -mt-16">
+    <main className="min-h-screen flex items-center justify-center bg-[#1e1e1e] -mt-16">
       <div className="w-full min-h-screen flex justify-center overflow-hidden">
         {/* Left Column */}
-        {isLargeScreen && (
-          <div className="hidden w-1/2 bg-[#111] lg:block">
-            <LeftSidePanel />
-          </div>
-        )}
+        {isLargeScreen && <LeftSidePanel />}
 
         {/* Right Column */}
         <div
@@ -81,5 +77,5 @@ export default function SignInForm() {
         </div>
       </div>
     </main>
-  )
+  );
 }

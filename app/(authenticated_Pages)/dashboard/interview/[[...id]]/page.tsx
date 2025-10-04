@@ -3,8 +3,9 @@
 import useSWR from "swr";
 import { use, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import InterviewPrepPage from "./interview";
 
 const fetcher: (url: string) => Promise<any> = (url: string) =>
   fetch(url).then((r) => r.json());
@@ -22,7 +23,7 @@ export default function InterviewQuizDetailPage({
     fetcher
   );
 
-  if (!quizId) return null;
+  if (!quizId) return InterviewPrepPage;
 
   const quiz = data?.quiz;
 
