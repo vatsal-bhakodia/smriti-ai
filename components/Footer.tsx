@@ -57,18 +57,20 @@ const Footer = () => {
       color: "hover:text-white",
     },
     {
-  name: "Discord",
-  href: "https://discord.gg/tN8HNxrzp8",
-  icon: (
-   <svg xmlns="http://www.w3.org/2000/svg"  
-   fill="currentColor" 
-   className="h-5 w-5"
-   viewBox="0 0 16 16">
-  <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"/>
-</svg>
-  ),
-  color: "hover:text-indigo-500",
-}
+      name: "Discord",
+      href: "https://discord.gg/tN8HNxrzp8",
+      icon: (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          className="h-5 w-5"
+          viewBox="0 0 16 16"
+        >
+          <path d="M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612" />
+        </svg>
+      ),
+      color: "hover:text-indigo-500",
+    },
   ];
 
   useEffect(() => {
@@ -94,19 +96,25 @@ const Footer = () => {
     product: [
       { name: "Features", href: "#features" },
       { name: "Pricing", href: "#pricing" },
-      { name: "Study Tools", href: "#" },
-      { name: "Mind Maps", href: "#" },
+      { name: "Study Tools", href: "/sign-in" },
+      { name: "Mind Maps", href: "/sign-in" },
     ],
     company: [
       { name: "About Us", href: "/about" },
-      { name: "Blog", href: "#" },
+      { name: "Blog", href: "/blogs" },
       { name: "Contact", href: "/contact" },
-      { name: "Our Contributors", href: "https://github.com/vatsal-bhakodia/smriti-ai/graphs/contributors" },
+      {
+        name: "Our Contributors",
+        href: "https://github.com/vatsal-bhakodia/smriti-ai/graphs/contributors",
+      },
     ],
     support: [
       { name: "Privacy Policy", href: "/privacy-policy" },
       { name: "Terms of Service", href: "/terms-of-use" },
-      { name: "Project Status", href: "https://github.com/vatsal-bhakodia/smriti-ai/actions" },
+      {
+        name: "Project Status",
+        href: "https://github.com/vatsal-bhakodia/smriti-ai/actions",
+      },
     ],
   };
 
@@ -115,23 +123,22 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Branding & Social Links */}
-          <div className="lg:col-span-2 flex flex-col items-center text-center space-y-6">
-            <Link href="/" className="flex items-center justify-center">
-              <div className="relative">
-                <Brain className="me-[5px] h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
-                <div className="absolute inset-0 bg-primary/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
+          <div className="lg:col-span-2 flex flex-col items-center md:items-start md:text-left text-center space-y-6">
+            <Link href="/" className="flex">
+              <Brain className="me-[5px] h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
               <span className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
                 Smriti AI
               </span>
             </Link>
 
             <p className="text-gray-400 text-sm max-w-md leading-relaxed">
-              Transform passive learning into active remembering. Smriti AI helps you retain knowledge faster with AI-powered study tools and spaced repetition.
+              Transform passive learning into active remembering. Smriti AI
+              helps you retain knowledge faster with AI-powered study tools and
+              spaced repetition.
             </p>
 
             {/* Social Links */}
-            <div className="flex justify-center space-x-4 mt-2">
+            <div className="flex space-x-4 mt-2">
               {socialLinks.map((link) => (
                 <a
                   key={link.name}
@@ -150,13 +157,19 @@ const Footer = () => {
           {/* Footer Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category} className="space-y-4 text-center sm:text-left">
-              <h3 className="text-white font-semibold text-sm uppercase tracking-wider">{category}</h3>
+              <h3 className="text-white font-semibold text-sm uppercase tracking-wider">
+                {category}
+              </h3>
               <ul className="space-y-3">
                 {links.map((link, index) => (
                   <li key={index}>
                     <Link
                       href={link.href}
-                      onClick={link.href.startsWith("#") ? (e) => handleNav(e, link.href) : undefined}
+                      onClick={
+                        link.href.startsWith("#")
+                          ? (e) => handleNav(e, link.href)
+                          : undefined
+                      }
                       className="group flex items-center justify-center sm:justify-start text-gray-400 hover:text-primary text-sm transition-all duration-300 hover:translate-x-1"
                     >
                       <span>{link.name}</span>

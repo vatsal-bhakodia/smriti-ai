@@ -1,5 +1,3 @@
-import BlogCard from "@/components/blog/BlogCard";
-
 import Hero from "@/components/landing/Hero";
 import About from "@/components/landing/About";
 import Features from "@/components/landing/Features";
@@ -11,7 +9,8 @@ import { generateMetadataUtil } from "@/utils/generateMetadata";
 
 export const metadata = generateMetadataUtil({
   title: "Smriti AI",
-  description: "Your AI-powered study companion that helps you learn faster and remember better. Generate summaries, flashcards, mind maps, and personalized learning roadmaps.",
+  description:
+    "Your AI-powered study companion that helps you learn faster and remember better. Generate summaries, flashcards, mind maps, and personalized learning roadmaps.",
   keywords: [
     "Smriti AI",
     "AI study companion",
@@ -22,7 +21,7 @@ export const metadata = generateMetadataUtil({
     "learning roadmap",
     "AI memory retention",
     "smart studying",
-    "educational AI"
+    "educational AI",
   ],
   url: "https://www.smriti.live/",
 });

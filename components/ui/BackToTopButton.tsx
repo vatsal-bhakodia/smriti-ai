@@ -6,6 +6,7 @@ import { ArrowUp } from "lucide-react";
 export default function BackToTopButton() {
   const [isVisible, setIsVisible] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [shouldMoveUp, setShouldMoveUp] = useState(false);
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -14,6 +15,15 @@ export default function BackToTopButton() {
       } else {
         setIsVisible(false);
       }
+
+      // Check if we're near the bottom of the page
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY;
+      const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
+
+      // If we're within 100px of the bottom, move the button up
+      setShouldMoveUp(distanceFromBottom < 100);
     };
 
     window.addEventListener("scroll", toggleVisibility);
@@ -40,7 +50,7 @@ export default function BackToTopButton() {
       onClick={scrollToTop}
       disabled={isScrolling}
       className={`
-        fixed bottom-6 right-6 z-50 p-3 rounded-full shadow-xl
+        fixed right-6 z-50 p-3 rounded-full shadow-xl
         bg-gradient-to-r from-neutral-600 to-neutral-800 hover:from-neutral-700 hover:to-neutral-900
         text-white border-2 border-white/20
         transform transition-all duration-500 ease-out
@@ -51,6 +61,7 @@ export default function BackToTopButton() {
             : "opacity-0 translate-y-8 rotate-180 pointer-events-none"
         }
         ${isScrolling ? "animate-pulse" : ""}
+        ${shouldMoveUp ? "bottom-24" : "bottom-6"}
       `}
       aria-label="Back to Top"
     >

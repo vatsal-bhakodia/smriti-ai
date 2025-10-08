@@ -40,10 +40,19 @@ type AnalyticsData = {
   aiInsights: string;
 };
 
+type InterviewAnalytics = {
+  averageScore: number;
+  latestScore: number | null;
+  totalQuestionsAnswered: number;
+  performanceTrend: Array<{ date: string; averageScore: number }>;
+  aiInsights?: string | null;
+};
+
 const AnalyticsPageContent = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
   );
+  const [interviewData, setInterviewData] = useState<InterviewAnalytics | null>(null);
   const barRef = useRef<ChartJS<"bar">>(null);
   const lineRef = useRef<ChartJS<"line">>(null);
   const radarRef = useRef<ChartJS<"radar">>(null);
@@ -58,6 +67,18 @@ const AnalyticsPageContent = () => {
       }
     };
     fetchAnalyticsData();
+  }, []);
+
+  useEffect(() => {
+    const fetchInterviewAnalytics = async () => {
+      try {
+        const { data } = await axios.get<InterviewAnalytics>("/api/interview/analytics");
+        setInterviewData(data);
+      } catch (error) {
+        console.error("Failed to fetch interview analytics:", error);
+      }
+    };
+    fetchInterviewAnalytics();
   }, []);
 
   if (!analyticsData) {
@@ -289,6 +310,37 @@ const AnalyticsPageContent = () => {
             }}
           />
         </div>
+
+        {/* Interview Prep: Performance Trend */}
+        {interviewData && (
+          <div className="md:col-span-2 col-span-1">
+            <h2 className="text-xl font-semibold mb-2">Interview Prep Trend</h2>
+            <div className="text-sm text-gray-600 mb-3">
+              Average: {interviewData.averageScore}% • Latest: {interviewData.latestScore ?? "-"}% • Total Answered: {interviewData.totalQuestionsAnswered}
+            </div>
+            <Line
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: { position: "top" },
+                  title: { display: true, text: "Interview Average Score Over Time" },
+                },
+              }}
+              data={{
+                labels: interviewData.performanceTrend.map((p) => new Date(p.date).toLocaleDateString()),
+                datasets: [
+                  {
+                    label: "Interview Avg%",
+                    data: interviewData.performanceTrend.map((p) => p.averageScore),
+                    borderColor: "rgb(99, 102, 241)",
+                    backgroundColor: "rgba(99, 102, 241, 0.4)",
+                    tension: 0.2,
+                  },
+                ],
+              }}
+            />
+          </div>
+        )}
 
         {/* AI Insights */}
         <div>
