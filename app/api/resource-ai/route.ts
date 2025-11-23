@@ -24,7 +24,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 // Helper: ask Gemini
 async function askGemini(prompt: string): Promise<string> {
-  const modelName = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest"; // default fallback
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash"; // default fallback
   const model = genAI.getGenerativeModel({ model: modelName });
   const result = await model.generateContent(prompt);
   return result.response.text();
