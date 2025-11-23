@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import "./accessibility.css";
@@ -16,11 +15,11 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
-
 export const metadata = generateMetadataUtil({
   title: "Smriti AI - Your AI-Powered Study Companion",
-  description: "Transform your learning with Smriti AI. Generate summaries, flashcards, mindmaps, quizzes, and personalized roadmaps.",
-  keywords: ["AI study companion", "smart learning", "AI flashcards"]
+  description:
+    "Transform your learning with Smriti AI. Generate summaries, flashcards, mindmaps, quizzes, and personalized roadmaps.",
+  keywords: ["AI study companion", "smart learning", "AI flashcards"],
 });
 
 export default function RootLayout({
