@@ -19,7 +19,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 181
+    "contributions": 185
   },
   {
     "login": "actions-user",
@@ -41,7 +41,7 @@
     "type": "User",
     "user_view_type": "public",
     "site_admin": false,
-    "contributions": 105
+    "contributions": 106
   },
   {
     "login": "git-lakshy",
@@ -154,6 +154,28 @@
     "contributions": 7
   },
   {
+    "login": "dependabot[bot]",
+    "id": 49699333,
+    "node_id": "MDM6Qm90NDk2OTkzMzM=",
+    "avatar_url": "https://avatars.githubusercontent.com/in/29110?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/dependabot%5Bbot%5D",
+    "html_url": "https://github.com/apps/dependabot",
+    "followers_url": "https://api.github.com/users/dependabot%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/dependabot%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/dependabot%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/dependabot%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/dependabot%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/dependabot%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/dependabot%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/dependabot%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/dependabot%5Bbot%5D/received_events",
+    "type": "Bot",
+    "user_view_type": "public",
+    "site_admin": false,
+    "contributions": 6
+  },
+  {
     "login": "jainabhishek2004",
     "id": 157394189,
     "node_id": "U_kgDOCWGlDQ",
@@ -215,28 +237,6 @@
     "events_url": "https://api.github.com/users/ayushjaiswal21/events{/privacy}",
     "received_events_url": "https://api.github.com/users/ayushjaiswal21/received_events",
     "type": "User",
-    "user_view_type": "public",
-    "site_admin": false,
-    "contributions": 5
-  },
-  {
-    "login": "dependabot[bot]",
-    "id": 49699333,
-    "node_id": "MDM6Qm90NDk2OTkzMzM=",
-    "avatar_url": "https://avatars.githubusercontent.com/in/29110?v=4",
-    "gravatar_id": "",
-    "url": "https://api.github.com/users/dependabot%5Bbot%5D",
-    "html_url": "https://github.com/apps/dependabot",
-    "followers_url": "https://api.github.com/users/dependabot%5Bbot%5D/followers",
-    "following_url": "https://api.github.com/users/dependabot%5Bbot%5D/following{/other_user}",
-    "gists_url": "https://api.github.com/users/dependabot%5Bbot%5D/gists{/gist_id}",
-    "starred_url": "https://api.github.com/users/dependabot%5Bbot%5D/starred{/owner}{/repo}",
-    "subscriptions_url": "https://api.github.com/users/dependabot%5Bbot%5D/subscriptions",
-    "organizations_url": "https://api.github.com/users/dependabot%5Bbot%5D/orgs",
-    "repos_url": "https://api.github.com/users/dependabot%5Bbot%5D/repos",
-    "events_url": "https://api.github.com/users/dependabot%5Bbot%5D/events{/privacy}",
-    "received_events_url": "https://api.github.com/users/dependabot%5Bbot%5D/received_events",
-    "type": "Bot",
     "user_view_type": "public",
     "site_admin": false,
     "contributions": 5
