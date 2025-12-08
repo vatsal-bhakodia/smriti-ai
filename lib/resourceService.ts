@@ -1,4 +1,4 @@
-import { PDFParse } from "pdf-parse";
+import { extractTextFromPDF } from "@/lib/pdfParser";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
@@ -28,10 +28,7 @@ export async function fetchPdfText(url: string): Promise<string> {
   }
   const arrayBuffer = await res.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  const parser = new PDFParse({ data: buffer });
-  const textResult = await parser.getText();
-  await parser.destroy();
-  return textResult.text || "";
+  return await extractTextFromPDF(buffer);
 }
 
 /**

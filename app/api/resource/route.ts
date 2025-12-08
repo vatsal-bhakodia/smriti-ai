@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { uploadPDFBuffer } from "@/lib/bufferToStream";
-import { PDFParse } from "pdf-parse";
+import { extractTextFromPDF } from "@/lib/pdfParser";
 import { SUMMARY_PROMPT_PDF } from "@/lib/prompts";
 import { processPrompt } from "@/lib/processPrompt";
 
@@ -97,21 +97,17 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Parse PDF using new class-based API
-    const parser = new PDFParse({ data: buffer });
-    const textResult = await parser.getText();
-    await parser.destroy();
+    // Extract text from PDF using serverless-compatible parser
+    const pdfText = await extractTextFromPDF(buffer);
 
-    // Now you can do anything with `buffer`
-    // e.g., save to disk, upload to S3, or store in DB
-
+    // Upload PDF to cloud storage
     const uploadResult: any = await uploadPDFBuffer(
       buffer,
       file.name.replace(/\.pdf$/, "")
     );
     console.log(uploadResult);
     const pdfURL = uploadResult.secure_url;
-    const SYSTEM_PROMPT = SUMMARY_PROMPT_PDF(textResult.text || "");
+    const SYSTEM_PROMPT = SUMMARY_PROMPT_PDF(pdfText || "");
     const summary = await processPrompt(SYSTEM_PROMPT);
     const resource = await prisma.resource.create({
       data: {
