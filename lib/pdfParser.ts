@@ -1,37 +1,45 @@
-import * as pdfParse from "pdf-parse";
+import * as pdfjsLib from "pdfjs-dist";
+
+// Disable worker in serverless environment
+pdfjsLib.GlobalWorkerOptions.workerSrc = "";
 
 /**
- * Extracts text from a PDF buffer.
- * Compatible with Vercel Serverless (Node.js runtime).
+ * Extracts text from a PDF buffer using pdfjs-dist directly.
  */
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    // Custom page render to avoid canvas dependencies
-    const options = {
-      pagerender: function (pageData: any) {
-        return pageData.getTextContent().then(function (textContent: any) {
-          let lastY,
-            text = "";
-          for (const item of textContent.items) {
-            if (lastY == item.transform[5] || !lastY) {
-              text += item.str;
-            } else {
-              text += "\n" + item.str;
-            }
-            lastY = item.transform[5];
-          }
-          return text;
-        });
-      },
-    };
+    // Load the PDF document
+    const loadingTask = pdfjsLib.getDocument({
+      data: new Uint8Array(buffer),
+      useSystemFonts: true,
+      standardFontDataUrl: undefined,
+      disableFontFace: true,
+    });
 
-    // Handle both CommonJS and ESM exports
-    const pdf = (pdfParse as any).default || pdfParse;
+    const pdf = await loadingTask.promise;
+    const textPages: string[] = [];
 
-    // pdf-parse returns a promise with .text, .numpages, etc.
-    const data = await pdf(buffer, options);
+    // Extract text from each page
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
 
-    return data.text;
+      let lastY: number | undefined;
+      let text = "";
+
+      for (const item of textContent.items as any[]) {
+        if (lastY === item.transform[5] || !lastY) {
+          text += item.str;
+        } else {
+          text += "\n" + item.str;
+        }
+        lastY = item.transform[5];
+      }
+
+      textPages.push(text);
+    }
+
+    return textPages.join("\n\n");
   } catch (error) {
     console.error("PDF text extraction error:", error);
     throw new Error(

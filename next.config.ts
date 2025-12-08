@@ -3,21 +3,21 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "images.ctfassets.net" }, // Contentful
-      { protocol: "https", hostname: "img.youtube.com" }, // used elsewhere
-      { protocol: "https", hostname: "via.placeholder.com" }, // <-- add this for your dummy images
+      { protocol: "https", hostname: "images.ctfassets.net" },
+      { protocol: "https", hostname: "img.youtube.com" },
+      { protocol: "https", hostname: "via.placeholder.com" },
     ],
   },
-  serverExternalPackages: ["pdf-parse"],
 
-  webpack: (config) => {
-    // Ignore 'canvas' which is an optional dependency of pdf-parse
-    // that fails to build in Vercel serverless functions
-    config.resolve.alias.canvas = false;
-
-    // Sometimes needed to prevent encoding errors
-    config.resolve.alias.encoding = false;
-
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Prevent canvas from being bundled
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        canvas: false,
+        "@napi-rs/canvas": false,
+      };
+    }
     return config;
   },
 };
