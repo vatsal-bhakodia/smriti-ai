@@ -1,4 +1,4 @@
-import { extractTextFromPDF } from "@/lib/pdfParser";
+import { fetchPdfText } from "@/lib/pdfParser";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
@@ -17,19 +17,6 @@ const SUPABASE_QUERY_NAME =
 // ============================
 // TEXT EXTRACTION
 // ============================
-
-/**
- * Fetches and extracts text from a PDF URL
- */
-export async function fetchPdfText(url: string): Promise<string> {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Failed to fetch PDF: ${res.status}`);
-  }
-  const arrayBuffer = await res.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  return await extractTextFromPDF(buffer);
-}
 
 /**
  * Extracts full text content from any resource type
