@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import { generateContent as geminiGenerate } from "@/lib/gemini-rest";
+import { processPrompt } from "@/lib/processPrompt";
 
 export async function GET(req: NextRequest) {
   const { userId } = getAuth(req);
-  if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  if (!userId)
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   try {
     const url = new URL(req.url);
@@ -28,7 +29,10 @@ export async function GET(req: NextRequest) {
     const quizFilter: any = {};
     if (language) quizFilter.language = language;
     if (domainsCsv) {
-      const domainList = domainsCsv.split(",").map((s) => s.trim()).filter(Boolean);
+      const domainList = domainsCsv
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
       if (domainList.length > 0) {
         // match if the concatenated domain string or any of stored domains overlaps
         quizFilter.OR = [
@@ -42,12 +46,22 @@ export async function GET(req: NextRequest) {
       prisma.interviewResult.findMany({
         where: baseWhere,
         orderBy: { createdAt: "asc" },
-        select: { score: true, totalQuestions: true, createdAt: true, quizId: true },
+        select: {
+          score: true,
+          totalQuestions: true,
+          createdAt: true,
+          quizId: true,
+        },
       }),
       prisma.interviewResult.findFirst({
         where: baseWhere,
         orderBy: { createdAt: "desc" },
-        select: { score: true, totalQuestions: true, createdAt: true, quizId: true },
+        select: {
+          score: true,
+          totalQuestions: true,
+          createdAt: true,
+          quizId: true,
+        },
       }),
     ]);
 
@@ -56,18 +70,30 @@ export async function GET(req: NextRequest) {
     if (language || domainsCsv) {
       const quizIds = Array.from(new Set(results.map((r) => r.quizId)));
       const quizzes = await prisma.interviewQuiz.findMany({
-        where: { id: { in: quizIds }, ...(Object.keys(quizFilter).length ? quizFilter : {}) },
+        where: {
+          id: { in: quizIds },
+          ...(Object.keys(quizFilter).length ? quizFilter : {}),
+        },
         select: { id: true },
       });
       const allowed = new Set(quizzes.map((q) => q.id));
       filtered = results.filter((r) => allowed.has(r.quizId));
     }
 
-    const totalAnswered = filtered.reduce((acc, r) => acc + (r.totalQuestions || 0), 0);
+    const totalAnswered = filtered.reduce(
+      (acc, r) => acc + (r.totalQuestions || 0),
+      0
+    );
     const totalScores = filtered.reduce((acc, r) => acc + (r.score || 0), 0);
-    const averagePct = totalAnswered > 0 ? Number(((totalScores / totalAnswered) * 100).toFixed(2)) : 0;
+    const averagePct =
+      totalAnswered > 0
+        ? Number(((totalScores / totalAnswered) * 100).toFixed(2))
+        : 0;
     const questionsPractised = results.length;
-    const latestScorePct = latest && latest.totalQuestions > 0 ? Number(((latest.score / latest.totalQuestions) * 100).toFixed(2)) : null;
+    const latestScorePct =
+      latest && latest.totalQuestions > 0
+        ? Number(((latest.score / latest.totalQuestions) * 100).toFixed(2))
+        : null;
 
     // Performance trend: map results by day, compute daily average %
     const trendMap = new Map<string, { sumPct: number; count: number }>();
@@ -82,7 +108,10 @@ export async function GET(req: NextRequest) {
       trendMap.set(key, cur);
     }
     const performanceTrend = Array.from(trendMap.entries())
-      .map(([date, v]) => ({ date, averageScore: Number((v.sumPct / v.count).toFixed(2)) }))
+      .map(([date, v]) => ({
+        date,
+        averageScore: Number((v.sumPct / v.count).toFixed(2)),
+      }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
     let aiInsights: string | null = null;
@@ -96,7 +125,7 @@ export async function GET(req: NextRequest) {
         "Give 4 concise, actionable recommendations (<=100 words).",
       ].join("\n");
       try {
-        aiInsights = await geminiGenerate(prompt, { model: "gemini-2.0-flash" });
+        aiInsights = await processPrompt(prompt);
       } catch {}
     }
 
@@ -110,8 +139,9 @@ export async function GET(req: NextRequest) {
     });
   } catch (e) {
     console.error("[INTERVIEW_ANALYTICS]", e);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
-
-

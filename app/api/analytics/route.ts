@@ -3,14 +3,11 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import prisma from "@/lib/prisma";
 import type { NextRequest } from "next/server";
+import { processPrompt } from "@/lib/processPrompt";
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const genAI = GEMINI_API_KEY ? new GoogleGenerativeAI(GEMINI_API_KEY) : null;
-
-// Helper: ask Gemini (guarded + timeout)
+// Helper: ask AI via unified client (guarded + timeout)
 function withTimeout<T>(p: Promise<T>, ms = 8000): Promise<T> {
   return new Promise((resolve, reject) => {
     const id = setTimeout(() => reject(new Error("AI timeout")), ms);
@@ -27,13 +24,15 @@ function withTimeout<T>(p: Promise<T>, ms = 8000): Promise<T> {
   });
 }
 
-async function askGemini(prompt: string): Promise<string | null> {
-  if (!genAI) return null;
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+async function askAI(prompt: string): Promise<string | null> {
   try {
-    const result = await withTimeout(model.generateContent(prompt), 8000);
-    const response = await result.response;
-    return response.text();
+    return await withTimeout(
+      processPrompt(
+        "You are a learning coach. Keep answers concise and actionable.",
+        prompt
+      ),
+      8000
+    );
   } catch (e) {
     console.error("[ANALYTICS_AI]", e);
     return null;
@@ -150,7 +149,7 @@ export async function GET(req: NextRequest) {
           missedQuestions.map((m) => ({ id: m.quizQAId, misses: m.misses }))
         )}`,
       ].join("\n");
-      aiInsights = await askGemini(aiPrompt);
+      aiInsights = await askAI(aiPrompt);
     }
 
     // Return the aggregated data and AI insights

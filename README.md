@@ -45,6 +45,7 @@ Smriti AI is an intelligent, all-in-one learning assistant that helps you **orga
 - ☁️ **Backend**: Next.js,Prisma,Postgres
 - 🤖 **Bot Layer**: WhatsApp + Twilio Integration
 - 🧪 **Chrome Extension**: Capture videos directly from YouTube //upcoming
+
 ## 📸 Screenshots
 
 Here’s a quick look at **Smriti AI in action** 👇
@@ -73,10 +74,6 @@ Here’s a quick look at **Smriti AI in action** 👇
 <p align="center">
   <img src="./screenshots/TopicWisenotes.jpg" width="80%"/>
 </p>
-
-
-
-
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -169,7 +166,27 @@ RAPIDAPI_KEY=your_rapidapi_key
 RAPIDAPI_URL=your_rapidapi_url
 ```
 
-### 4. Install Dependencies & Run the App
+### 4. Set Up Vector Extension and Documents Table
+
+**Important:** You need to manually create the vector extension and documents table in your Postgres database, as this is not included in the Prisma schema.
+
+1. Connect to your Postgres database (you can use Supabase SQL Editor or any Postgres client)
+2. Run the following SQL commands in the Postgres terminal:
+
+```sql
+create extension if not exists vector;
+
+create table documents (
+  id uuid primary key default gen_random_uuid(),
+  content text,
+  metadata jsonb,
+  embedding vector(1536) -- depends on your embedding model dimension
+);
+```
+
+> **Note:** The `vector` extension is required for vector similarity search functionality. The `documents` table stores document embeddings for AI-powered search features.
+
+### 5. Install Dependencies & Run the App
 
 ```bash
 git clone https://github.com/vatsal-bhakodia/smriti-ai
