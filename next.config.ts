@@ -8,9 +8,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "via.placeholder.com" }, // <-- add this for your dummy images
     ],
   },
-  experimental: {
-    serverComponentsExternalPackages: ["pdf-parse"],
-  },
+  serverExternalPackages: ["pdf-parse"],
+
   webpack: (config) => {
     // Ignore 'canvas' which is an optional dependency of pdf-parse
     // that fails to build in Vercel serverless functions
