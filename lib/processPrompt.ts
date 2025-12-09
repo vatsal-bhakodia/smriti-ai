@@ -50,10 +50,10 @@ function getAIClient() {
   // --- Gemini (default) ---
   //
   const geminiKey = process.env.GEMINI_API_KEY;
-  const geminiModel = process.env.GEMINI_API_MODEL;
+  const geminiModel = process.env.GEMINI_MODEL;
 
   if (!geminiKey) throw new Error("GEMINI_API_KEY is required");
-  if (!geminiModel) throw new Error("GEMINI_API_MODEL is required");
+  if (!geminiModel) throw new Error("GEMINI_MODEL is required");
 
   const gemini = new GoogleGenerativeAI(geminiKey);
 
