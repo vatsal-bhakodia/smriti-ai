@@ -2,6 +2,7 @@
 
 import React, { JSX } from "react";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   GitBranch,
   Code,
@@ -174,13 +175,21 @@ const ContributorAvatar: React.FC<{
     lg: "h-24 w-24",
   };
 
+  const sizePixels = {
+    sm: 40,
+    md: 64,
+    lg: 96,
+  };
+
   return (
     <div
-      className={`${sizes[size]} rounded-full overflow-hidden bg-gradient-to-r from-primary/20 to-purple-500/20 flex items-center justify-center ring-2 ring-white/10`}
+      className={`${sizes[size]} rounded-full overflow-hidden bg-gradient-to-r from-primary/20 to-purple-500/20 flex items-center justify-center ring-2 ring-white/10 relative`}
     >
-      <img
+      <Image
         src={contributor.avatar_url}
         alt={`Avatar of ${contributor.login}`}
+        width={sizePixels[size]}
+        height={sizePixels[size]}
         className="w-full h-full object-cover"
         onError={(e) => {
           e.currentTarget.style.display = "none";
@@ -521,7 +530,7 @@ export default function Contributors() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-6 md:px-20 pb-24 relative z-10">
+    <div className="max-w-7xl mx-auto pt-14 px-6 md:px-20 pb-24 relative z-10">
       {/* Header Section */}
       <section className="text-center mb-16 relative">
         {/* background effect */}

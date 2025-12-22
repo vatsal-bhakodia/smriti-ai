@@ -16,7 +16,8 @@ import { generateMetadataUtil } from "@/utils/generateMetadata";
 
 export const metadata = generateMetadataUtil({
   title: "Smriti AI",
-  description: "Your AI-powered study companion that helps you learn faster and remember better. Generate summaries, flashcards, mind maps, and personalized learning roadmaps.",
+  description:
+    "Your AI-powered study companion that helps you learn faster and remember better. Generate summaries, flashcards, mind maps, and personalized learning roadmaps.",
   keywords: [
     "Smriti AI",
     "AI study companion",
@@ -27,7 +28,7 @@ export const metadata = generateMetadataUtil({
     "learning roadmap",
     "AI memory retention",
     "smart studying",
-    "educational AI"
+    "educational AI",
   ],
   url: "https://www.smriti.live/about",
 });
@@ -83,7 +84,6 @@ export default function AboutPage() {
       highlight: "Global Impact",
     },
   ];
-  
 
   const stats = [
     { number: 1000, label: "Active Learners", suffix: "+" },
@@ -95,7 +95,7 @@ export default function AboutPage() {
   return (
     <>
       {/* Header Section */}
-      <div className="max-w-7xl mx-auto px-6 md:px-20 text-center mb-10 relative">
+      <div className="pt-14 max-w-7xl mx-auto px-6 md:px-20 text-center mb-10 relative">
         {/* Gradient background overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5 rounded-3xl blur-3xl -z-10"></div>
 
@@ -137,25 +137,25 @@ export default function AboutPage() {
       </div>
       {/* Stats Section */}
       <div className="max-w-7xl mx-auto px-6 md:px-20 mb-20">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
-        {stats.map((stat, index) => (
-          <div key={index} className="text-center group">
-            <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 hover:bg-primary/10 transition-colors">
-              <div className="text-4xl md:text-5xl font-bold text-primary mb-3">
-                <NumberTicker 
-                  value={stat.number}
-                  suffix={stat.suffix}
-                  enableKFormat={stat.suffix === "+"}
-                />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12">
+          {stats.map((stat, index) => (
+            <div key={index} className="text-center group">
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 hover:bg-primary/10 transition-colors">
+                <div className="text-4xl md:text-5xl font-bold text-primary mb-3">
+                  <NumberTicker
+                    value={stat.number}
+                    suffix={stat.suffix}
+                    enableKFormat={stat.suffix === "+"}
+                  />
+                </div>
+                <p className="text-white/60 text-sm md:text-base font-medium">
+                  {stat.label}
+                </p>
               </div>
-              <p className="text-white/60 text-sm md:text-base font-medium">
-                {stat.label}
-              </p>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-6 md:px-20 mb-20">
         <div className="text-center mb-12">

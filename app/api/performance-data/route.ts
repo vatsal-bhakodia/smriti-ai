@@ -33,7 +33,7 @@ export async function GET() {
       where: {
         quiz: {
           resource: {
-            topic: {
+            folder: {
               userId: userId,
             },
           },

@@ -1,6 +1,5 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
@@ -50,7 +49,6 @@ export default function RootLayout({
             `}
           </Script>
 
-          <Navbar />
           {children}
           <Toaster />
           <BackToTopButton />

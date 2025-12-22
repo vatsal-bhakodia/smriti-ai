@@ -32,7 +32,7 @@ const features = [
   },
   {
     icon: LineChart,
-    title: "Topic Mastery Tracker",
+    title: "Folder Mastery Tracker",
     desc: "Track what you’ve retained, what’s fading, and what needs review.",
   },
   {

@@ -28,10 +28,10 @@ export default function Page() {
                 <span className="md:block hidden">Analytics</span>
               </Button>
             </Link>
-            <Link href="/dashboard/topic/">
+            <Link href="/folder/">
               <Button variant="default">
                 <Plus className="h-4 w-4" />
-                <span className="md:block hidden">New Topic</span>
+                <span className="md:block hidden">New Folder</span>
               </Button>
             </Link>
           </div>
@@ -52,7 +52,7 @@ export default function Page() {
         {/*Study Reminder Modal */}
         <StudyReminder />
 
-        {/* Active Topics Table */}
+        {/* Active Folders Table */}
         <TopicsTable />
       </div>
     </main>

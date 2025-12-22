@@ -61,7 +61,7 @@ const SignUpForm = () => {
     return () => observer.disconnect();
   }, []);
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#1e1e1e] -mt-16">
+    <main className="min-h-screen flex items-center justify-center bg-[#1e1e1e]">
       <style jsx global>{`
         /* Dark-to-light transition styles for Clerk inputs */
         input[data-clerk-element="formFieldInput"].clerk-transition-input {

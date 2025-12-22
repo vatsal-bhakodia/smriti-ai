@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
           include: {
             resource: {
               include: {
-                topic: true,
+                folder: true,
               },
             },
           },
@@ -69,7 +69,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (!flashcard || !flashcard.deck.resource.topic || flashcard.deck.resource.topic.userId !== userId) {
+    if (
+      !flashcard ||
+      !flashcard.deck.resource.folder ||
+      flashcard.deck.resource.folder.userId !== userId
+    ) {
       return NextResponse.json(
         { message: "Flashcard not found or access denied" },
         { status: 404 }

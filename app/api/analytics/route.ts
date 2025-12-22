@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Average score per topic (percentage)
+    // Average score per folder (percentage)
     const results = await prisma.quizResult.findMany({
       where: { userId },
       select: {
@@ -59,33 +59,33 @@ export async function GET(req: NextRequest) {
         quiz: {
           select: {
             resource: {
-              select: { topicId: true, topic: { select: { title: true } } },
+              select: { folderId: true, folder: { select: { title: true } } },
             },
           },
         },
       },
       orderBy: { createdAt: "desc" },
     });
-    const topicAgg = new Map<
+    const folderAgg = new Map<
       string,
       { title?: string; sumPct: number; count: number }
     >();
     for (const r of results) {
-      const topicId = r.quiz?.resource?.topicId;
-      if (!topicId) continue;
+      const folderId = r.quiz?.resource?.folderId;
+      if (!folderId) continue;
       const pct = r.totalQuestions ? (r.score / r.totalQuestions) * 100 : 0;
-      const cur = topicAgg.get(topicId) ?? {
-        title: r.quiz?.resource?.topic?.title,
+      const cur = folderAgg.get(folderId) ?? {
+        title: r.quiz?.resource?.folder?.title,
         sumPct: 0,
         count: 0,
       };
       cur.sumPct += pct;
       cur.count += 1;
-      cur.title ||= r.quiz?.resource?.topic?.title;
-      topicAgg.set(topicId, cur);
+      cur.title ||= r.quiz?.resource?.folder?.title;
+      folderAgg.set(folderId, cur);
     }
-    const averageScorePerTopic = Array.from(topicAgg, ([topicId, v]) => ({
-      topicId,
+    const averageScorePerFolder = Array.from(folderAgg, ([folderId, v]) => ({
+      folderId,
       title: v.title ?? "",
       averageScore: Number((v.sumPct / v.count).toFixed(2)),
     }));
@@ -143,7 +143,7 @@ export async function GET(req: NextRequest) {
       const aiPrompt = [
         "You are a learning coach.",
         "Using ONLY these aggregates, give 5 concise, actionable recommendations (<=120 words total).",
-        `averageScorePerTopic: ${JSON.stringify(averageScorePerTopic)}`,
+        `averageScorePerFolder: ${JSON.stringify(averageScorePerFolder)}`,
         `trend7Days: ${JSON.stringify(performanceTrends7Days)}`,
         `topMissed: ${JSON.stringify(
           missedQuestions.map((m) => ({ id: m.quizQAId, misses: m.misses }))
@@ -155,7 +155,7 @@ export async function GET(req: NextRequest) {
     // Return the aggregated data and AI insights
     return NextResponse.json(
       {
-        averageScorePerTopic,
+        averageScorePerFolder,
         missedQuestions,
         performanceTrends30Days,
         performanceTrends7Days,

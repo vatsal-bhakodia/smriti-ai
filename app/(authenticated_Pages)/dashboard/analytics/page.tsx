@@ -34,7 +34,11 @@ ChartJS.register(
 );
 
 type AnalyticsData = {
-  averageScorePerTopic: { quizId: string; _avg: { score: number } }[];
+  averageScorePerFolder: {
+    folderId: string;
+    title: string;
+    averageScore: number;
+  }[];
   performanceTrends30Days: { createdAt: string; score: number }[];
   performanceTrends7Days: { createdAt: string; score: number }[];
   aiInsights: string;
@@ -52,7 +56,9 @@ const AnalyticsPageContent = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
   );
-  const [interviewData, setInterviewData] = useState<InterviewAnalytics | null>(null);
+  const [interviewData, setInterviewData] = useState<InterviewAnalytics | null>(
+    null
+  );
   const barRef = useRef<ChartJS<"bar">>(null);
   const lineRef = useRef<ChartJS<"line">>(null);
   const radarRef = useRef<ChartJS<"radar">>(null);
@@ -72,7 +78,9 @@ const AnalyticsPageContent = () => {
   useEffect(() => {
     const fetchInterviewAnalytics = async () => {
       try {
-        const { data } = await axios.get<InterviewAnalytics>("/api/interview/analytics");
+        const { data } = await axios.get<InterviewAnalytics>(
+          "/api/interview/analytics"
+        );
         setInterviewData(data);
       } catch (error) {
         console.error("Failed to fetch interview analytics:", error);
@@ -97,7 +105,7 @@ const AnalyticsPageContent = () => {
       },
       title: {
         display: true,
-        text: "Average Score by Topic",
+        text: "Average Score by Folder",
       },
       tooltip: {
         callbacks: {
@@ -220,22 +228,24 @@ const AnalyticsPageContent = () => {
       <h1 className="text-2xl font-bold mb-4">Performance Analytics</h1>
 
       <div className="grid md:gird-cols-3 grid-cols-1 gap-10">
-        {/* Average Score by Topic */}
+        {/* Average Score by Folder */}
         <div>
-          <h2 className="text-xl font-semibold mb-2">Average Score by Topic</h2>
+          <h2 className="text-xl font-semibold mb-2">
+            Average Score by Folder
+          </h2>
           <Bar
             ref={barRef}
             options={barOptions}
             onClick={handleBarClick}
             data={{
-              labels: analyticsData.averageScorePerTopic.map(
-                (item) => item.quizId
+              labels: analyticsData.averageScorePerFolder.map(
+                (item) => item.title || item.folderId
               ),
               datasets: [
                 {
                   label: "Average Score",
-                  data: analyticsData.averageScorePerTopic.map(
-                    (item) => item._avg.score
+                  data: analyticsData.averageScorePerFolder.map(
+                    (item) => item.averageScore
                   ),
                   backgroundColor: "rgba(54, 162, 235, 0.5)",
                   borderColor: "rgba(54, 162, 235, 1)",
@@ -293,14 +303,14 @@ const AnalyticsPageContent = () => {
             options={radarOptions}
             onClick={handleRadarClick}
             data={{
-              labels: analyticsData.averageScorePerTopic.map(
-                (item) => item.quizId
+              labels: analyticsData.averageScorePerFolder.map(
+                (item) => item.title || item.folderId
               ),
               datasets: [
                 {
                   label: "Your Performance",
-                  data: analyticsData.averageScorePerTopic.map(
-                    (item) => item._avg.score
+                  data: analyticsData.averageScorePerFolder.map(
+                    (item) => item.averageScore
                   ),
                   backgroundColor: "rgba(255, 99, 132, 0.2)",
                   borderColor: "rgba(255, 99, 132, 1)",
@@ -316,22 +326,31 @@ const AnalyticsPageContent = () => {
           <div className="md:col-span-2 col-span-1">
             <h2 className="text-xl font-semibold mb-2">Interview Prep Trend</h2>
             <div className="text-sm text-gray-600 mb-3">
-              Average: {interviewData.averageScore}% • Latest: {interviewData.latestScore ?? "-"}% • Total Answered: {interviewData.totalQuestionsAnswered}
+              Average: {interviewData.averageScore}% • Latest:{" "}
+              {interviewData.latestScore ?? "-"}% • Total Answered:{" "}
+              {interviewData.totalQuestionsAnswered}
             </div>
             <Line
               options={{
                 responsive: true,
                 plugins: {
                   legend: { position: "top" },
-                  title: { display: true, text: "Interview Average Score Over Time" },
+                  title: {
+                    display: true,
+                    text: "Interview Average Score Over Time",
+                  },
                 },
               }}
               data={{
-                labels: interviewData.performanceTrend.map((p) => new Date(p.date).toLocaleDateString()),
+                labels: interviewData.performanceTrend.map((p) =>
+                  new Date(p.date).toLocaleDateString()
+                ),
                 datasets: [
                   {
                     label: "Interview Avg%",
-                    data: interviewData.performanceTrend.map((p) => p.averageScore),
+                    data: interviewData.performanceTrend.map(
+                      (p) => p.averageScore
+                    ),
                     borderColor: "rgb(99, 102, 241)",
                     backgroundColor: "rgba(99, 102, 241, 0.4)",
                     tension: 0.2,

@@ -27,13 +27,17 @@ export async function GET(req: NextRequest) {
         cards: true,
         resource: {
           include: {
-            topic: true,
+            folder: true,
           },
         },
       },
     });
 
-    if (!deck || !deck.resource.topic || deck.resource.topic.userId !== userId) {
+    if (
+      !deck ||
+      !deck.resource.folder ||
+      deck.resource.folder.userId !== userId
+    ) {
       return NextResponse.json(
         { message: "Flashcard deck not found or access denied" },
         { status: 404 }
@@ -53,7 +57,9 @@ export async function GET(req: NextRequest) {
       return new NextResponse(content, {
         headers: {
           "Content-Type": "text/plain",
-          "Content-Disposition": `attachment; filename="${deck.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_flashcards.txt"`,
+          "Content-Disposition": `attachment; filename="${deck.title
+            .replace(/[^a-z0-9]/gi, "_")
+            .toLowerCase()}_flashcards.txt"`,
         },
       });
     } else if (format === "anki") {
@@ -67,7 +73,9 @@ export async function GET(req: NextRequest) {
       return new NextResponse(content, {
         headers: {
           "Content-Type": "text/csv",
-          "Content-Disposition": `attachment; filename="${deck.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_flashcards.csv"`,
+          "Content-Disposition": `attachment; filename="${deck.title
+            .replace(/[^a-z0-9]/gi, "_")
+            .toLowerCase()}_flashcards.csv"`,
         },
       });
     } else {

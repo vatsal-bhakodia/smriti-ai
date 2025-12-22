@@ -1,7 +1,8 @@
 import { generateMetadataUtil } from "@/utils/generateMetadata";
 export const metadata = generateMetadataUtil({
   title: "Privacy Policy",
-  description: "Read the Privacy Policy of Smriti AI to learn how we collect, use, and protect your personal information. Your data privacy and security are our top priority.",
+  description:
+    "Read the Privacy Policy of Smriti AI to learn how we collect, use, and protect your personal information. Your data privacy and security are our top priority.",
   keywords: [
     "Smriti AI Privacy Policy",
     "AI data protection",
@@ -12,14 +13,14 @@ export const metadata = generateMetadataUtil({
     "AI privacy guidelines",
     "data protection",
     "privacy rights",
-    "secure AI platform"
+    "secure AI platform",
   ],
   url: "https://www.smriti.live/privacy-policy",
 });
 
 export default function PrivacyPolicy() {
   return (
-    <div className="max-w-4xl mx-auto px-4 pb-20">
+    <div className="pt-14 max-w-4xl mx-auto px-4 pb-20">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
         Privacy Policy
       </h1>

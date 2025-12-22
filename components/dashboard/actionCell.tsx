@@ -14,10 +14,10 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function ActionsCell({
-  topicId,
+  folderId,
   onDelete,
 }: {
-  topicId: string;
+  folderId: string;
   onDelete: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -26,24 +26,24 @@ export default function ActionsCell({
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const res = await fetch("/api/topic", {
+      const res = await fetch("/api/folder", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: topicId }),
+        body: JSON.stringify({ id: folderId }),
       });
 
       if (!res.ok) throw new Error("Delete failed");
 
-      toast.success("Topic deleted");
+      toast.success("Folder deleted");
 
       // Delay to match animation before removal
       setTimeout(() => {
-        onDelete(topicId);
+        onDelete(folderId);
       }, 300);
     } catch (err) {
-      toast.error("Failed to delete topic");
+      toast.error("Failed to delete folder");
       console.error(err);
       setIsDeleting(false);
     }
@@ -63,9 +63,9 @@ export default function ActionsCell({
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Topic</AlertDialogTitle>
+            <AlertDialogTitle>Delete Folder</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this topic? This action cannot be
+              Are you sure you want to delete this folder? This action cannot be
               undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

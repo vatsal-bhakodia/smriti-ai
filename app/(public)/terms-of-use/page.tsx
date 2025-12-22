@@ -1,9 +1,9 @@
-
 import { generateMetadataUtil } from "@/utils/generateMetadata";
 
 export const metadata = generateMetadataUtil({
   title: "Terms of Use",
-  description: "Review the Terms of Use for Smriti AI. Learn about user responsibilities, acceptable usage, and our service guidelines before using our platform.",
+  description:
+    "Review the Terms of Use for Smriti AI. Learn about user responsibilities, acceptable usage, and our service guidelines before using our platform.",
   keywords: [
     "Smriti AI Terms of Use",
     "Smriti AI policies",
@@ -14,14 +14,14 @@ export const metadata = generateMetadataUtil({
     "Smriti AI legal terms",
     "user responsibilities",
     "platform guidelines",
-    "AI service terms"
+    "AI service terms",
   ],
   url: "https://www.smriti.live/terms-of-use",
 });
 
 export default function TermsOfUse() {
   return (
-    <div className="max-w-4xl mx-auto px-4 pb-20">
+    <div className="max-w-4xl mx-auto pt-14 px-4 pb-20">
       <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
         Terms of Use
       </h1>

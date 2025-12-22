@@ -19,8 +19,7 @@ model User {
   currentStreak Int          @default(0)
   experience    Int          @default(0)
   level         Int          @default(1)
-  notes         Note[]
-  topics        Topic[]
+  folders       Folder[]
   userAnswers   UserAnswer[]
   points        Int               @default(0)
   achievements  UserAchievement[]
@@ -28,20 +27,19 @@ model User {
   interviewResults InterviewResult[]
 }
 
-model Topic {
+model Folder {
   id        String     @id @default(uuid())
   userId    String
   title     String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  note      Note?
   resources Resource[]
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Resource {
   id            String         @id @default(uuid())
-  topicId       String
+  folderId      String
   title         String
   type          ResourceType
   url           String
@@ -50,7 +48,7 @@ model Resource {
   updatedAt     DateTime       @updatedAt
   flashcardDeck FlashcardDeck?
   quizzes       Quiz[]
-  topic         Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  folder        Folder         @relation(fields: [folderId], references: [id], onDelete: Cascade)
 }
 
 model Quiz {
@@ -138,17 +136,6 @@ model ContactQuery {
   subject   String?
   message   String
   createdAt DateTime @default(now())
-}
-
-model Note {
-  id        String   @id @default(uuid())
-  content   String?
-  topicId   String   @unique
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum ResourceType {

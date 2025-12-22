@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
-  const topicId = searchParams.get("topicId");
+  const folderId = searchParams.get("folderId");
 
   try {
     if (id) {
@@ -24,16 +24,30 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ resource });
     }
 
-    if (topicId) {
+    if (folderId) {
+      const limit = parseInt(searchParams.get("limit") || "20");
+      const skip = parseInt(searchParams.get("skip") || "0");
+
       const resources = await prisma.resource.findMany({
-        where: { topicId },
+        where: { folderId },
         orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: skip,
       });
-      return NextResponse.json({ resources });
+
+      const total = await prisma.resource.count({
+        where: { folderId },
+      });
+
+      return NextResponse.json({
+        resources,
+        hasMore: skip + resources.length < total,
+        total,
+      });
     }
 
     return NextResponse.json(
-      { message: "id or topicId is required" },
+      { message: "id or folderId is required" },
       { status: 400 }
     );
   } catch (error) {
@@ -51,9 +65,9 @@ export async function POST(req: NextRequest) {
   const contentType = req.headers.get("content-type");
   if (contentType?.includes("application/json")) {
     const body = await req.json();
-    const { topicId, title, type, url, summary } = body;
+    const { folderId, title, type, url, summary } = body;
 
-    if (!topicId || !title || !type || !url) {
+    if (!folderId || !title || !type || !url) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
@@ -61,7 +75,7 @@ export async function POST(req: NextRequest) {
     }
     try {
       const resource = await prisma.resource.create({
-        data: { topicId, title, type, url, summary: summary || "" },
+        data: { folderId, title, type, url, summary: summary || "" },
       });
 
       return NextResponse.json(
@@ -77,7 +91,7 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File;
     const type = formData.get("type");
     const title = formData.get("title");
-    const topicId = formData.get("topicId");
+    const folderId = formData.get("folderId");
     if (!file || !(file instanceof File)) {
       return NextResponse.json(
         { message: "No file uploaded" },
@@ -87,7 +101,7 @@ export async function POST(req: NextRequest) {
     if (
       type !== "PDF" ||
       typeof title !== "string" ||
-      typeof topicId !== "string"
+      typeof folderId !== "string"
     ) {
       return NextResponse.json(
         { message: "Missing required fields" },
@@ -111,7 +125,7 @@ export async function POST(req: NextRequest) {
     const summary = await processPrompt(SYSTEM_PROMPT);
     const resource = await prisma.resource.create({
       data: {
-        topicId,
+        folderId,
         title,
         type,
         url: pdfURL,
@@ -137,7 +151,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
-  const { id, title, summary } = body;
+  const { id, title, summary, folderId } = body;
 
   if (!id)
     return NextResponse.json(
@@ -149,8 +163,9 @@ export async function PUT(req: NextRequest) {
     const updated = await prisma.resource.update({
       where: { id },
       data: {
-        title,
-        summary,
+        ...(title !== undefined && { title }),
+        ...(summary !== undefined && { summary }),
+        ...(folderId !== undefined && { folderId }),
       },
     });
 

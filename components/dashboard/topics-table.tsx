@@ -40,8 +40,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// CHANGE 1: Updated the Topic type to match the new API response
-export type Topic = {
+// CHANGE 1: Updated the Folder type to match the new API response
+export type Folder = {
   id: string;
   title: string;
   completionPercentage: number;
@@ -50,7 +50,7 @@ export type Topic = {
 };
 
 export function TopicsTable(): React.JSX.Element {
-  const [data, setData] = React.useState<Topic[]>([]);
+  const [data, setData] = React.useState<Folder[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -61,18 +61,18 @@ export function TopicsTable(): React.JSX.Element {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const handleRemoveTopic = (topicId: string) => {
+  const handleRemoveFolder = (folderId: string) => {
     setData((prev) =>
-      prev.map((topic) =>
-        topic.id === topicId ? { ...topic, isDeleting: true } : topic
+      prev.map((folder) =>
+        folder.id === folderId ? { ...folder, isDeleting: true } : folder
       )
     );
     setTimeout(() => {
-      setData((prev) => prev.filter((topic) => topic.id !== topicId));
+      setData((prev) => prev.filter((folder) => folder.id !== folderId));
     }, 500);
   };
 
-  const columns: ColumnDef<Topic>[] = [
+  const columns: ColumnDef<Folder>[] = [
     {
       accessorKey: "title",
       header: ({ column }) => (
@@ -80,12 +80,12 @@ export function TopicsTable(): React.JSX.Element {
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Topic <ArrowUpDown className="ml-2 h-4 w-4" />
+          Folder <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
       cell: ({ row }) => (
         <Link
-          href={`/dashboard/topic/${row.original.id}`}
+          href={`/folder/${row.original.id}`}
           className="hover:underline font-medium"
         >
           {row.getValue("title")}
@@ -132,7 +132,10 @@ export function TopicsTable(): React.JSX.Element {
       header: () => <div className="text-right">Actions</div>,
       cell: ({ row }) => (
         <div className="flex justify-end">
-          <ActionsCell topicId={row.original.id} onDelete={handleRemoveTopic} />
+          <ActionsCell
+            folderId={row.original.id}
+            onDelete={handleRemoveFolder}
+          />
         </div>
       ),
     },
@@ -158,20 +161,20 @@ export function TopicsTable(): React.JSX.Element {
   });
 
   React.useEffect(() => {
-    async function fetchTopics() {
+    async function fetchFolders() {
       setIsLoading(true);
       try {
-        const res = await axios.get("/api/topic");
-        const topics = (res.data as { topics: Topic[] }).topics;
-        setData(topics);
+        const res = await axios.get("/api/folder");
+        const folders = (res.data as { folders: Folder[] }).folders;
+        setData(folders);
       } catch (error) {
         console.error("Error occurred", error);
-        toast.error("Failed to load topics");
+        toast.error("Failed to load folders");
       } finally {
         setIsLoading(false);
       }
     }
-    fetchTopics();
+    fetchFolders();
   }, []);
 
   return (
@@ -179,7 +182,7 @@ export function TopicsTable(): React.JSX.Element {
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center space-x-2">
           <GraduationCap className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-semibold">Topics</h2>
+          <h2 className="text-xl font-semibold">Folders</h2>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -257,7 +260,7 @@ export function TopicsTable(): React.JSX.Element {
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No topics created yet.
+                    No folders created yet.
                   </TableCell>
                 </TableRow>
               )}

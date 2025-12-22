@@ -10,10 +10,12 @@ interface BlogPostPageProps {
 }
 
 // for indivisual blog post metadata generation
-export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
-  
+
   if (!post) {
     return generateMetadataUtil({
       title: "Blog Post Not Found",
@@ -29,18 +31,22 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     "study tips",
     "AI education",
     "productivity",
-    "educational technology"
+    "educational technology",
   ];
 
-  const titleWords = post.title.toLowerCase().split(' ')
-    .filter(word => word.length > 3)
+  const titleWords = post.title
+    .toLowerCase()
+    .split(" ")
+    .filter((word) => word.length > 3)
     .slice(0, 5);
-  
+
   const keywords = [...titleWords, ...defaultKeywords];
 
   return generateMetadataUtil({
     title: post.title,
-    description: post.summary || `Read "${post.title}" on Smriti AI blog. Discover insights about learning, productivity, and AI-powered education.`,
+    description:
+      post.summary ||
+      `Read "${post.title}" on Smriti AI blog. Discover insights about learning, productivity, and AI-powered education.`,
     keywords,
     url: `https://smriti.ai/blogs/${slug}`,
     image: post.featureImage?.url || "/og-image.png",
@@ -53,7 +59,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   if (!post) return notFound();
 
   return (
-    <main className="max-w-2xl mx-auto pb-24 px-4">
+    <main className="max-w-2xl mx-auto pt-14 pb-24 px-4">
       <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
       <p className="text-gray-500 text-sm mb-4">
         By {post.author} • {new Date(post.publishDate).toLocaleDateString()}

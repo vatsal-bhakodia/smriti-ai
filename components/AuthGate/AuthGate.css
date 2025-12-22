@@ -1,0 +1,124 @@
+/* Dark-to-light transition styles for dashboard form */
+input[type="text"],
+input[type="date"] {
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
+  border: 2px solid #404040 !important;
+  transition: all 0.3s ease !important;
+}
+
+input[type="text"]::placeholder,
+input[type="date"]::placeholder {
+  color: #888888 !important;
+  transition: color 0.3s ease !important;
+}
+
+/* Focus state - transitions to light */
+input[type="text"]:focus,
+input[type="text"].focused,
+input[type="date"]:focus,
+input[type="date"].focused {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border-color: #a3ff19 !important;
+  box-shadow: 0 0 0 3px rgba(163, 255, 25, 0.1) !important;
+}
+
+input[type="text"]:focus::placeholder,
+input[type="text"].focused::placeholder,
+input[type="date"]:focus::placeholder,
+input[type="date"].focused::placeholder {
+  color: #999999 !important;
+}
+
+/* Filled state - stays light when user has typed */
+input[type="text"].has-content,
+input[type="date"].has-content {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border-color: #d1d5db !important;
+}
+
+input[type="text"].has-content::placeholder,
+input[type="date"].has-content::placeholder {
+  color: #999999 !important;
+}
+
+/* Date input specific styling */
+input[type="date"] {
+  color-scheme: dark !important;
+}
+
+input[type="date"]:focus,
+input[type="date"].focused,
+input[type="date"].has-content {
+  color-scheme: light !important;
+}
+
+/* Date picker icon styling */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) !important;
+  transition: filter 0.3s ease !important;
+  cursor: pointer !important;
+}
+
+input[type="date"]:focus::-webkit-calendar-picker-indicator,
+input[type="date"].focused::-webkit-calendar-picker-indicator,
+input[type="date"].has-content::-webkit-calendar-picker-indicator {
+  filter: invert(0) !important;
+}
+
+/* Phone input styling - enhanced for dark-to-light transitions */
+.react-tel-input .form-control {
+  background-color: #2a2a2a !important;
+  color: #ffffff !important;
+  border: 2px solid #404040 !important;
+  transition: all 0.3s ease !important;
+}
+
+.react-tel-input .form-control::placeholder {
+  color: #888888 !important;
+  transition: color 0.3s ease !important;
+}
+
+.react-tel-input .form-control:focus,
+.react-tel-input .form-control.focused {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border-color: #a3ff19 !important;
+  box-shadow: 0 0 0 3px rgba(163, 255, 25, 0.1) !important;
+}
+
+.react-tel-input .form-control:focus::placeholder,
+.react-tel-input .form-control.focused::placeholder {
+  color: #999999 !important;
+}
+
+.react-tel-input .form-control.has-content {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border-color: #d1d5db !important;
+}
+
+.react-tel-input .form-control.has-content::placeholder {
+  color: #999999 !important;
+}
+
+/* Flag dropdown button styling */
+.react-tel-input .flag-dropdown {
+  background-color: #2a2a2a !important;
+  border: 2px solid #404040 !important;
+  border-right: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.react-tel-input .form-control:focus + .flag-dropdown,
+.react-tel-input .form-control.focused + .flag-dropdown,
+.react-tel-input .form-control.has-content + .flag-dropdown {
+  background-color: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+
+.react-tel-input .form-control:focus + .flag-dropdown {
+  border-color: #a3ff19 !important;
+}
