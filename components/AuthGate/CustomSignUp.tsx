@@ -163,7 +163,6 @@ export function CustomSignup({
       }
     };
   }, [username]);
-  342;
 
   useEffect(() => {
     const timer = setTimeout(() => {

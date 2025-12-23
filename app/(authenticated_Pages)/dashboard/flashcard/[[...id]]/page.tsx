@@ -20,6 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Kbd, KbdGroup } from "@/components/ui/kbd";
 
 interface FlashcardData {
   id: string;
@@ -238,7 +239,6 @@ export default function FlashcardPage({ params }: { params: any }) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [flashcardDeck, currentIndex, isFlipped]);
 
   if (isLoading) {
@@ -535,27 +535,24 @@ export default function FlashcardPage({ params }: { params: any }) {
           </div>
 
           {/* Keyboard Shortcuts Hint */}
-          <div className="mt-8 text-center space-y-1">
+          <div className="mt-8 text-center space-y-2">
             <p className="text-sm font-medium text-foreground/80">
               Keyboard Shortcuts
             </p>
-            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-              <span>
-                <kbd className="px-2 py-0.5 bg-secondary rounded text-xs font-mono">
-                  ←→
-                </kbd>{" "}
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <span className="flex items-center gap-2">
+                <KbdGroup>
+                  <Kbd>←</Kbd>
+                  <Kbd>→</Kbd>
+                </KbdGroup>
                 Navigate
               </span>
-              <span>
-                <kbd className="px-2 py-0.5 bg-secondary rounded text-xs font-mono">
-                  Space
-                </kbd>{" "}
+              <span className="flex items-center gap-2">
+                <Kbd>Space</Kbd>
                 Flip
               </span>
-              <span>
-                <kbd className="px-2 py-0.5 bg-secondary rounded text-xs font-mono">
-                  R
-                </kbd>{" "}
+              <span className="flex items-center gap-2">
+                <Kbd>R</Kbd>
                 Reset
               </span>
             </div>

@@ -441,8 +441,3 @@ body {
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
-
-/* Keyboard shortcut badge styling */
-kbd {
-  font-family: var(--font-mono);
-}
