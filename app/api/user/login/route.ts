@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
 
     // Calculate new streak
     let newStreak = user.currentStreak;
+    let streakBroken = false;
+    const previousStreak = user.currentStreak;
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
 
@@ -45,6 +47,7 @@ export async function POST(req: NextRequest) {
       newStreak += 1;
     } else if (lastLoginDate.getTime() < yesterday.getTime()) {
       // Gap in login - reset streak to 1
+      streakBroken = true;
       newStreak = 1;
     }
     // If lastLoginDate > yesterday, it's a future date (shouldn't happen), keep current streak
@@ -62,6 +65,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       message: "Daily login recorded successfully",
       currentStreak: updatedUser.currentStreak,
+      previousStreak,
+      streakBroken,
       alreadyLogged: false,
     });
   } catch (error) {

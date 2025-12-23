@@ -6,6 +6,8 @@ import "react-phone-input-2/lib/style.css";
 import axios from "axios";
 import { useUser } from "@clerk/nextjs";
 import { CustomSignup } from "./CustomSignUp";
+import { toast } from "sonner";
+import { getStreakMessage } from "./getStreakMessage";
 
 export default function AuthGate({ children }: { children: ReactNode }) {
   const { user, isLoaded } = useUser();
@@ -21,7 +23,6 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     // Only redirect if not already on resource page
     if (pendingUrl && !hasRedirectedRef.current && pathname !== "/resource") {
       hasRedirectedRef.current = true;
-      // Redirect to resource page without ID - it will handle the processing
       router.push("/resource");
     }
   }, [isLoaded, user?.publicMetadata?.onboarded, pathname]);
@@ -32,11 +33,33 @@ export default function AuthGate({ children }: { children: ReactNode }) {
       // Call API to log daily login
       const logDailyLogin = async () => {
         try {
-          await axios.post("/api/user/login");
+          const response = await axios.post<{
+            currentStreak: number;
+            previousStreak: number;
+            streakBroken: boolean;
+            alreadyLogged: boolean;
+          }>("/api/user/login");
+          const { currentStreak, streakBroken, previousStreak, alreadyLogged } =
+            response.data;
+
+          // Only show toast if this is a new login
+          if (!alreadyLogged) {
+            const { emoji, message } = getStreakMessage(
+              currentStreak,
+              streakBroken,
+              previousStreak
+            );
+
+            toast.success(`${emoji} ${message}`, {
+              duration: 5000,
+              position: "bottom-right",
+              className: "text-base",
+            });
+          }
+
           console.log("Daily login tracked successfully");
         } catch (error) {
           console.error("Error tracking daily login:", error);
-          // Don't show error to user, just log it
         }
       };
 
