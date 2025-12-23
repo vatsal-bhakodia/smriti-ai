@@ -105,7 +105,7 @@ const Footer = () => {
       { name: "Contact", href: "/contact" },
       {
         name: "Our Contributors",
-        href: "https://github.com/vatsal-bhakodia/smriti-ai/graphs/contributors",
+        href: "/contributors",
       },
     ],
     support: [

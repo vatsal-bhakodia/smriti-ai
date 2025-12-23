@@ -1,124 +1,152 @@
-/* Dark-to-light transition styles for dashboard form */
-input[type="text"],
-input[type="date"] {
-  background-color: #2a2a2a !important;
+/* Enhanced form input styling */
+input[type="text"] {
+  background-color: rgba(39, 39, 42, 0.5) !important;
   color: #ffffff !important;
-  border: 2px solid #404040 !important;
-  transition: all 0.3s ease !important;
+  border: 1px solid #3f3f46 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-input[type="text"]::placeholder,
-input[type="date"]::placeholder {
-  color: #888888 !important;
+input[type="text"]::placeholder {
+  color: #71717a !important;
   transition: color 0.3s ease !important;
 }
 
-/* Focus state - transitions to light */
+/* Focus state */
 input[type="text"]:focus,
-input[type="text"].focused,
-input[type="date"]:focus,
-input[type="date"].focused {
-  background-color: #ffffff !important;
-  color: #333333 !important;
+input[type="text"].focused {
+  background-color: rgba(39, 39, 42, 0.8) !important;
   border-color: #a3ff19 !important;
   box-shadow: 0 0 0 3px rgba(163, 255, 25, 0.1) !important;
 }
 
 input[type="text"]:focus::placeholder,
-input[type="text"].focused::placeholder,
-input[type="date"]:focus::placeholder,
-input[type="date"].focused::placeholder {
-  color: #999999 !important;
+input[type="text"].focused::placeholder {
+  color: #a1a1aa !important;
 }
 
-/* Filled state - stays light when user has typed */
-input[type="text"].has-content,
-input[type="date"].has-content {
-  background-color: #ffffff !important;
-  color: #333333 !important;
-  border-color: #d1d5db !important;
+/* Filled state */
+input[type="text"].has-content {
+  background-color: rgba(39, 39, 42, 0.7) !important;
+  border-color: #52525b !important;
 }
 
-input[type="text"].has-content::placeholder,
-input[type="date"].has-content::placeholder {
-  color: #999999 !important;
-}
-
-/* Date input specific styling */
-input[type="date"] {
-  color-scheme: dark !important;
-}
-
-input[type="date"]:focus,
-input[type="date"].focused,
-input[type="date"].has-content {
-  color-scheme: light !important;
-}
-
-/* Date picker icon styling */
-input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) !important;
-  transition: filter 0.3s ease !important;
-  cursor: pointer !important;
-}
-
-input[type="date"]:focus::-webkit-calendar-picker-indicator,
-input[type="date"].focused::-webkit-calendar-picker-indicator,
-input[type="date"].has-content::-webkit-calendar-picker-indicator {
-  filter: invert(0) !important;
-}
-
-/* Phone input styling - enhanced for dark-to-light transitions */
+/* Phone input styling - modern glassmorphism effect */
 .react-tel-input .form-control {
-  background-color: #2a2a2a !important;
+  background-color: rgba(39, 39, 42, 0.5) !important;
   color: #ffffff !important;
-  border: 2px solid #404040 !important;
-  transition: all 0.3s ease !important;
+  border: 1px solid #3f3f46 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 .react-tel-input .form-control::placeholder {
-  color: #888888 !important;
+  color: #71717a !important;
   transition: color 0.3s ease !important;
 }
 
 .react-tel-input .form-control:focus,
 .react-tel-input .form-control.focused {
-  background-color: #ffffff !important;
-  color: #333333 !important;
+  background-color: rgba(39, 39, 42, 0.8) !important;
   border-color: #a3ff19 !important;
   box-shadow: 0 0 0 3px rgba(163, 255, 25, 0.1) !important;
 }
 
 .react-tel-input .form-control:focus::placeholder,
 .react-tel-input .form-control.focused::placeholder {
-  color: #999999 !important;
+  color: #a1a1aa !important;
 }
 
 .react-tel-input .form-control.has-content {
-  background-color: #ffffff !important;
-  color: #333333 !important;
-  border-color: #d1d5db !important;
-}
-
-.react-tel-input .form-control.has-content::placeholder {
-  color: #999999 !important;
+  background-color: rgba(39, 39, 42, 0.7) !important;
+  border-color: #52525b !important;
 }
 
 /* Flag dropdown button styling */
 .react-tel-input .flag-dropdown {
-  background-color: #2a2a2a !important;
-  border: 2px solid #404040 !important;
-  border-right: none !important;
+  background-color: transparent !important;
+  border: none !important;
   transition: all 0.3s ease !important;
 }
 
-.react-tel-input .form-control:focus + .flag-dropdown,
-.react-tel-input .form-control.focused + .flag-dropdown,
-.react-tel-input .form-control.has-content + .flag-dropdown {
-  background-color: #ffffff !important;
-  border-color: #d1d5db !important;
+.react-tel-input .flag-dropdown:hover {
+  background-color: rgba(163, 255, 25, 0.1) !important;
 }
 
-.react-tel-input .form-control:focus + .flag-dropdown {
-  border-color: #a3ff19 !important;
+.react-tel-input .selected-flag {
+  padding: 0 8px !important;
+  border-radius: 8px !important;
+}
+
+.react-tel-input .selected-flag:hover {
+  background-color: rgba(163, 255, 25, 0.1) !important;
+}
+
+/* Country list styling */
+.react-tel-input .country-list {
+  background-color: #27272a !important;
+  border: 1px solid #3f3f46 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.react-tel-input .country-list .country {
+  color: #ffffff !important;
+  padding: 10px 12px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.react-tel-input .country-list .country:hover {
+  background-color: rgba(163, 255, 25, 0.1) !important;
+}
+
+.react-tel-input .country-list .country.highlight {
+  background-color: rgba(163, 255, 25, 0.15) !important;
+}
+
+.react-tel-input .search-box {
+  background-color: #18181b !important;
+  border: 1px solid #3f3f46 !important;
+  color: #ffffff !important;
+  margin: 8px !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+}
+
+.react-tel-input .search-box::placeholder {
+  color: #71717a !important;
+}
+
+/* Calendar customization for dark theme */
+.bg-zinc-900 .rdp {
+  --rdp-accent-color: #a3ff19;
+  --rdp-background-color: rgba(163, 255, 25, 0.1);
+}
+
+.bg-zinc-900 .rdp-day_selected {
+  background-color: #a3ff19 !important;
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+.bg-zinc-900 .rdp-day:hover:not(.rdp-day_selected) {
+  background-color: rgba(163, 255, 25, 0.1) !important;
+}
+
+.bg-zinc-900 .rdp-button:hover:not([disabled]) {
+  background-color: rgba(163, 255, 25, 0.1) !important;
+}
+
+/* Smooth transitions for form elements */
+.phone-input-wrapper {
+  transition: all 0.3s ease;
+}
+
+/* Loading state animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
 }

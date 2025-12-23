@@ -2,7 +2,6 @@
 
 import React, { JSX } from "react";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import {
   GitBranch,
   Code,
@@ -185,7 +184,7 @@ const ContributorAvatar: React.FC<{
     <div
       className={`${sizes[size]} rounded-full overflow-hidden bg-gradient-to-r from-primary/20 to-purple-500/20 flex items-center justify-center ring-2 ring-white/10 relative`}
     >
-      <Image
+      <img
         src={contributor.avatar_url}
         alt={`Avatar of ${contributor.login}`}
         width={sizePixels[size]}

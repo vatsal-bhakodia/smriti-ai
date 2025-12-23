@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  
+
   const { username, email, mobile, dob } = body;
 
   if (!username || !email || !mobile || !dob) {
@@ -25,10 +25,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const existingUser = await prisma.user.findUnique({
-    where: { username },
-  });
+  // Normalize username to lowercase for uniqueness check
+  const normalizedUsername = username.toLowerCase().trim();
 
+  // Validate username format (alphanumeric, underscore, period, 3-20 chars)
+  const usernameRegex = /^[a-z0-9_.]{3,20}$/;
+  if (!usernameRegex.test(normalizedUsername)) {
+    return NextResponse.json(
+      {
+        message:
+          "Username must be 3-20 characters and contain only letters, numbers, underscores, or periods.",
+      },
+      { status: 400 }
+    );
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { username: normalizedUsername },
+  });
 
   if (existingUser) {
     return NextResponse.json(
@@ -39,19 +53,19 @@ export async function POST(req: NextRequest) {
 
   // ✅ Mobile number validation using regex
   if (!isValidPhoneNumber(mobile)) {
-  return NextResponse.json(
-    {
-      message: "Invalid mobile number. Please enter a valid mobile number.",
-    },
-    { status: 400 }
-  );
-}
+    return NextResponse.json(
+      {
+        message: "Invalid mobile number. Please enter a valid mobile number.",
+      },
+      { status: 400 }
+    );
+  }
 
   try {
     const user = await prisma.user.create({
       data: {
         id: userId,
-        username,
+        username: normalizedUsername,
         email,
         mobile,
         dob,
