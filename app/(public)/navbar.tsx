@@ -79,11 +79,7 @@ const NavButton = ({
 
   return (
     <Link href={href}>
-      <Button
-        variant="ghost"
-        className={`${baseClass} ${className}`}
-        size="adaptive"
-      >
+      <Button variant="ghost" className={`${baseClass} ${className}`}>
         {label}
       </Button>
     </Link>
