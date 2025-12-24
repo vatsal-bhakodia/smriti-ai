@@ -457,7 +457,7 @@ export default function FolderSidebar({
           <div className="p-4 border-b border-zinc-800 space-y-2">
             <Button
               onClick={() => setShowNewFolderModal(true)}
-              className="w-full bg-[#adff2f] text-black hover:bg-[#9dff07] font-semibold"
+              className="w-full bg-primary text-black hover:bg-primary-dark font-semibold"
             >
               <Plus className="h-4 w-4 mr-2" />
               New Folder
@@ -468,7 +468,7 @@ export default function FolderSidebar({
           <div className="p-2 border-b border-zinc-800 space-y-2 flex flex-col items-center">
             <Button
               onClick={() => router.push("/resource")}
-              className="w-12 h-12 p-0 bg-[#adff2f] text-black hover:bg-[#9dff07] font-semibold"
+              className="w-12 h-12 p-0 bg-primary text-black hover:bg-primary-dark font-semibold"
               title="New Resource"
             >
               <Plus className="h-4 w-4" />
@@ -496,7 +496,7 @@ export default function FolderSidebar({
                     className="flex items-center gap-2 p-2 rounded-lg animate-pulse"
                   >
                     <div className="w-4 h-4 bg-zinc-700/60 rounded" />
-                    <div className="h-4 w-4 bg-zinc-700/60 rounded flex-shrink-0" />
+                    <div className="h-4 w-4 bg-zinc-700/60 rounded shrink-0" />
                     <div className="flex-1 h-4 bg-zinc-700/60 rounded" />
                   </div>
                 ))}
@@ -542,7 +542,7 @@ export default function FolderSidebar({
                         )}
                         {/* Spacer when on folder page to maintain alignment */}
                         {isOnFolderPage && isSelected && (
-                          <div className="w-4 h-4 flex-shrink-0" />
+                          <div className="w-4 h-4 shrink-0" />
                         )}
 
                         {/* Folder Icon and Name */}
@@ -556,7 +556,7 @@ export default function FolderSidebar({
                             }
                           }}
                         >
-                          <Folder className="h-4 w-4 text-zinc-400 flex-shrink-0" />
+                          <Folder className="h-4 w-4 text-zinc-400 shrink-0" />
                           {editingId === folder.id ? (
                             <div className="flex-1 flex items-center gap-1 min-w-0">
                               <Input
@@ -576,7 +576,7 @@ export default function FolderSidebar({
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-6 w-6 p-0 flex-shrink-0"
+                                className="h-6 w-6 p-0 shrink-0"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleUpdateFolder(folder.id, editTitle);
@@ -587,7 +587,7 @@ export default function FolderSidebar({
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-6 w-6 p-0 flex-shrink-0"
+                                className="h-6 w-6 p-0 shrink-0"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setEditingId(null);
@@ -602,7 +602,7 @@ export default function FolderSidebar({
                                 {folder.title}
                               </span>
                               {!isSelected && folderResources.length > 0 && (
-                                <span className="text-xs text-zinc-500 flex-shrink-0">
+                                <span className="text-xs text-zinc-500 shrink-0">
                                   ({folderResources.length})
                                 </span>
                               )}
@@ -611,7 +611,7 @@ export default function FolderSidebar({
                                   isSelected
                                     ? "opacity-100"
                                     : "opacity-0 group-hover:opacity-100"
-                                } flex items-center gap-1 flex-shrink-0`}
+                                } flex items-center gap-1 shrink-0`}
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <DropdownMenu>
@@ -699,9 +699,9 @@ export default function FolderSidebar({
                                     {editingResourceId === resource.id ? (
                                       <>
                                         {resource.type === "VIDEO" ? (
-                                          <Video className="h-4 w-4 text-zinc-400 flex-shrink-0" />
+                                          <Video className="h-4 w-4 text-zinc-400 shrink-0" />
                                         ) : (
-                                          <FileText className="h-4 w-4 text-zinc-400 flex-shrink-0" />
+                                          <FileText className="h-4 w-4 text-zinc-400 shrink-0" />
                                         )}
                                         <Input
                                           value={editResourceTitle}
@@ -725,7 +725,7 @@ export default function FolderSidebar({
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          className="h-5 w-5 p-0 flex-shrink-0"
+                                          className="h-5 w-5 p-0 shrink-0"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handleUpdateResource(
@@ -739,7 +739,7 @@ export default function FolderSidebar({
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          className="h-5 w-5 p-0 flex-shrink-0"
+                                          className="h-5 w-5 p-0 shrink-0"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             setEditingResourceId(null);
@@ -757,16 +757,16 @@ export default function FolderSidebar({
                                           }
                                         >
                                           {resource.type === "VIDEO" ? (
-                                            <Video className="h-4 w-4 text-zinc-400 flex-shrink-0" />
+                                            <Video className="h-4 w-4 text-zinc-400 shrink-0" />
                                           ) : (
-                                            <FileText className="h-4 w-4 text-zinc-400 flex-shrink-0" />
+                                            <FileText className="h-4 w-4 text-zinc-400 shrink-0" />
                                           )}
                                           <span className="flex-1 text-sm text-zinc-300 truncate leading-relaxed">
                                             {resource.title}
                                           </span>
                                         </div>
                                         <div
-                                          className="opacity-0 group-hover:opacity-100 flex-shrink-0"
+                                          className="opacity-0 group-hover:opacity-100 shrink-0"
                                           onClick={(e) => e.stopPropagation()}
                                         >
                                           <DropdownMenu>

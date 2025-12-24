@@ -76,7 +76,7 @@ export default function FolderModal({
             <Button
               onClick={handleCreate}
               disabled={!folderName.trim() || isCreating}
-              className="bg-[#adff2f] text-black hover:bg-[#9dff07]"
+              className="bg-primary text-black hover:bg-primary-dark"
             >
               {isCreating ? "Creating..." : "Create"}
             </Button>
@@ -86,4 +86,3 @@ export default function FolderModal({
     </Dialog>
   );
 }
-

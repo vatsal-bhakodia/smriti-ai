@@ -100,7 +100,7 @@ export default function LoginStreakCard({ days = 90 }: LoginStreakProps) {
           <div className="space-y-1 w-full">
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">Study Streak</p>
-              <span className="text-xs font-medium text-[#adff2f] bg-[#adff2f]/10 px-3 py-1 rounded-full flex items-center gap-1 border border-[#adff2f]/20">
+              <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full flex items-center gap-1 border border-primary/20">
                 {getGrowthTrend()}
               </span>
             </div>

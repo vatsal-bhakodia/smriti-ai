@@ -45,7 +45,7 @@ const LeftSidePanel = () => {
               key={idx}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm"
             >
-              <feature.icon className="w-4 h-4 text-[#adff2f]" />
+              <feature.icon className="w-4 h-4 text-primary" />
               <span className="text-sm text-gray-300">{feature.text}</span>
             </div>
           ))}

@@ -88,7 +88,7 @@ export default function LevelCard() {
           <div className="space-y-1 w-full">
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">Mastery Level</p>
-              <span className="text-xs font-medium text-[#adff2f] bg-[#adff2f]/10 px-3 py-1 rounded-full flex items-center gap-1 border border-[#adff2f]/20">
+              <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full flex items-center gap-1 border border-primary/20">
                 {displayXP} XP
               </span>
             </div>
@@ -103,7 +103,9 @@ export default function LevelCard() {
                 </Tooltip.Trigger>
                 <Tooltip.Content className="bg-black text-white px-2 py-1 rounded-md text-xs shadow-md">
                   {stats.level < 4
-                    ? `Need ${stats.level * 100 - stats.experience} XP for next level`
+                    ? `Need ${
+                        stats.level * 100 - stats.experience
+                      } XP for next level`
                     : "Max level reached"}
                   <Tooltip.Arrow className="fill-black" />
                 </Tooltip.Content>

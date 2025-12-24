@@ -6,7 +6,7 @@ import { Globe, Rocket, ArrowRightIcon, Mail } from "lucide-react";
 const CTA = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 md:px-20 py-24 relative text-center">
-      <div className="rounded-2xl px-8 py-12 md:px-12 md:py-16 shadow-2xl backdrop-blur-md bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+      <div className="rounded-2xl px-8 py-12 md:px-12 md:py-16 shadow-2xl backdrop-blur-md bg-linear-to-br from-primary/10 to-primary/5 border border-primary/20">
         <Globe className="w-20 h-20 mx-auto mb-8 text-primary" />
         <h2 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
           Ready to <span className="text-primary">Transform</span> Your
@@ -18,7 +18,7 @@ const CTA = () => {
         </p>
         <div className="flex flex-col sm:flex-row gap-6 justify-center">
           <Button
-            className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/80 hover:to-primary text-black font-semibold rounded-full px-10 py-4 h-auto transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 group relative overflow-hidden"
+            className="bg-linear-to-r from-primary to-primary/80 hover:from-primary/80 hover:to-primary text-black font-semibold rounded-full px-10 py-4 h-auto transform transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/30 group relative overflow-hidden"
             asChild
           >
             <Link href="/sign-in">
@@ -27,7 +27,7 @@ const CTA = () => {
                 Start Learning Free
                 <ArrowRightIcon className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1" />
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-primary/80 to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </Link>
           </Button>
           <Button

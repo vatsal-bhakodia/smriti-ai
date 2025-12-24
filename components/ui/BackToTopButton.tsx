@@ -51,7 +51,7 @@ export default function BackToTopButton() {
       disabled={isScrolling}
       className={`
         fixed right-6 z-50 p-3 rounded-full shadow-xl
-        bg-gradient-to-r from-neutral-600 to-neutral-800 hover:from-neutral-700 hover:to-neutral-900
+        bg-linear-to-r from-neutral-600 to-neutral-800 hover:from-neutral-700 hover:to-neutral-900
         text-white border-2 border-white/20
         transform transition-all duration-500 ease-out
         hover:scale-110 hover:shadow-2xl active:scale-95

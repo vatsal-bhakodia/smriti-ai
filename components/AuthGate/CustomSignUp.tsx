@@ -300,7 +300,7 @@ export function CustomSignup({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-white min-h-screen w-full px-4 py-8">
+    <div className="flex flex-col items-center justify-center bg-linear-to-br from-black via-zinc-950 to-zinc-900 text-white min-h-screen w-full px-4 py-8">
       <div className="mb-8 text-center">
         <header className="text-3xl md:text-4xl font-bold mb-3 text-white">
           Welcome to Smriti AI

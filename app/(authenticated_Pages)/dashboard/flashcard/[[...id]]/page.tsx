@@ -450,7 +450,7 @@ export default function FlashcardPage({ params }: { params: any }) {
                                 <div className="inline-block px-4 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">
                                   Term
                                 </div>
-                                <h2 className="text-2xl md:text-3xl font-bold break-words px-4">
+                                <h2 className="text-2xl md:text-3xl font-bold wrap-break-word px-4">
                                   {currentCard.term}
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
@@ -476,7 +476,7 @@ export default function FlashcardPage({ params }: { params: any }) {
                                 <div className="inline-block px-4 py-1 bg-primary/10 text-primary text-sm font-medium rounded-full">
                                   Definition
                                 </div>
-                                <p className="text-lg md:text-xl leading-relaxed break-words px-4">
+                                <p className="text-lg md:text-xl leading-relaxed wrap-break-word px-4">
                                   {currentCard.definition}
                                 </p>
                                 <p className="text-sm text-muted-foreground">

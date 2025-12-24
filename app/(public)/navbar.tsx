@@ -65,7 +65,7 @@ const NavButton = ({
   external = false,
 }: NavButtonProps) => {
   const baseClass =
-    "rounded-full cursor-pointer hover:bg-[#adff2f]/10 hover:text-[#adff2f] transition-all duration-300 hover:scale-105";
+    "rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-105";
 
   if (external) {
     return (
@@ -99,13 +99,13 @@ export default function Navbar() {
       <div className="px-4 lg:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center w-1/5 flex-shrink-0">
+          <div className="flex items-center w-1/5 shrink-0">
             <Link
               href="/#"
               className="flex items-center cursor-pointer hover:opacity-90 transition-all duration-300 group whitespace-nowrap"
             >
-              <Brain className="me-[5px] h-5 w-5 text-[#adff2f]" />
-              <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent group-hover:from-[#adff2f] group-hover:to-[#9dff07] transition-all duration-300">
+              <Brain className="me-[5px] h-5 w-5 text-primary" />
+              <span className="text-xl font-bold bg-linear-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent group-hover:from-primary group-hover:to-primary-dark transition-all duration-300">
                 Smriti AI
               </span>
             </Link>
@@ -128,7 +128,7 @@ export default function Navbar() {
                   label="Dashboard"
                   icon={LayoutDashboard}
                   variant="outline"
-                  className="rounded-full flex items-center gap-2 cursor-pointer border-[#adff2f]/30 text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] hover:text-black hover:border-[#adff2f] transition-all duration-300 hover:scale-105"
+                  className="rounded-full flex items-center gap-2 cursor-pointer border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black hover:border-primary transition-all duration-300 hover:scale-105"
                 />
               </div>
             </SignedIn>
@@ -140,12 +140,12 @@ export default function Navbar() {
                   href="/sign-in"
                   label="Sign In"
                   variant="outline"
-                  className="rounded-full flex items-center gap-2 border-[#adff2f]/30 text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] hover:text-black hover:border-[#adff2f] transition-all duration-300 hover:scale-105 px-4 py-2"
+                  className="rounded-full flex items-center gap-2 border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black hover:border-primary transition-all duration-300 hover:scale-105 px-4 py-2"
                 />
                 <ActionButton
                   href="/sign-up"
                   label="Sign Up"
-                  className="rounded-full bg-gradient-to-r from-[#adff2f] to-[#9dff07] text-black hover:text-black transition-all duration-300 hover:scale-105 px-4 py-2"
+                  className="rounded-full bg-linear-to-r from-primary to-primary-dark text-black hover:text-black transition-all duration-300 hover:scale-105 px-4 py-2"
                 />
               </div>
             </SignedOut>
@@ -158,12 +158,12 @@ export default function Navbar() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden flex items-center p-2 rounded-full hover:bg-[#adff2f]/10"
+              className="md:hidden flex items-center p-2 rounded-full hover:bg-primary/10"
             >
               {isMenuOpen ? (
-                <X className="h-6 w-6 text-[#adff2f]" />
+                <X className="h-6 w-6 text-primary" />
               ) : (
-                <Menu className="h-6 w-6 text-[#adff2f]" />
+                <Menu className="h-6 w-6 text-primary" />
               )}
             </button>
           </div>
@@ -206,7 +206,7 @@ export default function Navbar() {
                         icon={button.icon}
                         variant={button.variant}
                         external={button.external}
-                        className="w-full rounded-full flex items-center justify-center gap-2 border-[#adff2f]/30 text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] hover:text-black"
+                        className="w-full rounded-full flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black"
                       />
                     </SignedIn>
                   ) : (
@@ -217,7 +217,7 @@ export default function Navbar() {
                       icon={button.icon}
                       variant={button.variant}
                       external={button.external}
-                      className="w-full rounded-full flex items-center justify-center gap-2 border-[#adff2f]/30 text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] hover:text-black"
+                      className="w-full rounded-full flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black"
                     />
                   )
                 )}

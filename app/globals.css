@@ -172,6 +172,7 @@ body {
 
 @theme {
   --color-primary: #adff2f;
+  --color-primary-dark: #9dff07;
 }
 
 /* Webkit-based browsers (Chrome, Edge, Safari) */

@@ -97,7 +97,7 @@ export default function AboutPage() {
       {/* Header Section */}
       <div className="pt-14 max-w-7xl mx-auto px-6 md:px-20 text-center mb-10 relative">
         {/* Gradient background overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5 rounded-3xl blur-3xl -z-10"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-blue-500/5 rounded-3xl blur-3xl -z-10"></div>
 
         {/* Main heading with improved spacing */}
         <div className="space-y-8">
@@ -185,7 +185,7 @@ export default function AboutPage() {
       </div>
       {/* Vision Section */}
       <div className="max-w-7xl mx-auto px-6 md:px-20 mb-20">
-        <div className="bg-gradient-to-br from-primary/8 via-primary/4 to-transparent border border-primary/15 rounded-3xl p-8 md:p-16 relative overflow-hidden">
+        <div className="bg-linear-to-br from-primary/8 via-primary/4 to-transparent border border-primary/15 rounded-3xl p-8 md:p-16 relative overflow-hidden">
           {/* Background pattern */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary),0.03),transparent_70%)]"></div>
 
@@ -216,7 +216,7 @@ export default function AboutPage() {
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center mt-1">
+                  <div className="shrink-0 w-6 h-6 bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center mt-1">
                     <CheckCircle className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-white/80 text-lg">
@@ -224,7 +224,7 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center mt-1">
+                  <div className="shrink-0 w-6 h-6 bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center mt-1">
                     <CheckCircle className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-white/80 text-lg">
@@ -232,7 +232,7 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center mt-1">
+                  <div className="shrink-0 w-6 h-6 bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center mt-1">
                     <CheckCircle className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-white/80 text-lg">
@@ -240,7 +240,7 @@ export default function AboutPage() {
                   </span>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center mt-1">
+                  <div className="shrink-0 w-6 h-6 bg-primary/20 border border-primary/30 rounded-lg flex items-center justify-center mt-1">
                     <CheckCircle className="w-4 h-4 text-primary" />
                   </div>
                   <span className="text-white/80 text-lg">

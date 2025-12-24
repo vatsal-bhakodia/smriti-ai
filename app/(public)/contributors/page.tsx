@@ -69,7 +69,7 @@ const getLevelBadge = (contributions: number): ContributorLevel => {
     return {
       icon: <Trophy className="h-4 w-4" />,
       text: "Expert",
-      color: "bg-gradient-to-r from-yellow-400 to-orange-500",
+      color: "bg-linear-to-r from-yellow-400 to-orange-500",
       level: 3,
       requirement: "30+",
     };
@@ -77,7 +77,7 @@ const getLevelBadge = (contributions: number): ContributorLevel => {
     return {
       icon: <Medal className="h-4 w-4" />,
       text: "Advanced",
-      color: "bg-gradient-to-r from-purple-400 to-purple-600",
+      color: "bg-linear-to-r from-purple-400 to-purple-600",
       level: 2,
       requirement: "15-29",
     };
@@ -85,7 +85,7 @@ const getLevelBadge = (contributions: number): ContributorLevel => {
     return {
       icon: <Award className="h-4 w-4" />,
       text: "Contributor",
-      color: "bg-gradient-to-r from-primary to-[#9dff07]",
+      color: "bg-linear-to-r from-primary to-primary-dark",
       level: 1,
       requirement: "1-14",
     };
@@ -128,7 +128,7 @@ const levelRequirements: LevelRequirement[] = [
     requirement: "1-14 contributions",
     description:
       "Welcome to the community! Every journey starts with a single contribution.",
-    color: "from-primary to-[#9dff07]",
+    color: "from-primary to-primary-dark",
     benefits: [
       "Community recognition",
       "Contributor badge",
@@ -182,7 +182,7 @@ const ContributorAvatar: React.FC<{
 
   return (
     <div
-      className={`${sizes[size]} rounded-full overflow-hidden bg-gradient-to-r from-primary/20 to-purple-500/20 flex items-center justify-center ring-2 ring-white/10 relative`}
+      className={`${sizes[size]} rounded-full overflow-hidden bg-linear-to-r from-primary/20 to-purple-500/20 flex items-center justify-center ring-2 ring-white/10 relative`}
     >
       <img
         src={contributor.avatar_url}
@@ -291,7 +291,7 @@ const TopContributors: React.FC<{ contributors: Contributor[] }> = ({
             </div>
             <CardHeader className="text-center pb-4 relative z-10">
               <div className="relative mx-auto mb-4">
-                <div className="h-24 w-24 mx-auto rounded-full ring-4 ring-primary/30 group-hover:ring-primary/60 transition-all duration-300 overflow-hidden bg-gradient-to-r from-primary/20 to-purple-500/20 group-hover:scale-110">
+                <div className="h-24 w-24 mx-auto rounded-full ring-4 ring-primary/30 group-hover:ring-primary/60 transition-all duration-300 overflow-hidden bg-linear-to-r from-primary/20 to-purple-500/20 group-hover:scale-110">
                   <ContributorAvatar contributor={contributor} size="lg" />
                 </div>
                 <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-black font-bold text-sm group-hover:scale-110 transition-transform duration-300">
@@ -592,7 +592,7 @@ export default function Contributors() {
             >
               <CardHeader className="text-center">
                 <div
-                  className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-r ${level.color} flex items-center justify-center mb-4 text-white`}
+                  className={`w-16 h-16 mx-auto rounded-full bg-linear-to-r ${level.color} flex items-center justify-center mb-4 text-white`}
                 >
                   {level.icon}
                 </div>
@@ -646,7 +646,7 @@ export default function Contributors() {
       )}
 
       {/* Call to Action Section */}
-      <section className="text-center space-y-10 bg-gradient-to-br from-primary/15 via-primary/8 to-transparent backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/5 relative overflow-hidden">
+      <section className="text-center space-y-10 bg-linear-to-br from-primary/15 via-primary/8 to-transparent backdrop-blur-sm rounded-2xl p-8 md:p-12 border border-white/5 relative overflow-hidden">
         <div className="relative z-10">
           {/* Hero Content */}
           <div className="space-y-6 mb-10">

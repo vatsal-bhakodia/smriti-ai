@@ -222,7 +222,7 @@ export default function AddResourceForm({
   };
 
   return (
-    <div className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 rounded-2xl px-6 py-4 mb-8 border border-zinc-800/60 shadow-2xl shadow-black/40 backdrop-blur-sm">
+    <div className="bg-linear-to-br from-zinc-900 via-zinc-900 to-zinc-950 rounded-2xl px-6 py-4 mb-8 border border-zinc-800/60 shadow-2xl shadow-black/40 backdrop-blur-sm">
       {/* Header with Resource Type Selector */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2 p-1 bg-zinc-800/50 rounded-lg border border-zinc-700/50 w-fit">
@@ -256,12 +256,12 @@ export default function AddResourceForm({
                   >
                     <Icon
                       className={`h-4 w-4 transition-colors ${
-                        isSelected ? "text-[#adff2f]" : "text-zinc-400"
+                        isSelected ? "text-primary" : "text-zinc-400"
                       }`}
                     />
                     <span
                       className={`text-xs font-medium transition-colors ${
-                        isSelected ? "text-[#adff2f]" : "text-zinc-400"
+                        isSelected ? "text-primary" : "text-zinc-400"
                       }`}
                     >
                       {item.label}
@@ -293,7 +293,7 @@ export default function AddResourceForm({
                 value={youtubeUrl}
                 onChange={(e) => setYoutubeUrl(e.target.value)}
                 placeholder="Enter YouTube URL (e.g., https://youtube.com/watch?v=...)"
-                className="bg-zinc-800/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:border-[#adff2f]/60 focus:ring-2 focus:ring-[#adff2f]/20 transition-all h-12 pl-4 pr-4 rounded-xl"
+                className="bg-zinc-800/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-all h-12 pl-4 pr-4 rounded-xl"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && youtubeUrl && !isCreating) {
                     handleCreateResource();
@@ -304,7 +304,7 @@ export default function AddResourceForm({
             <Button
               onClick={handleCreateResource}
               disabled={!youtubeUrl || isCreating}
-              className="w-full bg-[#adff2f] text-black hover:bg-[#9dff07] font-semibold h-12 shadow-lg shadow-[#adff2f]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-xl hover:shadow-xl hover:shadow-[#adff2f]/30 hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full bg-primary text-black hover:bg-primary-dark font-semibold h-12 shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-xl hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
             >
               {isCreating ? (
                 <span className="flex items-center gap-2">
@@ -334,7 +334,7 @@ export default function AddResourceForm({
                 value={pdfTitle}
                 onChange={(e) => setPdfTitle(e.target.value)}
                 placeholder="Enter a title for your PDF"
-                className="bg-zinc-800/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:border-[#adff2f]/60 focus:ring-2 focus:ring-[#adff2f]/20 transition-all h-12 rounded-xl"
+                className="bg-zinc-800/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-all h-12 rounded-xl"
               />
             </div>
 
@@ -349,17 +349,17 @@ export default function AddResourceForm({
                 onDrop={handleDrop}
                 className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${
                   isDragging
-                    ? "border-[#adff2f] bg-[#adff2f]/5 scale-[1.01]"
+                    ? "border-primary bg-primary/5 scale-[1.01]"
                     : pdfFile
-                    ? "border-[#adff2f]/50 bg-zinc-800/40"
+                    ? "border-primary/50 bg-zinc-800/40"
                     : "border-zinc-700/60 bg-zinc-800/30 hover:border-zinc-600 hover:bg-zinc-800/50"
                 }`}
               >
                 {pdfFile ? (
                   <div className="p-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-[#adff2f]/10 rounded-lg">
-                        <FileText className="h-8 w-8 text-[#adff2f]" />
+                      <div className="p-3 bg-primary/10 rounded-lg">
+                        <FileText className="h-8 w-8 text-primary" />
                       </div>
                       <div className="flex-1">
                         <p className="text-white font-medium text-sm truncate max-w-[300px]">
@@ -391,7 +391,7 @@ export default function AddResourceForm({
                       <div>
                         <p className="text-white font-medium mb-1">
                           Drop your PDF here or{" "}
-                          <span className="text-[#adff2f] hover:text-[#9dff07] transition-colors">
+                          <span className="text-primary hover:text-primary-dark transition-colors">
                             browse
                           </span>
                         </p>
@@ -416,7 +416,7 @@ export default function AddResourceForm({
             <Button
               onClick={handleCreateResource}
               disabled={!pdfTitle || !pdfFile || isCreating}
-              className="w-full bg-[#adff2f] text-black hover:bg-[#9dff07] font-semibold h-12 shadow-lg shadow-[#adff2f]/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-xl hover:shadow-xl hover:shadow-[#adff2f]/30 hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full bg-primary text-black hover:bg-primary-dark font-semibold h-12 shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-xl hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
             >
               {isCreating ? (
                 <span className="flex items-center gap-2">

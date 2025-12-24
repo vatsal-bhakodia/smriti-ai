@@ -24,13 +24,13 @@ export default function Navbar() {
       <div className="px-4 lg:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center w-1/5 flex-shrink-0">
+          <div className="flex items-center w-1/5 shrink-0">
             <Link
               href="/#"
               className="flex items-center cursor-pointer hover:opacity-90 transition-all duration-300 group whitespace-nowrap"
             >
-              <Brain className="me-[5px] h-5 w-5 text-[#adff2f]" />
-              <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent group-hover:from-[#adff2f] group-hover:to-[#9dff07] transition-all duration-300">
+              <Brain className="me-[5px] h-5 w-5 text-primary" />
+              <span className="text-xl font-bold bg-linear-to-r from-gray-900 to-gray-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent group-hover:from-primary group-hover:to-primary-dark transition-all duration-300">
                 Smriti AI
               </span>
             </Link>
@@ -43,7 +43,7 @@ export default function Navbar() {
               label="Dashboard"
               icon={LayoutDashboard}
               variant="outline"
-              className="rounded-full flex items-center gap-2 cursor-pointer border-[#adff2f]/30 text-[#adff2f] hover:bg-gradient-to-r hover:from-[#adff2f] hover:to-[#9dff07] hover:text-black hover:border-[#adff2f] transition-all duration-300 hover:scale-105"
+              className="rounded-full flex items-center gap-2 cursor-pointer border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black hover:border-primary transition-all duration-300 hover:scale-105"
             />
             {/* Profile */}
             <UserButton />
@@ -52,9 +52,9 @@ export default function Navbar() {
             {isResourcePage && sidebarContext && (
               <button
                 onClick={() => sidebarContext.toggleSidebar()}
-                className="lg:hidden flex items-center p-2 rounded-full hover:bg-[#adff2f]/10"
+                className="lg:hidden flex items-center p-2 rounded-full hover:bg-primary/10"
               >
-                <Menu className="h-6 w-6 text-[#adff2f]" />
+                <Menu className="h-6 w-6 text-primary" />
               </button>
             )}
           </div>

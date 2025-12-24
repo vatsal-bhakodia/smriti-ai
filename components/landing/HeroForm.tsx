@@ -109,7 +109,7 @@ const HeroForm = () => {
           rounded-full
           ${
             isFocused
-              ? "border-[#adff2f] shadow-lg shadow-[#adff2f]/20"
+              ? "border-primary shadow-lg shadow-primary/20"
               : "border-zinc-700 hover:border-zinc-600"
           }
         `}
@@ -139,11 +139,11 @@ const HeroForm = () => {
             group
             relative
             px-8 py-4
-            bg-gradient-to-r from-[#adff2f] to-[#9dff07]
-            hover:from-[#9dff07] hover:to-[#adff2f]
+            bg-linear-to-r from-primary to-primary-dark
+            hover:from-primary-dark hover:to-primary
             text-black font-semibold
             transition-all duration-300
-            hover:shadow-xl hover:shadow-[#adff2f]/30
+            hover:shadow-xl hover:shadow-primary/30
             flex items-center gap-2
             overflow-hidden
             whitespace-nowrap
@@ -156,7 +156,7 @@ const HeroForm = () => {
               <ArrowRightIcon className="w-5 h-5 transform transition-transform duration-300 group-hover:translate-x-1" />
             )}
           </span>
-          <div className="absolute inset-0 bg-gradient-to-r from-[#9dff07] to-[#adff2f] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="absolute inset-0 bg-linear-to-r from-primary-dark to-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </button>
       </div>
     </form>

@@ -234,13 +234,13 @@ export default function FolderPage({ params }: { params: any }) {
                   handleCancelEditFolderName();
                 }
               }}
-              className="text-3xl font-bold text-white bg-zinc-800/60 border-zinc-700/60 focus:border-[#adff2f]/60 focus:ring-2 focus:ring-[#adff2f]/20 transition-all h-auto py-2 px-4"
+              className="text-3xl font-bold text-white bg-zinc-800/60 border-zinc-700/60 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-all h-auto py-2 px-4"
               autoFocus
             />
             <Button
               onClick={handleSaveFolderName}
               size="icon"
-              className="bg-[#adff2f] text-black hover:bg-[#9dff07] h-9 w-9"
+              className="bg-primary text-black hover:bg-primary-dark h-9 w-9"
             >
               <Check className="h-4 w-4" />
             </Button>
@@ -259,12 +259,12 @@ export default function FolderPage({ params }: { params: any }) {
               <h1 className="text-3xl font-bold text-white">{folderName}</h1>
               <Pencil
                 onClick={handleStartEditFolderName}
-                className="text-zinc-400 hover:text-[#adff2f] hover:bg-zinc-800/50 transition-opacity h-6 w-6 cursor-pointer"
+                className="text-zinc-400 hover:text-primary hover:bg-zinc-800/50 transition-opacity h-6 w-6 cursor-pointer"
               />
             </div>
             <Button
               onClick={() => setShowAddResource(!showAddResource)}
-              className="bg-[#adff2f] text-black hover:bg-[#9dff07] font-semibold"
+              className="bg-primary text-black hover:bg-primary-dark font-semibold"
             >
               {showAddResource ? (
                 <>
@@ -298,7 +298,7 @@ export default function FolderPage({ params }: { params: any }) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search resources..."
-            className="pl-10 bg-zinc-900/80 border-zinc-800 text-white placeholder:text-zinc-500 focus:border-[#adff2f]/50 focus:ring-1 focus:ring-[#adff2f]/20 transition-all"
+            className="pl-10 bg-zinc-900/80 border-zinc-800 text-white placeholder:text-zinc-500 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
           />
         </div>
       </div>
@@ -343,7 +343,7 @@ export default function FolderPage({ params }: { params: any }) {
           {filteredResources.map((resource) => (
             <div
               key={resource.id}
-              className="relative group cursor-pointer bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-[#adff2f] transition"
+              className="relative group cursor-pointer bg-zinc-900 rounded-lg overflow-hidden hover:ring-2 hover:ring-primary transition"
               style={{ maxWidth: "320px" }}
               onClick={() => handleResourceClick(resource.id)}
             >

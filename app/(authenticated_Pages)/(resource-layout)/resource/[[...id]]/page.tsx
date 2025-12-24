@@ -268,7 +268,7 @@ export default function ResourcePage({ params }: { params: any }) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-gray-200 border-t-[#adff2f] rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-white text-lg">Processing your YouTube video...</p>
         </div>
       </div>
@@ -281,17 +281,17 @@ export default function ResourcePage({ params }: { params: any }) {
         <div className="w-full max-w-3xl">
           {/* Decorative background elements */}
           <div className="absolute inset-0 -z-10 overflow-hidden">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#adff2f]/5 rounded-full blur-3xl"></div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
           </div>
 
           {/* Header Section */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-[#adff2f]/20 to-[#adff2f]/5 border border-[#adff2f]/20 mb-6 shadow-lg shadow-[#adff2f]/10 backdrop-blur-sm">
-              <Brain className="h-12 w-12 text-[#adff2f]" />
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-linear-to-br from-primary/20 to-primary/5 border border-primary/20 mb-6 shadow-lg shadow-primary/10 backdrop-blur-sm">
+              <Brain className="h-12 w-12 text-primary" />
             </div>
 
-            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-bold mb-4 bg-linear-to-r from-white to-zinc-300 bg-clip-text text-transparent">
               Add Your Resource
             </h2>
 
@@ -327,7 +327,7 @@ export default function ResourcePage({ params }: { params: any }) {
       <div className="flex-1 flex flex-col pt-5 w-full h-full min-h-0">
         {/* Header - Only show when there are messages */}
         {messages.length > 0 && (
-          <div className="px-6 flex-shrink-0">
+          <div className="px-6 shrink-0">
             <div className="max-w-7xl mx-auto">
               {isLoading ? (
                 <div className="flex items-center gap-3 mb-4">
@@ -339,7 +339,7 @@ export default function ResourcePage({ params }: { params: any }) {
                   href={resourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex justify-center items-center gap-2 text-white text-lg hover:text-[#adff2f] transition-colors mb-4"
+                  className="inline-flex justify-center items-center gap-2 text-white text-lg hover:text-primary transition-colors mb-4"
                 >
                   <h1 className="text-3xl font-bold">{resourceTitle}</h1>
                   <ExternalLink className="h-5 w-5" />
@@ -364,7 +364,7 @@ export default function ResourcePage({ params }: { params: any }) {
                       href={resourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 text-white hover:text-[#adff2f] transition-colors"
+                      className="inline-flex items-center gap-3 text-white hover:text-primary transition-colors"
                     >
                       <h2 className="text-lg md:text-4xl font-bold">
                         {resourceTitle}
@@ -424,7 +424,7 @@ export default function ResourcePage({ params }: { params: any }) {
         </div>
 
         {/* Input & Actions */}
-        <div className="max-w-7xl mx-auto w-full border-t border-muted bg-zinc-800 p-4 shadow-inner rounded-t-3xl flex-shrink-0">
+        <div className="max-w-7xl mx-auto w-full border-t border-muted bg-zinc-800 p-4 shadow-inner rounded-t-3xl shrink-0">
           {/* Input Row */}
           <div className="flex gap-2 mb-4 items-end">
             <Textarea
@@ -443,7 +443,7 @@ export default function ResourcePage({ params }: { params: any }) {
             />
             <Button
               size="icon"
-              className="rounded-full bg-[#adff2f] hover:bg-[#9dff07] text-black hover:scale-105 transition"
+              className="rounded-full bg-primary hover:bg-primary-dark text-black hover:scale-105 transition"
               onClick={() => handleSend(input)}
             >
               <Send className="w-4 h-4" />

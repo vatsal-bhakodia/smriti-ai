@@ -11,7 +11,7 @@ import {
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartColumnBig, LoaderCircle } from "lucide-react";
-import useSWR from 'swr';
+import useSWR from "swr";
 
 // A simple fetcher function for SWR
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -64,7 +64,11 @@ function PerformanceChart({ data }: { data: any[] }) {
 
 export default function PerformanceCard() {
   // SWR to fetch data from API endpoint
-  const { data: chartData, error, isLoading } = useSWR('/api/performance-data', fetcher);
+  const {
+    data: chartData,
+    error,
+    isLoading,
+  } = useSWR("/api/performance-data", fetcher);
 
   return (
     <Card className="pt-3 pb-0 gap-3">
@@ -76,7 +80,7 @@ export default function PerformanceCard() {
           <div className="flex items-center justify-between">
             <p className="text-sm">Performance</p>
             {/* This part can be dynamic later */}
-            <span className="text-xs font-medium text-[#adff2f] bg-[#adff2f]/10 px-3 py-1 rounded-full flex items-center gap-1 border border-[#adff2f]/20">
+            <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full flex items-center gap-1 border border-primary/20">
               Last 6 Months
             </span>
           </div>
@@ -85,13 +89,13 @@ export default function PerformanceCard() {
       <CardContent className="px-2">
         {isLoading && (
           <div className="h-[80px] flex items-center justify-center">
-             <LoaderCircle className="h-6 w-6 animate-spin text-muted-foreground" />
+            <LoaderCircle className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         )}
         {error && (
-            <div className="h-[80px] flex items-center justify-center text-red-500 text-xs">
-                Failed to load chart data.
-            </div>
+          <div className="h-[80px] flex items-center justify-center text-red-500 text-xs">
+            Failed to load chart data.
+          </div>
         )}
         {chartData && <PerformanceChart data={chartData} />}
       </CardContent>
