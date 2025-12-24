@@ -50,11 +50,21 @@ export default function AuthGate({ children }: { children: ReactNode }) {
               previousStreak
             );
 
-            toast.success(`${emoji} ${message}`, {
-              duration: 5000,
-              position: "bottom-right",
-              className: "text-base",
-            });
+            toast.success(
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "8px" }}
+              >
+                <span style={{ fontSize: "1.75rem", lineHeight: "1" }}>
+                  {emoji}
+                </span>
+                <span>{message}</span>
+              </div>,
+              {
+                duration: 5000,
+                position: "bottom-right",
+                className: "text-base",
+              }
+            );
           }
 
           console.log("Daily login tracked successfully");

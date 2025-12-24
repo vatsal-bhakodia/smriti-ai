@@ -7,7 +7,7 @@ export function getStreakMessage(
   if (streakBroken && previousStreak > 1) {
     return {
       emoji: "😢",
-      message: `Streak reset! But don't worry, you're back at day 1. Every master was once a beginner!`,
+      message: `Streak reset! But don't worry, you're back at day 1.`,
     };
   }
 
@@ -15,8 +15,7 @@ export function getStreakMessage(
   if (currentStreak === 1 && !streakBroken) {
     return {
       emoji: "🌟",
-      message:
-        "Welcome back! Day 1 of your new streak. Let's make this one count!",
+      message: "Welcome back! Day 1 of your new streak.",
     };
   }
 
@@ -24,19 +23,19 @@ export function getStreakMessage(
   if (currentStreak === 100) {
     return {
       emoji: "💯",
-      message: "100 days! You're a legend! This is incredible dedication!",
+      message: "100 days! You're a legend!",
     };
   }
   if (currentStreak === 50) {
     return {
       emoji: "👑",
-      message: "50 day streak! You're unstoppable! Keep this momentum going!",
+      message: "50 day streak! You're unstoppable!",
     };
   }
   if (currentStreak === 30) {
     return {
       emoji: "🎖️",
-      message: "30 days strong! You've built an amazing habit. Keep shining!",
+      message: "30 days strong! You've built an amazing habit!",
     };
   }
   if (currentStreak === 21) {
