@@ -119,18 +119,46 @@ ${question}`,
 
 export const MINDMAP_PROMPT = (summary: string) => ({
   system: SYSTEM_PROMPTS.MINDMAP_GENERATOR,
-  user: `Generate a clear, organized mind map from this summary.
+  user: `
+Generate a clean, clutter-free, beautitful mind map.
 
-Rules:
-1. Use mermaid.js 'graph TD' format
-2. Start from a central topic node and branch into key concepts
-3. Sub-branches should cover details, processes, relationships, or definitions
-4. Use 6-12 nodes maximum for clarity
-5. DO NOT use emojis or special characters (α, β, ∑, ₹, etc.) - use plain English words
-6. DO NOT use numbers - use words like "one", "two", etc.
+STRICT RULES:
+- Use ONLY mermaid.js syntax
+- Use "graph TD"
+- Output ONLY valid mermaid code
+- One visually dominant central node
+- Arrange the branches in a balanced layout:
+- Achieve balance using subgraph grouping (do not place all branches in one vertical line)
+- Each main branch may have one or two small sub-branches only
+- Keep the total node count between six and twelve
+- Do NOT use emojis, icons, images, or special characters
+- Do NOT use digits or numbers (write numbers in words)
 
-Summary:
-${summary}`,
+LAYOUT & STRUCTURE:
+- Use subgraphs to simulate a radial layout
+- Keep depth shallow (maximum two levels from center)
+- Avoid long horizontal chains
+- Structure must feel symmetric, calm, and uncluttered
+
+STYLE & AESTHETIC:
+- Central node must be visually dominant
+- Subgraphs must NOT have visible backgrounds
+- Each main branch must have a unique soft pastel color
+- Do NOT rely on subgraph background alone
+- Use rounded shapes
+- Borders should be subtle and readable
+- Use classDef and :::className consistently
+- Avoid heavy strokes or harsh contrast
+
+OUTPUT FORMAT:
+- Mermaid code only
+- No explanations
+- No markdown
+- No code fences
+
+SUMMARY:
+${summary}
+`,
 });
 
 // ============================
