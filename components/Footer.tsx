@@ -94,15 +94,14 @@ const Footer = () => {
 
   const footerLinks = {
     product: [
-      { name: "Features", href: "#features" },
-      { name: "Pricing", href: "#pricing" },
-      { name: "Study Tools", href: "/sign-in" },
-      { name: "Mind Maps", href: "/sign-in" },
+      { name: "AI Quizes", href: "/quiz" },
+      { name: "AI Mind Maps", href: "/mindmap" },
+      { name: "AI FLashcards", href: "/quiz" },
     ],
     company: [
+      { name: "Blogs", href: "/blogs" },
       { name: "About Us", href: "/about" },
-      { name: "Blog", href: "/blogs" },
-      { name: "Contact", href: "/contact" },
+      { name: "Contact Us", href: "/contact" },
       {
         name: "Our Contributors",
         href: "/contributors",

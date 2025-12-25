@@ -3,51 +3,109 @@
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { AnimatePresence, motion } from "framer-motion";
-import { Brain, LayoutDashboard, Star } from "lucide-react";
+import {
+  Brain,
+  LayoutDashboard,
+  ChevronDown,
+  FileText,
+  File,
+  Youtube,
+  Layers,
+  Network,
+  HelpCircle,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { ActionButton } from "@/components/ActionButton";
+
+// ---------------- Tools Data Structure ----------------
+const toolsData = {
+  flashcard: {
+    title: "Flashcard",
+    icon: Layers,
+    items: [
+      {
+        href: "/tools/text-to-flashcards",
+        label: "Text to Flashcards",
+        icon: FileText,
+        description: "Convert text content into interactive flashcards",
+        default: true,
+      },
+      {
+        href: "/tools/pdf-to-flashcards",
+        label: "PDF to Flashcards",
+        icon: File,
+        description: "Transform PDF documents into study flashcards",
+      },
+      {
+        href: "/tools/youtube-to-flashcards",
+        label: "YouTube to Flashcards",
+        icon: Youtube,
+        description: "Create flashcards from YouTube video content",
+      },
+    ],
+  },
+  mindmap: {
+    title: "Mindmap",
+    icon: Network,
+    items: [
+      {
+        href: "/tools/text-to-mindmaps",
+        label: "Text to Mindmaps",
+        icon: FileText,
+        description: "Visualize text content as structured mindmaps",
+        default: true,
+      },
+      {
+        href: "/tools/pdf-to-mindmaps",
+        label: "PDF to Mindmaps",
+        icon: File,
+        description: "Generate mindmaps from PDF documents",
+      },
+      {
+        href: "/tools/youtube-to-mindmaps",
+        label: "YouTube to Mindmaps",
+        icon: Youtube,
+        description: "Create visual mindmaps from YouTube videos",
+      },
+    ],
+  },
+  quiz: {
+    title: "Quiz",
+    icon: HelpCircle,
+    items: [
+      {
+        href: "/tools/text-to-quiz",
+        label: "Text to Quiz",
+        mobileLabel: "Quiz",
+        icon: FileText,
+        description: "Generate quizzes from text content",
+        default: true,
+      },
+      {
+        href: "/tools/pdf-to-quiz",
+        label: "PDF to Quiz",
+        mobileLabel: "Quiz",
+        icon: File,
+        description: "Create quizzes from PDF documents",
+      },
+      {
+        href: "/tools/youtube-to-quiz",
+        label: "YouTube to Quiz",
+        icon: Youtube,
+        description: "Build quizzes from YouTube video content",
+      },
+    ],
+  },
+};
 
 // ---------------- Navigation Links ----------------
 const navigationLinks = [
   { href: "/#", label: "Home" },
-  { href: "/dashboard/interview", label: "Interview Prep" },
-  { href: "/about", label: "About Us" },
-  { href: "/blogs", label: "Blogs" },
-  { href: "/contact", label: "Contact Us" },
-];
-
-// ---------------- Mobile Action Buttons ----------------
-const mobileActionButtons: Array<{
-  href: string;
-  label: string;
-  icon?: React.ElementType;
-  variant?: "outline" | "ghost" | "default";
-  authRequired?: boolean;
-  external?: boolean;
-}> = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    variant: "outline",
-    authRequired: true,
-  },
-  {
-    href: "/dashboard/interview",
-    label: "Interview Prep",
-    variant: "outline",
-    authRequired: true,
-  },
-  {
-    href: "https://github.com/vatsal-bhakodia/smriti-ai",
-    label: "Star on GitHub",
-    icon: Star,
-    variant: "outline",
-    external: true,
-  },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/contact", label: "Contact" },
 ];
 
 // ---------------- Reusable Nav Button ----------------
@@ -86,9 +144,99 @@ const NavButton = ({
   );
 };
 
+// ---------------- Mega Menu Component ----------------
+type MegaMenuProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+const MegaMenu = ({ isOpen, onClose }: MegaMenuProps) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        ref={menuRef}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
+        transition={{ duration: 0.2 }}
+        className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[90vw] max-w-5xl bg-background border border-border rounded-lg shadow-lg p-8"
+        onMouseLeave={onClose}
+      >
+        <div className="grid grid-cols-3 gap-8">
+          {Object.values(toolsData).map((category) => {
+            const CategoryIcon = category.icon;
+            return (
+              <div key={category.title} className="space-y-4">
+                <h3 className="font-medium text-md text-foreground mb-4 flex items-center gap-2">
+                  <div className="p-1.5 rounded-md bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
+                    <CategoryIcon className="h-5 w-5 text-primary" />
+                  </div>
+                  {category.title}
+                </h3>
+                <ul className="space-y-3">
+                  {category.items.map((item) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <li key={item.href}>
+                        <Link
+                          href={item.href}
+                          onClick={onClose}
+                          className="group block p-3 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-all duration-200"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0">
+                              <div className="p-1.5 rounded-md bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
+                                <IconComponent className="h-4 w-4 text-primary" />
+                              </div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors duration-200 mb-1.5">
+                                {item.label}
+                              </h4>
+                              <p className="text-xs text-muted-foreground leading-relaxed">
+                                {item.description}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 // ---------------- Public Navbar Component ----------------
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+  const [isMobileToolsOpen, setIsMobileToolsOpen] = useState(false);
   const pathname = usePathname();
 
   // Close mobile menu on route change
@@ -112,8 +260,32 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center justify-center gap-4 w-3/5">
-            {navigationLinks.map((link) => (
+          <div className="hidden md:flex items-center justify-center gap-4 w-3/5 relative">
+            {/* Home */}
+            <NavButton
+              href={navigationLinks[0].href}
+              label={navigationLinks[0].label}
+            />
+            {/* Tools Mega Menu Trigger */}
+            <div
+              className="relative"
+              onMouseEnter={() => setIsMegaMenuOpen(true)}
+              onMouseLeave={() => setIsMegaMenuOpen(false)}
+            >
+              <Button
+                variant="ghost"
+                className="rounded-full cursor-pointer hover:bg-primary/10 hover:text-primary transition-all duration-300 hover:scale-105 flex items-center gap-1"
+              >
+                Tools
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+              <MegaMenu
+                isOpen={isMegaMenuOpen}
+                onClose={() => setIsMegaMenuOpen(false)}
+              />
+            </div>
+            {/* Pricing and Contact */}
+            {navigationLinks.slice(1).map((link) => (
               <NavButton key={link.href} href={link.href} label={link.label} />
             ))}
           </div>
@@ -177,50 +349,92 @@ export default function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden bg-background/95 border-t border-border"
+              className="md:hidden overflow-hidden bg-background/98 backdrop-blur-lg border-t border-border shadow-lg"
             >
               <motion.div
                 initial={{ y: -20 }}
                 animate={{ y: 0 }}
                 exit={{ y: -20 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="py-4 px-2 space-y-3"
+                className="py-6 px-4 space-y-1"
               >
                 {/* Mobile Navigation Links */}
-                {navigationLinks.map((link) => (
-                  <NavButton
-                    key={link.href}
-                    href={link.href}
-                    label={link.label}
-                    className="w-full text-left"
-                  />
-                ))}
+                <div className="space-y-1">
+                  {navigationLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200 text-sm font-medium text-foreground"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
 
-                {/* Mobile Action Buttons */}
-                {mobileActionButtons.map((button) =>
-                  button.authRequired ? (
-                    <SignedIn key={button.href}>
-                      <ActionButton
-                        href={button.href}
-                        label={button.label}
-                        icon={button.icon}
-                        variant={button.variant}
-                        external={button.external}
-                        className="w-full rounded-full flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black"
-                      />
-                    </SignedIn>
-                  ) : (
+                {/* Mobile Tools Dropdown */}
+                <div className="border-b border-t border-border">
+                  <button
+                    onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200 text-sm font-semibold text-foreground"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Layers className="h-4 w-4" />
+                      Tools
+                    </span>
+                    <motion.div
+                      animate={{ rotate: isMobileToolsOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </motion.div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isMobileToolsOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pl-4 pr-2 py-2 space-y-1 mt-2">
+                          {Object.values(toolsData).map((category) => {
+                            const defaultItem = category.items.find(
+                              (item) => (item.default = true)
+                            );
+                            if (!defaultItem) return null;
+                            return (
+                              <Link
+                                key={category.title}
+                                href={defaultItem.href}
+                                onClick={() => setIsMenuOpen(false)}
+                                className="block px-4 py-2 rounded-md hover:bg-primary/10 hover:text-primary transition-colors duration-200 text-sm font-medium"
+                              >
+                                {category.title}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Dashboard Link */}
+                <div className="space-y-1">
+                  <SignedIn>
                     <ActionButton
-                      key={button.href}
-                      href={button.href}
-                      label={button.label}
-                      icon={button.icon}
-                      variant={button.variant}
-                      external={button.external}
-                      className="w-full rounded-full flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black"
+                      href="/dashboard"
+                      label="Dashboard"
+                      icon={LayoutDashboard}
+                      variant="outline"
+                      external={true}
+                      className="w-full rounded-lg flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-primary/10 hover:border-primary transition-all duration-200 mt-2"
                     />
-                  )
-                )}
+                  </SignedIn>
+                </div>
               </motion.div>
             </motion.div>
           )}

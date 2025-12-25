@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { getAllBlogPosts } from "@/lib/blog";
+import { toolsData } from "@/content/tools";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const h = await headers();
@@ -35,5 +36,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  return [...staticEntries, ...blogEntries];
+  // Dynamic tool pages
+  const toolEntries: MetadataRoute.Sitemap = Object.values(toolsData).map(
+    (tool) => ({
+      url: new URL(`/tools/${tool.slug}`, BASE).toString(),
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    })
+  );
+
+  return [...staticEntries, ...blogEntries, ...toolEntries];
 }
