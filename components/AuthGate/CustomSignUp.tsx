@@ -78,7 +78,7 @@ export function CustomSignup({
           const res = await axios.post<{
             available: boolean;
             username: string;
-          }>("/api/check-username", {
+          }>("/api/user/check-username", {
             username: finalUsername,
           });
 
@@ -145,7 +145,7 @@ export function CustomSignup({
     usernameCheckTimeout.current = setTimeout(async () => {
       try {
         const res = await axios.post<{ available: boolean; username: string }>(
-          "/api/check-username",
+          "/api/user/check-username",
           { username }
         );
         setUsernameStatus(res.data.available ? "available" : "taken");
@@ -265,7 +265,7 @@ export function CustomSignup({
     setIsLoading(true);
 
     try {
-      const res = await axios.post<{ message: string }>("/api/create-user", {
+      const res = await axios.post<{ message: string }>("/api/user/create", {
         email,
         mobile: `+${phone}`,
         dob: format(dob, "yyyy-MM-dd"),

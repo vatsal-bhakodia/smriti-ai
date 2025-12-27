@@ -1,6 +1,4 @@
-// app/api/performance-data/route.ts
-
-import db from "@/lib/prisma"; // import style for a default export
+import db from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { QuizResult } from "@prisma/client";
@@ -46,7 +44,9 @@ export async function GET() {
 
     const monthlyPerformance = quizResults.reduce(
       (acc: MonthlyPerformanceAccumulator, result: QuizResult) => {
-        const month = result.createdAt.toLocaleString("default", { month: "long" });
+        const month = result.createdAt.toLocaleString("default", {
+          month: "long",
+        });
         const year = result.createdAt.getFullYear();
         const key = `${month} ${year}`;
 
@@ -63,7 +63,9 @@ export async function GET() {
     );
 
     // Format data for the chart
-    const chartData = (Object.values(monthlyPerformance) as MonthlyPerformanceValue[])
+    const chartData = (
+      Object.values(monthlyPerformance) as MonthlyPerformanceValue[]
+    )
       .map((value) => ({
         month: value.date.toLocaleString("default", { month: "long" }),
         marks: Math.round(value.totalScore / value.count),
@@ -74,7 +76,6 @@ export async function GET() {
       .map(({ month, marks }) => ({ month, marks }));
 
     return NextResponse.json(chartData);
-
   } catch (error) {
     console.error("[PERFORMANCE_DATA_API]", error);
     return new NextResponse("Internal Server Error", { status: 500 });

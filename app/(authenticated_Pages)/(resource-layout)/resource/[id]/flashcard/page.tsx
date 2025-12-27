@@ -75,7 +75,7 @@ export default function FlashcardPage({ params }: { params: any }) {
           task: "flashcards",
         };
 
-        const resFlashcards = await axios.post("/api/resource-ai", payload);
+        const resFlashcards = await axios.post("/api/resource/ai", payload);
 
         if (
           resFlashcards.data &&
@@ -119,7 +119,7 @@ export default function FlashcardPage({ params }: { params: any }) {
         task: "flashcards",
       };
 
-      const res = await axios.post("/api/resource-ai", payload);
+      const res = await axios.post("/api/resource/ai", payload);
 
       if (
         res.data &&
@@ -149,7 +149,7 @@ export default function FlashcardPage({ params }: { params: any }) {
   const handleExport = async (format: "txt" | "anki" = "txt") => {
     setIsExporting(true);
     try {
-      const response = await axios.get(`/api/flashcard-export`, {
+      const response = await axios.get(`/api/resource/flashcard-export`, {
         params: {
           resourceId: id,
           format,

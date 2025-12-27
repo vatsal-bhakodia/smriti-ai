@@ -8,7 +8,7 @@ import CTA from "@/components/landing/CTA";
 import { generateMetadataUtil } from "@/utils/generateMetadata";
 
 export const metadata = generateMetadataUtil({
-  title: "Smriti AI",
+  title: "Smriti AI - Study Tool & Online Learning Platform",
   description:
     "Join millions of students using Smriti AI to learn faster and remember better. Turn any PDF, YouTube video, or website into AI-powered flashcards, summaries, and mind maps instantly. Free to start.",
   keywords: [
@@ -43,10 +43,10 @@ export const metadata = generateMetadataUtil({
   ],
   url: "https://www.smriti.live/",
   image: "/seo_banner.png",
-  ogTitle: "Smriti AI - AI Learning Tool | Learn Faster, Remember Better",
+  ogTitle: "Smriti AI - Study Tool & Online Learning Platform",
   ogDescription:
     "Turn any PDF into AI-powered flashcards. Join millions of students learning smarter with personalized summaries, mind maps, and instant feedback.",
-  twitterTitle: "Smriti AI - Personal AI Tutor",
+  twitterTitle: "Smriti AI - Study Tool & Online Learning Platform",
   twitterDescription:
     "Smriti AI gives you an unfair advantage by using AI to ace every exam. Upload notes or PDFs and instantly get flashcards, summaries, mind maps and deep research.",
 });

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileVideo, FileText, Upload, X } from "lucide-react";
+import { FileVideo, FileText, Upload, X, Type } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -34,10 +34,12 @@ export default function AddResourceForm({
   showCancelButton = false,
 }: AddResourceFormProps) {
   const router = useRouter();
-  const [resourceType, setResourceType] = useState<"VIDEO" | "PDF">("VIDEO");
+  const [resourceType, setResourceType] = useState<"VIDEO" | "PDF" | "TEXT">("TEXT");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfTitle, setPdfTitle] = useState("");
+  const [textContent, setTextContent] = useState("");
+  const [textTitle, setTextTitle] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -134,7 +136,7 @@ export default function AddResourceForm({
         formData.append("file", pdfFile);
         formData.append("type", "PDF");
         formData.append("title", pdfTitle);
-        formData.append("topicId", targetFolderId);
+        formData.append("folderId", targetFolderId);
 
         const response = await axios.post<ResourceResponse>(
           "/api/resource",
@@ -150,7 +152,41 @@ export default function AddResourceForm({
           setYoutubeUrl("");
           setPdfFile(null);
           setPdfTitle("");
-          setResourceType("VIDEO");
+          setResourceType("TEXT");
+
+          if (onResourceCreated) {
+            onResourceCreated(response.data.resource.id);
+          } else {
+            router.push(`/resource/${response.data.resource.id}`);
+          }
+        }
+      } else if (resourceType === "TEXT") {
+        if (!textContent.trim()) {
+          toast.error("Please enter some text content");
+          setIsCreating(false);
+          return;
+        }
+
+        // Use text content as title if title is empty, or use first line
+        const title = textTitle.trim() || textContent.substring(0, 100).split("\n")[0] || "Text Content";
+
+        const response = await axios.post<ResourceResponse>("/api/resource", {
+          folderId: targetFolderId,
+          title: title,
+          type: "TEXT",
+          url: "text://content",
+          summary: textContent,
+        });
+
+        if (response.data.resource) {
+          toast.success("Resource created successfully");
+          // Reset form
+          setTextContent("");
+          setTextTitle("");
+          setYoutubeUrl("");
+          setPdfFile(null);
+          setPdfTitle("");
+          setResourceType("TEXT");
 
           if (onResourceCreated) {
             onResourceCreated(response.data.resource.id);
@@ -215,7 +251,9 @@ export default function AddResourceForm({
     setYoutubeUrl("");
     setPdfFile(null);
     setPdfTitle("");
-    setResourceType("VIDEO");
+    setTextContent("");
+    setTextTitle("");
+    setResourceType("TEXT");
     if (onCancel) {
       onCancel();
     }
@@ -227,6 +265,11 @@ export default function AddResourceForm({
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2 p-1 bg-zinc-800/50 rounded-lg border border-zinc-700/50 w-fit">
           {[
+            {
+              type: "TEXT" as const,
+              icon: Type,
+              label: "Text",
+            },
             {
               type: "VIDEO" as const,
               icon: FileVideo,
@@ -286,7 +329,61 @@ export default function AddResourceForm({
 
       {/* Content Area */}
       <div className="space-y-4">
-        {resourceType === "VIDEO" ? (
+        {resourceType === "TEXT" ? (
+          <div className="space-y-4">
+            {/* Title Input */}
+            <div>
+              <Label
+                htmlFor="text-title"
+                className="text-sm font-medium text-zinc-300 mb-2 block"
+              >
+                Title (Optional)
+              </Label>
+              <Input
+                id="text-title"
+                value={textTitle}
+                onChange={(e) => setTextTitle(e.target.value)}
+                placeholder="Enter a title (or leave empty to use first line of text)"
+                className="bg-zinc-800/60 border-zinc-700/60 text-white placeholder:text-zinc-500 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-all h-12 rounded-xl"
+              />
+            </div>
+
+            {/* Text Content */}
+            <div>
+              <Label
+                htmlFor="text-content"
+                className="text-sm font-medium text-zinc-300 mb-2 block"
+              >
+                Text Content
+              </Label>
+              <textarea
+                id="text-content"
+                value={textContent}
+                onChange={(e) => setTextContent(e.target.value)}
+                placeholder="Paste your text here... (can be a long paragraph or just a topic name)"
+                className="w-full min-h-[200px] bg-zinc-800/60 border border-zinc-700/60 text-white placeholder:text-zinc-500 focus:border-primary/60 focus:ring-2 focus:ring-primary/20 transition-all rounded-xl p-4 resize-y"
+              />
+            </div>
+
+            <Button
+              onClick={handleCreateResource}
+              disabled={!textContent.trim() || isCreating}
+              className="w-full bg-primary text-black hover:bg-primary-dark font-semibold h-12 shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all rounded-xl hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              {isCreating ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                  Creating Resource...
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Create Resource
+                </span>
+              )}
+            </Button>
+          </div>
+        ) : resourceType === "VIDEO" ? (
           <div className="space-y-4">
             <div className="relative">
               <Input

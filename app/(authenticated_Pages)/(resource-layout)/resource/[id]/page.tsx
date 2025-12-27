@@ -225,7 +225,7 @@ export default function ResourcePage({ params }: { params: any }) {
         payload.question = userMessage;
       }
 
-      const res = await axios.post<AIResponse>("/api/resource-ai", payload);
+      const res = await axios.post<AIResponse>("/api/resource/ai", payload);
 
       let botText = "";
 
@@ -480,7 +480,7 @@ export default function ResourcePage({ params }: { params: any }) {
                 <Button
                   variant="outline"
                   className="rounded-full border-zinc-700 text-white hover:bg-zinc-800"
-                  onClick={() => router.push(`/dashboard/quiz/${resourceId}`)}
+                  onClick={() => router.push(`/resource/${resourceId}/quiz`)}
                 >
                   <FileQuestion className="h-4 w-4" />
                   <span className="hidden sm:inline ml-2">Quiz</span>
@@ -489,7 +489,7 @@ export default function ResourcePage({ params }: { params: any }) {
                   variant="outline"
                   className="rounded-full border-zinc-700 text-white hover:bg-zinc-800"
                   onClick={() =>
-                    router.push(`/dashboard/flashcard/${resourceId}`)
+                    router.push(`/resource/${resourceId}/flashcard`)
                   }
                 >
                   <Brain className="h-4 w-4" />

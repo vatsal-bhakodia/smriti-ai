@@ -110,7 +110,7 @@ export default function FolderPage({ params }: { params: any }) {
           (res.data.resources || []).map((r) => ({
             id: r.id,
             title: r.title,
-            type: r.type as "VIDEO" | "PDF" | "ARTICLE",
+            type: r.type as "VIDEO" | "PDF" | "TEXT",
             url: r.url,
           }))
         );
@@ -128,18 +128,17 @@ export default function FolderPage({ params }: { params: any }) {
   const handleResourceCreated = async (resourceId: string) => {
     // Reload resources
     const res = await axios.get<ResourceResponse>("/api/resource", {
-      params: { topicId: folderId },
+      params: { folderId: folderId },
     });
     setResources(
       (res.data.resources || []).map((r) => ({
         id: r.id,
         title: r.title,
-        type: r.type as "VIDEO" | "PDF" | "ARTICLE",
+        type: r.type as "VIDEO" | "PDF" | "TEXT",
         url: r.url,
       }))
     );
     setShowAddResource(false);
-    router.push(`/resource/${resourceId}`);
   };
 
   const handleResourceClick = (resourceId: string) => {
@@ -157,13 +156,13 @@ export default function FolderPage({ params }: { params: any }) {
       });
       // Reload resources
       const res = await axios.get<ResourceResponse>("/api/resource", {
-        params: { topicId: folderId },
+        params: { folderId: folderId },
       });
       setResources(
         (res.data.resources || []).map((r) => ({
           id: r.id,
           title: r.title,
-          type: r.type as "VIDEO" | "PDF" | "ARTICLE",
+          type: r.type as "VIDEO" | "PDF" | "TEXT",
           url: r.url,
         }))
       );

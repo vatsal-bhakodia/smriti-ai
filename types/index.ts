@@ -1,6 +1,4 @@
-// /types/index.ts
-
-export type ResourceType = "VIDEO" | "PDF" | "ARTICLE";
+export type ResourceType = "VIDEO" | "PDF" | "TEXT";
 
 export interface ResourceItem {
   id: string;
@@ -10,9 +8,7 @@ export interface ResourceItem {
 }
 
 // Frequency type
-export type Frequency = 
-  | { type: 'daily' }
-  | { type: 'custom', days: number[] }; // 0 for Sunday, 1 for Monday, etc.
+export type Frequency = { type: "daily" } | { type: "custom"; days: number[] }; // 0 for Sunday, 1 for Monday, etc.
 
 export type StudyTime = {
   id: string;
@@ -20,6 +16,6 @@ export type StudyTime = {
   //  Frequency type
   frequency: Frequency;
   //  Notify-via methods
-  method: 'site' | 'mail' | 'whatsapp';
+  method: "site" | "mail" | "whatsapp";
   isEnabled: boolean;
 };

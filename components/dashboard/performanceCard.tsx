@@ -68,7 +68,7 @@ export default function PerformanceCard() {
     data: chartData,
     error,
     isLoading,
-  } = useSWR("/api/performance-data", fetcher);
+  } = useSWR("/api/user/performance", fetcher);
 
   return (
     <Card className="pt-3 pb-0 gap-3">

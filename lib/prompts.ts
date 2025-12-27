@@ -50,7 +50,7 @@ PDF Text:
 ${text}`,
   }),
 
-  fromTitle: (title: string, type: "VIDEO" | "PDF" | "ARTICLE") => ({
+  fromTitle: (title: string, type: "VIDEO" | "PDF" | "TEXT") => ({
     system: SYSTEM_PROMPTS.LEARNING_ASSISTANT,
     user: `Based on the ${type.toLowerCase()} titled "${title}", write a detailed, well-structured summary.
 

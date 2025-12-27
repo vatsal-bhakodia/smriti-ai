@@ -66,7 +66,7 @@ const AnalyticsPageContent = () => {
   useEffect(() => {
     const fetchAnalyticsData = async () => {
       try {
-        const { data } = await axios.get<AnalyticsData>("/api/analytics");
+        const { data } = await axios.get<AnalyticsData>("/api/user/analytics");
         setAnalyticsData(data);
       } catch (error) {
         console.error("Failed to fetch analytics data:", error);

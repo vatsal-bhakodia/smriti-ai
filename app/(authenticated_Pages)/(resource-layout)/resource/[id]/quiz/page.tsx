@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef, use } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import QuizQuestion from "@/components/quiz/QuizQuestion";
 import QuizFinalResult from "@/components/quiz/QuizResult";
 import QuizReview from "@/components/quiz/QuizReview";
 import { AccessibleProgressBar } from "@/components/accessibility/AccessibleProgressBar";
 import { AriaLiveRegion } from "@/components/accessibility/AriaLiveRegion";
+import { Skeleton } from "@/components/ui/skeleton";
 import axios from "axios";
 
 // Define the shape of the resolved params object
@@ -50,6 +52,7 @@ export default function QuizPage({ params }: QuizPageProps) {
   const id = Array.isArray(resolvedParams.id)
     ? resolvedParams.id[0]
     : resolvedParams.id;
+  const router = useRouter();
   const hasFetched = useRef(false);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -106,7 +109,7 @@ export default function QuizPage({ params }: QuizPageProps) {
 
         const payload = { resourceId: id, task: "quiz" };
         const resQuiz = await axios.post<QuizResponse>(
-          `/api/resource-ai`,
+          `/api/resource/ai`,
           payload
         );
 
@@ -194,7 +197,7 @@ export default function QuizPage({ params }: QuizPageProps) {
       if (quizId && allQuestionsAnswered) {
         // CHANGE 2: Cleaner way to handle toast.promise
         const saveResults = async () => {
-          const response = await axios.post("/api/quiz-result", {
+          const response = await axios.post("/api/resource/quiz-result", {
             quizId,
             answers: finalAnswersPayload,
           });
@@ -247,9 +250,48 @@ export default function QuizPage({ params }: QuizPageProps) {
 
   if (isLoading || askedQuestions.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <p className="mt-4 text-muted-foreground">Generating your quiz...</p>
+      <div className="mt-10 px-6 max-w-3xl mx-auto flex flex-col w-full">
+        {/* Back Button Skeleton */}
+        <div className="mb-6">
+          <Skeleton className="h-10 w-24 bg-zinc-800 rounded" />
+        </div>
+
+        {/* Header Skeleton */}
+        <header className="py-8 space-y-4 text-center mb-6 w-full">
+          <Skeleton className="h-10 w-48 mx-auto bg-zinc-800" />
+          <Skeleton className="h-6 w-full max-w-md mx-auto bg-zinc-800" />
+        </header>
+
+        {/* Main Content Skeleton */}
+        <main className="bg-zinc-900 rounded-xl p-6 shadow-xl w-full">
+          {/* Progress Bar Skeleton */}
+          <div className="mb-6 space-y-2 w-full">
+            <div className="flex justify-between w-full">
+              <Skeleton className="h-4 w-32 bg-zinc-800" />
+              <Skeleton className="h-4 w-32 bg-zinc-800" />
+            </div>
+            <Skeleton className="h-2 w-full rounded-full bg-zinc-800" />
+          </div>
+
+          {/* Question Card Skeleton */}
+          <div className="space-y-6 w-full">
+            <Skeleton className="h-6 w-full bg-zinc-800" />
+            <Skeleton className="h-6 w-full bg-zinc-800" />
+
+            {/* Options Skeleton */}
+            <div className="space-y-3 mt-8 w-full">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-12 w-full bg-zinc-800 rounded" />
+              ))}
+            </div>
+          </div>
+
+          {/* Navigation Skeleton */}
+          <div className="flex items-center justify-between mt-6 w-full">
+            <Skeleton className="h-10 w-32 bg-zinc-800 rounded" />
+            <Skeleton className="h-10 w-32 bg-zinc-800 rounded" />
+          </div>
+        </main>
       </div>
     );
   }
@@ -266,101 +308,114 @@ export default function QuizPage({ params }: QuizPageProps) {
   }
 
   return (
-    <div className="mt-10 min-h-[90vh] h-full px-6 max-w-3xl mx-auto flex flex-col items-center justify-center">
+    <div className="mt-10 px-6 max-w-3xl mx-auto flex flex-col w-full">
       <AriaLiveRegion
         message={ariaMessage}
         priority="polite"
         clearAfter={3000}
       />
-      {quizState !== "results" && (
-        <header className="py-8 space-y-4 text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-lime-400">
-            Quiz On
-          </h1>
-          <h2 className="text-xl sm:text-xl font-medium text-white px-4">
-            {resourceTopic}
-          </h2>
-        </header>
-      )}
-      <main
-        className="bg-zinc-900 rounded-xl p-6 shadow-xl w-full"
-        id="main-content"
-      >
-        {quizState === "quiz" && (
-          <>
-            <AccessibleProgressBar
-              current={currentQIndex + 1}
-              total={totalQuestionsToAsk}
-              label="Quiz Progress"
-              className="mb-6"
-            />
-            <QuizQuestion
-              question={currentQuestion.question}
-              options={currentQuestion.options}
-              selected={selectedOption}
-              setSelected={setSelectedOption}
-              questionNumber={currentQIndex + 1}
-              totalQuestions={totalQuestionsToAsk}
-            />
-            <nav
-              className="flex items-center justify-between mt-6"
-              aria-label="Quiz navigation"
-            >
-              <div>
-                {currentQIndex > 0 && (
-                  <button
-                    onClick={handlePrevious}
-                    className="flex items-center gap-2 bg-zinc-700 text-white px-4 py-2 rounded hover:bg-zinc-600 transition-colors"
-                  >
-                    <ArrowLeft size={16} aria-hidden="true" /> Previous
-                  </button>
-                )}
-              </div>
-              <button
-                onClick={handleNext}
-                disabled={!selectedOption}
-                className="bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 flex items-center gap-2 transition-colors disabled:opacity-50"
+      {/* Back Button */}
+      <div className="mb-4">
+        <button
+          onClick={() => router.push(`/resource/${id}`)}
+          className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors"
+          aria-label="Go back to resource page"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          <span>Back to Resource</span>
+        </button>
+      </div>
+      <div className="flex flex-col items-center flex-1">
+        {quizState !== "results" && (
+          <header className="py-8 space-y-4 text-center">
+            <h1 className="text-3xl sm:text-4xl font-bold text-lime-400">
+              Quiz On
+            </h1>
+            <h2 className="text-xl sm:text-xl font-medium text-white px-4">
+              {resourceTopic}
+            </h2>
+          </header>
+        )}
+        <main
+          className="bg-zinc-900 rounded-xl p-6 shadow-xl w-full"
+          id="main-content"
+        >
+          {quizState === "quiz" && (
+            <>
+              <AccessibleProgressBar
+                current={currentQIndex + 1}
+                total={totalQuestionsToAsk}
+                label="Quiz Progress"
+                className="mb-6"
+              />
+              <QuizQuestion
+                question={currentQuestion.question}
+                options={currentQuestion.options}
+                selected={selectedOption}
+                setSelected={setSelectedOption}
+                questionNumber={currentQIndex + 1}
+                totalQuestions={totalQuestionsToAsk}
+              />
+              <nav
+                className="flex items-center justify-between mt-6"
+                aria-label="Quiz navigation"
               >
-                {currentQIndex === totalQuestionsToAsk - 1
-                  ? "Finish Quiz"
-                  : "Next"}
-                <ArrowRight className="w-4 h-4" aria-hidden="true" />
-              </button>
-            </nav>
-          </>
-        )}
+                <div>
+                  {currentQIndex > 0 && (
+                    <button
+                      onClick={handlePrevious}
+                      className="flex items-center gap-2 bg-zinc-700 text-white px-4 py-2 rounded hover:bg-zinc-600 transition-colors"
+                    >
+                      <ArrowLeft size={16} aria-hidden="true" /> Previous
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={handleNext}
+                  disabled={!selectedOption}
+                  className="bg-primary text-black px-6 py-2 rounded hover:bg-lime-300 flex items-center gap-2 transition-colors disabled:opacity-50"
+                >
+                  {currentQIndex === totalQuestionsToAsk - 1
+                    ? "Finish Quiz"
+                    : "Next"}
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </button>
+              </nav>
+            </>
+          )}
 
-        {quizState === "results" && (
-          <QuizFinalResult
-            userAnswers={askedQuestions.map((qaId, index) => {
-              const question = quizData.find((q) => q.id === qaId)!;
-              return {
-                quizQAId: qaId,
-                selectedOption: userSelections[index]!,
-                isCorrect: userSelections[index] === question.correctAnswer,
-              };
-            })}
-            quizData={quizData}
-            resetQuiz={resetQuiz}
-            startReview={startReview}
-          />
-        )}
+          {quizState === "results" && (
+            <QuizFinalResult
+              userAnswers={askedQuestions.map((qaId, index) => {
+                const question = quizData.find((q) => q.id === qaId)!;
+                return {
+                  quizQAId: qaId,
+                  selectedOption: userSelections[index]!,
+                  isCorrect: userSelections[index] === question.correctAnswer,
+                };
+              })}
+              quizData={quizData}
+              resetQuiz={resetQuiz}
+              startReview={startReview}
+            />
+          )}
 
-        {quizState === "review" && (
-          <QuizReview
-            userAnswers={askedQuestions.map((qaId, index) => {
-              const question = quizData.find((q) => q.id === qaId)!;
-              return {
-                quizQAId: qaId,
-                selectedOption: userSelections[index]!,
-                isCorrect: userSelections[index] === question.correctAnswer,
-              };
-            })}
-            quizData={quizData}
-            returnToResults={returnToResults}
-          />
-        )}
-      </main>
+          {quizState === "review" && (
+            <QuizReview
+              userAnswers={askedQuestions.map((qaId, index) => {
+                const question = quizData.find((q) => q.id === qaId)!;
+                return {
+                  quizQAId: qaId,
+                  selectedOption: userSelections[index]!,
+                  isCorrect: userSelections[index] === question.correctAnswer,
+                };
+              })}
+              quizData={quizData}
+              returnToResults={returnToResults}
+            />
+          )}
+        </main>
+      </div>
     </div>
   );
 }

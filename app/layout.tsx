@@ -5,7 +5,10 @@ import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import BackToTopButton from "@/components/ui/BackToTopButton";
 import { SkipLinks } from "@/components/accessibility/SkipLinks";
-import { generateMetadataUtil } from "@/utils/generateMetadata";
+import {
+  generateMetadataUtil,
+  generateViewport,
+} from "@/utils/generateMetadata";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,6 +22,8 @@ export const metadata = generateMetadataUtil({
     "Transform your learning with Smriti AI. Generate summaries, flashcards, mindmaps, quizzes, and personalized roadmaps.",
   keywords: ["AI study companion", "smart learning", "AI flashcards"],
 });
+
+export const viewport = generateViewport();
 
 export default function RootLayout({
   children,

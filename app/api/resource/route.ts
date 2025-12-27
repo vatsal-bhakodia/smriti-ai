@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { uploadPDFBuffer } from "@/lib/bufferToStream";
 import { extractTextFromPDF } from "@/lib/pdfParser";
-import { SUMMARY_PROMPT_PDF } from "@/lib/prompts";
+import { SUMMARY_PROMPT_PDF, SUMMARY_PROMPTS } from "@/lib/prompts";
 import { processPrompt } from "@/lib/processPrompt";
 
 // GET: get single or multiple resources
@@ -67,15 +67,50 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { folderId, title, type, url, summary } = body;
 
-    if (!folderId || !title || !type || !url) {
+    // For TEXT type, url is optional (we use a placeholder)
+    if (!folderId || !title || !type) {
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    // For non-TEXT types, url is required
+    if (type !== "TEXT" && !url) {
       return NextResponse.json(
         { message: "Missing required fields" },
         { status: 400 }
       );
     }
     try {
+      // For TEXT type, use placeholder URL if not provided
+      const resourceUrl = type === "TEXT" ? (url || "text://content") : url;
+      
+      // For TEXT type, generate summary from the text content if provided
+      let finalSummary = summary || "";
+      if (type === "TEXT" && summary && summary.trim()) {
+        try {
+          // If text is short (likely just a topic name), use title-based summary
+          // Otherwise, generate summary from the text content
+          if (summary.trim().length < 100) {
+            const prompt = SUMMARY_PROMPTS.fromTitle(title, "TEXT");
+            const generatedSummary = await processPrompt(prompt.system, prompt.user);
+            finalSummary = generatedSummary || summary;
+          } else {
+            // Long text - generate summary from content
+            const prompt = SUMMARY_PROMPTS.fromTranscript(summary);
+            const generatedSummary = await processPrompt(prompt.system, prompt.user);
+            finalSummary = generatedSummary || summary;
+          }
+        } catch (error) {
+          console.error("Error generating summary for TEXT resource:", error);
+          // Fall back to using the original text if summary generation fails
+          finalSummary = summary;
+        }
+      }
+      
       const resource = await prisma.resource.create({
-        data: { folderId, title, type, url, summary: summary || "" },
+        data: { folderId, title, type, url: resourceUrl, summary: finalSummary },
       });
 
       return NextResponse.json(

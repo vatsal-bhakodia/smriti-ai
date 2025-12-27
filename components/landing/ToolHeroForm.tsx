@@ -159,7 +159,7 @@ const ToolHeroForm = ({
 
           router.push(`/resource/${resourceResponse.data.resource.id}`);
         } else if (inputType === "text") {
-          // Create ARTICLE resource for text content
+          // Create TEXT resource for text content
           // Store text in summary field, use placeholder URL
           const title =
             textContent.substring(0, 100).split("\n")[0] || "Text Content";
@@ -168,7 +168,7 @@ const ToolHeroForm = ({
           }>("/api/resource", {
             folderId,
             title: title,
-            type: "ARTICLE",
+            type: "TEXT",
             url: "text://content",
             summary: textContent,
           });

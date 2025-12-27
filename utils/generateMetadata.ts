@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 export interface PageMetadata {
   title: string;
@@ -18,7 +18,6 @@ export function generateMetadataUtil(pageData: PageMetadata): Metadata {
   const defaultDescription = "Smriti AI Learning Tool";
   const defaultImage = "/brain.png";
   const siteUrl = "https://www.smriti.live/";
-  const defaultThemeColor = "#1D1CE5";
 
   const fullTitle =
     pageData.title === baseTitle
@@ -32,12 +31,16 @@ export function generateMetadataUtil(pageData: PageMetadata): Metadata {
   const ogDescription = pageData.ogDescription || description;
   const twitterTitle = pageData.twitterTitle || fullTitle;
   const twitterDescription = pageData.twitterDescription || description;
-  const themeColor = pageData.themeColor || defaultThemeColor;
 
   return {
     title: fullTitle,
     description,
-    keywords: pageData.keywords || ["Smriti AI", "AI Memory", "Productivity"],
+    keywords: pageData.keywords || [
+      "smriti ai",
+      "ai tutor",
+      "ai tool",
+      "online learning platform",
+    ],
     applicationName: baseTitle,
     metadataBase: new URL(siteUrl),
     alternates: {
@@ -70,6 +73,14 @@ export function generateMetadataUtil(pageData: PageMetadata): Metadata {
     appleWebApp: {
       title: baseTitle,
     },
+  };
+}
+
+export function generateViewport(pageData?: PageMetadata): Viewport {
+  const defaultThemeColor = "#adff2f";
+  const themeColor = pageData?.themeColor || defaultThemeColor;
+
+  return {
     themeColor: themeColor,
   };
 }

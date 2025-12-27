@@ -34,7 +34,7 @@ export async function getResourceText(resource: {
       case "PDF":
         return await fetchPdfText(resource.url);
 
-      case "ARTICLE":
+      case "TEXT":
         return resource.summary || null;
 
       default:
@@ -73,7 +73,7 @@ export async function generateSummary(resource: {
         prompt = SUMMARY_PROMPTS.fromTranscript(fullText);
       } else if (resource.type === "PDF") {
         prompt = SUMMARY_PROMPTS.fromPdfText(fullText);
-      } else if (resource.type === "ARTICLE") {
+      } else if (resource.type === "TEXT") {
         prompt = SUMMARY_PROMPTS.fromTranscript(fullText); // Treat as transcript
       }
     }
@@ -87,7 +87,7 @@ export async function generateSummary(resource: {
   if (!prompt) {
     prompt = SUMMARY_PROMPTS.fromTitle(
       resource.title,
-      resource.type as "VIDEO" | "PDF" | "ARTICLE"
+      resource.type as "VIDEO" | "PDF" | "TEXT"
     );
   }
 

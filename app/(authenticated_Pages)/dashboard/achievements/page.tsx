@@ -16,7 +16,7 @@ const AchievementsPage = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   useEffect(() => {
     axios
-      .get<Achievement[]>("/api/achievements")
+      .get<Achievement[]>("/api/user/achievements")
       .then((res) => setAchievements(res.data));
   }, []);
 
