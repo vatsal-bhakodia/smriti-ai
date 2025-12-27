@@ -7,6 +7,16 @@ import prisma from "@/lib/prisma";
 import type { NextRequest } from "next/server";
 import { processPrompt } from "@/lib/processPrompt";
 
+// In-memory cache for AI insights
+// Key: userId, Value: { insights: string, timestamp: number }
+const insightsCache = new Map<
+  string,
+  { insights: string; timestamp: number }
+>();
+
+// Cache TTL: 6 hours (in milliseconds)
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+
 // Helper: ask AI via unified client (guarded + timeout)
 function withTimeout<T>(p: Promise<T>, ms = 8000): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -37,6 +47,29 @@ async function askAI(prompt: string): Promise<string | null> {
     console.error("[ANALYTICS_AI]", e);
     return null;
   }
+}
+
+// Get cached insights or null if cache is expired/missing
+function getCachedInsights(userId: string): string | null {
+  const cached = insightsCache.get(userId);
+  if (!cached) return null;
+
+  const now = Date.now();
+  if (now - cached.timestamp > CACHE_TTL_MS) {
+    // Cache expired, remove it
+    insightsCache.delete(userId);
+    return null;
+  }
+
+  return cached.insights;
+}
+
+// Store insights in cache
+function setCachedInsights(userId: string, insights: string): void {
+  insightsCache.set(userId, {
+    insights,
+    timestamp: Date.now(),
+  });
 }
 
 export async function GET(req: NextRequest) {
@@ -140,16 +173,33 @@ export async function GET(req: NextRequest) {
 
     let aiInsights = null;
     if (wantInsights) {
-      const aiPrompt = [
-        "You are a learning coach.",
-        "Using ONLY these aggregates, give 5 concise, actionable recommendations (<=120 words total).",
-        `averageScorePerFolder: ${JSON.stringify(averageScorePerFolder)}`,
-        `trend7Days: ${JSON.stringify(performanceTrends7Days)}`,
-        `topMissed: ${JSON.stringify(
-          missedQuestions.map((m) => ({ id: m.quizQAId, misses: m.misses }))
-        )}`,
-      ].join("\n");
-      aiInsights = await askAI(aiPrompt);
+      // Check cache first
+      const cached = getCachedInsights(userId);
+      if (cached) {
+        aiInsights = cached;
+        console.log("[ANALYTICS_AI] Serving cached insights for user:", userId);
+      } else {
+        // Generate new insights
+        const aiPrompt = [
+          "You are a learning coach.",
+          "Using ONLY these aggregates, give 5 concise, actionable recommendations (<=120 words total).",
+          `averageScorePerFolder: ${JSON.stringify(averageScorePerFolder)}`,
+          `trend7Days: ${JSON.stringify(performanceTrends7Days)}`,
+          `topMissed: ${JSON.stringify(
+            missedQuestions.map((m) => ({ id: m.quizQAId, misses: m.misses }))
+          )}`,
+        ].join("\n");
+        const generated = await askAI(aiPrompt);
+        if (generated) {
+          aiInsights = generated;
+          // Cache the result
+          setCachedInsights(userId, generated);
+          console.log(
+            "[ANALYTICS_AI] Generated and cached insights for user:",
+            userId
+          );
+        }
+      }
     }
 
     // Return the aggregated data and AI insights

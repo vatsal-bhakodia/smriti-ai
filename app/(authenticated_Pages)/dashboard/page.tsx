@@ -22,10 +22,10 @@ export default function Page() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/dashboard/analytics/">
+            <Link href="/dashboard/performance/">
               <Button variant="outline">
                 <TrendingUp className="h-4 w-4" />
-                <span className="md:block hidden">Analytics</span>
+                <span className="md:block hidden">Performance</span>
               </Button>
             </Link>
             <Link href="/folder/">
