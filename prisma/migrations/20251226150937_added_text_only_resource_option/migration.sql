@@ -7,7 +7,12 @@
 -- AlterEnum
 BEGIN;
 CREATE TYPE "ResourceType_new" AS ENUM ('TEXT', 'VIDEO', 'PDF');
-ALTER TABLE "Resource" ALTER COLUMN "type" TYPE "ResourceType_new" USING ("type"::text::"ResourceType_new");
+ALTER TABLE "Resource" ALTER COLUMN "type" TYPE "ResourceType_new" USING (
+  CASE 
+    WHEN "type"::text = 'ARTICLE' THEN 'TEXT'::ResourceType_new
+    ELSE "type"::text::ResourceType_new
+  END
+);
 ALTER TYPE "ResourceType" RENAME TO "ResourceType_old";
 ALTER TYPE "ResourceType_new" RENAME TO "ResourceType";
 DROP TYPE "public"."ResourceType_old";
