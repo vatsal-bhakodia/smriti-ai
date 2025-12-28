@@ -15,13 +15,15 @@ export interface PageMetadata {
 
 export function generateMetadataUtil(pageData: PageMetadata): Metadata {
   const baseTitle = "Smriti AI";
-  const defaultDescription = "Smriti AI Learning Tool";
-  const defaultImage = "/brain.png";
+  const defaultDescription =
+    "Smriti AI is an online learning platform which helps you to learn faster and remember better. Turn any PDF, YouTube video, into AI-powered flashcards, summaries, and mind maps instantly.";
+  const defaultImage = "/opengraph-image.png";
   const siteUrl = "https://www.smriti.live/";
 
   const fullTitle =
-    pageData.title === baseTitle
-      ? baseTitle
+    pageData.title === baseTitle ||
+    pageData.title.toLowerCase().includes(baseTitle.toLowerCase())
+      ? pageData.title
       : `${pageData.title} | ${baseTitle}`;
 
   const description = pageData.description || defaultDescription;
@@ -67,8 +69,6 @@ export function generateMetadataUtil(pageData: PageMetadata): Metadata {
       title: twitterTitle,
       description: twitterDescription,
       images: [image],
-      creator: "@smriti_ai",
-      site: "@smriti_ai",
     },
     appleWebApp: {
       title: baseTitle,

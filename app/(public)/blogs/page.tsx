@@ -3,15 +3,15 @@ import { getAllBlogPosts } from "@/lib/blog";
 import { generateMetadataUtil } from "@/utils/generateMetadata";
 
 export const metadata = generateMetadataUtil({
-  title: "Blog",
+  title: "Blogs",
   description:
     "Discover the latest insights, tips, and strategies for smarter learning with AI. Read our blog for study techniques, productivity hacks, and educational technology updates.",
   keywords: [
-    "Smriti AI Blog",
+    "Smriti AI Blogs",
     "learning blog",
     "study tips",
     "AI education",
-    "productivity blog",
+    "productivity blogs",
     "learning strategies",
     "educational technology",
     "study techniques",

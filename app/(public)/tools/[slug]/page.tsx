@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!toolData) {
     return generateMetadataUtil({
-      title: "Tool Not Found | Smriti AI",
+      title: "Tool Not Found",
       description: "The requested tool page could not be found.",
       keywords: ["smriti ai"],
       url: "https://www.smriti.live/tools",

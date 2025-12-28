@@ -15,9 +15,9 @@ import CTA from "@/components/landing/CTA";
 import { generateMetadataUtil } from "@/utils/generateMetadata";
 
 export const metadata = generateMetadataUtil({
-  title: "Smriti AI",
+  title: "About Smriti AI - Your AI Tutor",
   description:
-    "Your AI-powered study companion that helps you learn faster and remember better. Generate summaries, flashcards, mind maps, and personalized learning roadmaps.",
+    "Your AI Tutor that helps you learn faster and remember better. Generate summaries, flashcards, mind maps, and personalized learning roadmaps.",
   keywords: [
     "Smriti AI",
     "AI study companion",

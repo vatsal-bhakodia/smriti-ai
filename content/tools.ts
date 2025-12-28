@@ -66,8 +66,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "pdf-to-flashcards": {
     slug: "pdf-to-flashcards",
     metadata: {
-      title:
-        "PDF to Flashcards in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "PDF to Flashcards in 30 Seconds - Free AI Study Tool",
       description:
         "Turn PDF documents into flashcards automatically. Free AI tool for students. Just upload your PDF. Export to Anki or Quizlet. Study smarter!",
       keywords: [
@@ -181,8 +180,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "youtube-to-flashcards": {
     slug: "youtube-to-flashcards",
     metadata: {
-      title:
-        "YouTube to Flashcards in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "YouTube to Flashcards in 30 Seconds - Free AI Study Tool",
       description:
         "Turn YouTube lectures into flashcards automatically. Free AI tool for students. Just paste the video URL. Export to Anki or Quizlet. Study smarter!",
       keywords: [
@@ -297,8 +295,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "text-to-flashcards": {
     slug: "text-to-flashcards",
     metadata: {
-      title:
-        "Text to Flashcards in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "Text to Flashcards in 30 Seconds - Free AI Study Tool",
       description:
         "Turn text content into flashcards automatically. Free AI tool for students. Just paste your text. Export to Anki or Quizlet. Study smarter!",
       keywords: [
@@ -412,8 +409,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "pdf-to-mindmaps": {
     slug: "pdf-to-mindmaps",
     metadata: {
-      title:
-        "PDF to Mindmaps in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "PDF to Mindmaps in 30 Seconds - Free AI Study Tool",
       description:
         "Turn PDF documents into visual mindmaps automatically. Free AI tool for students. Just upload your PDF. Visualize concepts and relationships easily.",
       keywords: [
@@ -553,8 +549,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "youtube-to-mindmaps": {
     slug: "youtube-to-mindmaps",
     metadata: {
-      title:
-        "YouTube to Mindmaps in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "YouTube to Mindmaps in 30 Seconds - Free AI Study Tool",
       description:
         "Turn YouTube lectures into visual mindmaps automatically. Free AI tool for students. Just paste the video URL. Visualize concepts and relationships easily.",
       keywords: [
@@ -695,8 +690,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "text-to-mindmaps": {
     slug: "text-to-mindmaps",
     metadata: {
-      title:
-        "Text to Mindmaps in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "Text to Mindmaps in 30 Seconds - Free AI Study Tool",
       description:
         "Turn text content into visual mindmaps automatically. Free AI tool for students. Just paste your text. Visualize concepts and relationships easily.",
       keywords: [
@@ -836,8 +830,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "pdf-to-quiz": {
     slug: "pdf-to-quiz",
     metadata: {
-      title:
-        "PDF to Quiz in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "PDF to Quiz in 30 Seconds - Free AI Study Tool",
       description:
         "Turn PDF documents into interactive quizzes automatically. Free AI tool for students. Just upload your PDF. Test your knowledge and track your performance.",
       keywords: [
@@ -977,8 +970,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "youtube-to-quiz": {
     slug: "youtube-to-quiz",
     metadata: {
-      title:
-        "YouTube to Quiz in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "YouTube to Quiz in 30 Seconds - Free AI Study Tool",
       description:
         "Turn YouTube lectures into interactive quizzes automatically. Free AI tool for students. Just paste the video URL. Test your knowledge and track your performance.",
       keywords: [
@@ -1119,8 +1111,7 @@ export const toolsData: Record<string, ToolPageProps> = {
   "text-to-quiz": {
     slug: "text-to-quiz",
     metadata: {
-      title:
-        "Text to Quiz in 30 Seconds - Free AI Converter - Free AI Study Tool | Smriti AI",
+      title: "Text to Quiz in 30 Seconds - Free AI Study Tool",
       description:
         "Turn text content into interactive quizzes automatically. Free AI tool for students. Just paste your text. Test your knowledge and track your performance.",
       keywords: [

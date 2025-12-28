@@ -17,7 +17,7 @@ const poppins = Poppins({
 });
 
 export const metadata = generateMetadataUtil({
-  title: "Smriti AI - Your AI-Powered Study Companion",
+  title: "Smriti AI - Online Learning with AI Tutor",
   description:
     "Transform your learning with Smriti AI. Generate summaries, flashcards, mindmaps, quizzes, and personalized roadmaps.",
   keywords: ["AI study companion", "smart learning", "AI flashcards"],
