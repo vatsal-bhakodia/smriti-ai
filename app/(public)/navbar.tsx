@@ -104,6 +104,7 @@ const toolsData = {
 // ---------------- Navigation Links ----------------
 const navigationLinks = [
   { href: "/#", label: "Home" },
+  { href: "/resources", label: "Resources" },
   { href: "/#pricing", label: "Pricing" },
   { href: "/contact", label: "Contact" },
 ];
