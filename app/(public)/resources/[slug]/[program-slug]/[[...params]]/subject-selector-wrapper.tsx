@@ -32,7 +32,6 @@ interface SubjectSelectorWrapperProps {
   hasBranch: boolean;
   universitySlug: string;
   programSlug: string;
-  subjects: Subject[];
   shouldShowSheetInitially: boolean;
 }
 
@@ -44,7 +43,6 @@ export function SubjectSelectorWrapper({
   hasBranch,
   universitySlug,
   programSlug,
-  subjects,
   shouldShowSheetInitially,
 }: SubjectSelectorWrapperProps) {
   const router = useRouter();
@@ -83,7 +81,6 @@ export function SubjectSelectorWrapper({
       {/* Sheet - controlled by manual trigger or initial state */}
       {showSheet && semester && canOpenSheet && (
         <SubjectsSheet
-          subjects={subjects}
           semester={semester}
           branch={selectedBranch}
           universitySlug={universitySlug}

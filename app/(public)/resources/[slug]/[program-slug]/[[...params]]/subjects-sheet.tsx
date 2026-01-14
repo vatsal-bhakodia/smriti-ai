@@ -11,8 +11,10 @@ import {
 } from "@/components/ui/sheet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen, ChevronRight, Search } from "lucide-react";
 import Link from "next/link";
+import axios from "axios";
 
 interface Subject {
   id: string;
@@ -31,7 +33,6 @@ interface Branch {
 }
 
 interface SubjectsSheetProps {
-  subjects: Subject[];
   semester: string;
   branch?: Branch;
   universitySlug: string;
@@ -49,7 +50,6 @@ function getOrdinalSuffix(num: number): string {
 }
 
 export function SubjectsSheet({
-  subjects,
   semester,
   branch,
   universitySlug,
@@ -59,6 +59,41 @@ export function SubjectsSheet({
   const router = useRouter();
   const [open, setOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch subjects when sheet opens or params change
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams({
+          universitySlug,
+          programSlug,
+          semester,
+        });
+        if (branch?.slug) {
+          params.set("branch", branch.slug);
+        }
+
+        const response = await axios.get<Subject[]>(
+          `/api/resources/subjects?${params.toString()}`
+        );
+        setSubjects(response.data);
+      } catch (err: any) {
+        console.error("Error fetching subjects:", err);
+        setError("Failed to load subjects. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (open) {
+      fetchSubjects();
+    }
+  }, [open, universitySlug, programSlug, semester, branch?.slug]);
 
   // Auto-open when semester changes
   useEffect(() => {
@@ -88,7 +123,10 @@ export function SubjectsSheet({
 
   return (
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-xl overflow-y-auto gap-0"
+      >
         <SheetHeader>
           <div className="flex items-center justify-between">
             <SheetTitle className="text-2xl">Subjects</SheetTitle>
@@ -112,7 +150,24 @@ export function SubjectsSheet({
             />
           </div>
 
-          {subjects.length === 0 ? (
+          {isLoading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className="py-3 rounded-md">
+                  <CardContent className="px-4">
+                    <div className="flex justify-between items-center gap-3">
+                      <Skeleton className="h-5 flex-1" />
+                      <Skeleton className="h-5 w-5 rounded" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">{error}</p>
+            </div>
+          ) : subjects.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
                 No subjects found for the selected criteria.
@@ -133,15 +188,12 @@ export function SubjectsSheet({
 
                 return (
                   <Link key={subject.id} href={subjectUrl} className="block">
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                    <Card className="py-2 rounded-md hover:shadow-md transition-shadow cursor-pointer">
                       <CardContent className="px-4">
-                        <div className="flex items-center gap-3">
-                          <BookOpen className="size-5 text-primary flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-lg">
-                              {subject.name}
-                            </h3>
-                          </div>
+                        <div className="flex justify-between items-center gap-3">
+                          <h3 className="font-medium text-md">
+                            {subject.name}
+                          </h3>
                           <ChevronRight className="size-5 text-muted-foreground flex-shrink-0" />
                         </div>
                       </CardContent>

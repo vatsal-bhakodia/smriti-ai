@@ -85,35 +85,6 @@ async function getProgramData(universitySlug: string, programSlug: string) {
   }
 }
 
-async function getSubjects(
-  universitySlug: string,
-  programSlug: string,
-  semester: string,
-  branchSlug?: string
-) {
-  try {
-    const cmsUrl = process.env.CMS_URL;
-    if (!cmsUrl) {
-      throw new Error("CMS URL not configured");
-    }
-
-    const baseUrl = cmsUrl.replace(/\/$/, "");
-    const url = new URL(
-      `${baseUrl}/api/public/programs/${universitySlug}/${programSlug}/subjects`
-    );
-    url.searchParams.set("semester", semester);
-    if (branchSlug) {
-      url.searchParams.set("branch", branchSlug);
-    }
-
-    const response = await axios.get<Subject[]>(url.toString());
-    return response.data;
-  } catch (error: any) {
-    console.error("Error fetching subjects:", error);
-    return [];
-  }
-}
-
 async function getSubjectDetails(
   universitySlug: string,
   programSlug: string,
@@ -180,7 +151,6 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
   let semester: string | undefined;
   let branchSlug: string | undefined;
   let subjectSlug: string | undefined;
-  let subjects: Subject[] = [];
   let subjectData: {
     subject: Subject;
     resources: {
@@ -204,12 +174,6 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
         // /semester/branch -> show subjects sheet
         branchSlug = pathParams[1];
         shouldShowSheet = true;
-        subjects = await getSubjects(
-          universitySlug,
-          programSlug,
-          semester,
-          branchSlug
-        );
       } else if (pathParams.length === 3) {
         // /semester/branch/subject -> show subject detail below
         branchSlug = pathParams[1];
@@ -231,7 +195,6 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
       if (pathParams.length === 1) {
         // /semester -> show subjects sheet
         shouldShowSheet = true;
-        subjects = await getSubjects(universitySlug, programSlug, semester);
       } else if (pathParams.length === 2) {
         // /semester/subject -> show subject detail below
         subjectSlug = pathParams[1];
@@ -344,7 +307,6 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
           hasBranch={program.hasBranch}
           universitySlug={universitySlug}
           programSlug={programSlug}
-          subjects={subjects}
           shouldShowSheetInitially={shouldShowSheet}
         />
       </div>
