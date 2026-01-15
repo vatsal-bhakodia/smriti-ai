@@ -251,8 +251,14 @@ export default function ResultsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
-      <div className="w-full max-w-7xl mx-auto">
+    <div className="bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
+      <div
+        className={`w-full max-w-7xl mx-auto ${
+          !isLoggedIn
+            ? "min-h-[90vh] flex flex-col items-center justify-center"
+            : ""
+        }`}
+      >
         {!isLoggedIn ? (
           <LoginForm
             enrollmentNumber={enrollmentNumber}

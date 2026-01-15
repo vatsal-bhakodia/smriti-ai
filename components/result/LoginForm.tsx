@@ -42,18 +42,18 @@ export default function LoginForm({
   return (
     <>
       {/* Password Information Warning Box */}
-      <Card className="mb-6 border-orange-500/30 bg-orange-950/20">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+      <Card className="w-full max-w-xl mx-auto py-1.5 mb-4 border-orange-500/30 bg-orange-950/20">
+        <CardContent className="p-3">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="font-bold text-white mb-2">
+              <h3 className="font-bold text-white text-sm mb-1.5">
                 Password Information
               </h3>
-              <p className="text-white text-sm mb-3">
+              <p className="text-white text-xs mb-2">
                 Please double-check the following before entering your password:
               </p>
-              <ul className="text-white text-sm space-y-1.5 list-disc list-inside">
+              <ul className="text-white text-xs space-y-1 list-disc list-inside">
                 <li>
                   Default password is your{" "}
                   <span className="text-lime-400 font-semibold">
@@ -74,21 +74,21 @@ export default function LoginForm({
       </Card>
 
       {/* Login Form Card */}
-      <Card className="bg-zinc-900/95 border-zinc-800 max-w-2xl mx-auto">
-        <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary text-black mb-4">
-              <Brain className="h-10 w-10" />
+      <Card className="bg-zinc-900/95 border-zinc-800 w-full max-w-xl mx-auto">
+        <CardContent className="p-6">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-black mb-3">
+              <Brain className="h-6 w-6" />
             </div>
-            <h1 className="text-4xl font-bold text-white mb-2">
+            <h1 className="text-2xl font-bold text-white mb-1.5">
               GGSIPU Results
             </h1>
-            <p className="text-zinc-400">
+            <p className="text-zinc-400 text-sm">
               Enter your credentials to view your result analysis
             </p>
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-6">
+          <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="enrollment" className="text-white">
                 Enrollment Number
@@ -114,9 +114,6 @@ export default function LoginForm({
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter Password"
                   value={password}
-                  onChange={(e) =>
-                    onPasswordChange(e.target.value.toUpperCase())
-                  }
                   className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 pr-10"
                   disabled={isLoading}
                 />
@@ -197,13 +194,13 @@ export default function LoginForm({
             <Button
               type="submit"
               disabled={isLoading || isLoadingCaptcha}
-              className="w-full bg-primary hover:bg-lime-400 text-black font-semibold py-6 text-lg"
+              className="w-full bg-primary hover:bg-lime-400 text-black font-semibold py-4 text-base"
             >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
 
-          <p className="text-center text-zinc-500 text-sm mt-6">
+          <p className="text-center text-zinc-500 text-xs mt-4">
             Data is fetched directly from GGSIPU Exam Portal.
           </p>
         </CardContent>
