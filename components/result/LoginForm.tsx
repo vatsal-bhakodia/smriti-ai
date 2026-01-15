@@ -142,7 +142,7 @@ export default function LoginForm({
               <Label htmlFor="captcha" className="text-white">
                 Captcha
               </Label>
-              <div className="flex gap-3">
+              <div className="flex flex-col md:flex-row gap-3">
                 <Input
                   id="captcha"
                   type="text"
@@ -151,7 +151,7 @@ export default function LoginForm({
                   onChange={(e) =>
                     onCaptchaChange(e.target.value.toUpperCase())
                   }
-                  className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 flex-1"
+                  className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 flex-1 w-full md:w-auto"
                   disabled={isLoading}
                 />
                 <div className="flex gap-2">

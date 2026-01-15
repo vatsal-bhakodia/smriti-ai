@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ResultAPIResponse, ProcessedData } from "./types";
-import { calculateSGPA } from "./utils";
 import LoginForm from "@/components/result/LoginForm";
 import StudentHeader from "@/components/result/StudentHeader";
 import GradeDistributionChart from "@/components/result/GradeDistributionChart";
@@ -45,7 +44,8 @@ export default function ResultsPage() {
     // Process each semester
     const semesters = Array.from(semesterMap.entries())
       .map(([euno, subjects]) => {
-        const sgpa = calculateSGPA(subjects);
+        // Use eugpa directly from the response (all subjects in a semester have the same eugpa)
+        const sgpa = subjects[0]?.eugpa || 0;
         const totalMarks = subjects.reduce(
           (sum, sub) => sum + (parseFloat(sub.moderatedprint) || 0),
           0
@@ -93,8 +93,13 @@ export default function ResultsPage() {
       sgpa: sem.sgpa,
     }));
 
-    // Get CGPA (from first entry eugpa)
-    const cgpa = firstEntry.eugpa || 0;
+    // Calculate CGPA from SGPA values (weighted by credits)
+    const totalCredits = semesters.reduce((sum, sem) => sum + sem.credits, 0);
+    const weightedSGPA = semesters.reduce(
+      (sum, sem) => sum + sem.sgpa * sem.credits,
+      0
+    );
+    const cgpa = totalCredits > 0 ? weightedSGPA / totalCredits : 0;
 
     return {
       studentInfo: {
