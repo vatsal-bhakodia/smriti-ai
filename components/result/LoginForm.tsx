@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, RefreshCw, Brain } from "lucide-react";
+import { AlertCircle, RefreshCw, Brain, Eye, EyeOff } from "lucide-react";
 
 interface LoginFormProps {
   enrollmentNumber: string;
@@ -36,6 +37,8 @@ export default function LoginForm({
   onRefreshCaptcha,
   onSubmit,
 }: LoginFormProps) {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <>
       {/* Password Information Warning Box */}
@@ -105,15 +108,34 @@ export default function LoginForm({
               <Label htmlFor="password" className="text-white">
                 Password
               </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter Password"
-                value={password}
-                onChange={(e) => onPasswordChange(e.target.value)}
-                className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500"
-                disabled={isLoading}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter Password"
+                  value={password}
+                  onChange={(e) =>
+                    onPasswordChange(e.target.value.toUpperCase())
+                  }
+                  className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 pr-10"
+                  disabled={isLoading}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-zinc-400 hover:text-white"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
             </div>
 
             <div className="space-y-2">
