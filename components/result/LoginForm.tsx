@@ -114,6 +114,7 @@ export default function LoginForm({
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter Password"
                   value={password}
+                  onChange={(e) => onPasswordChange(e.target.value)}
                   className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 pr-10"
                   disabled={isLoading}
                 />
