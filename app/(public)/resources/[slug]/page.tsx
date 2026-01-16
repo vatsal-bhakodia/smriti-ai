@@ -3,6 +3,7 @@ import { generateMetadataUtil } from "@/utils/generateMetadata";
 import { getUniversityBySlug, getProgramsByUniversityId } from "@/lib/cms-api";
 import UniversityHeader from "@/components/university-programs/university-header";
 import ProgramsGrid from "@/components/university-programs/programs-grid";
+import Banner from "@/components/ads/Banner";
 
 interface UniversityPageProps {
   params: Promise<{ slug: string }>;
@@ -44,8 +45,9 @@ export default async function UniversityPage({ params }: UniversityPageProps) {
   const programs = await getProgramsByUniversityId(university.id);
 
   return (
-    <section className="max-w-7xl mx-auto pb-32 px-6 pt-8 md:pt-12 min-h-[68vh]">
+    <section className="max-w-7xl mx-auto pb-32 px-6 pt-8 md:pt-12 min-h-[65vh]">
       <UniversityHeader university={university} />
+      <Banner className="mb-6" />
       <ProgramsGrid programs={programs} universitySlug={university.slug} />
     </section>
   );

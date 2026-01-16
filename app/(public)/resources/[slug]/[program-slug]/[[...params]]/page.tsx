@@ -447,7 +447,7 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
   }
 
   return (
-    <section className="max-w-7xl mx-auto pb-32 px-6 pt-8 min-h-[68vh]">
+    <section className="max-w-7xl mx-auto px-6 pt-8 min-h-[65vh]">
       {/* H1 for SEO */}
       <h1 className="sr-only">{h1Title}</h1>
 

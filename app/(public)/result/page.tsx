@@ -1,30 +1,23 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
 import { ResultAPIResponse, ProcessedData } from "./types";
-import LoginForm from "@/components/result/LoginForm";
 import StudentHeader from "@/components/result/StudentHeader";
 import GradeDistributionChart from "@/components/result/GradeDistributionChart";
 import GPATrendChart from "@/components/result/GPATrendChart";
 import SemesterSummaryTable from "@/components/result/SemesterSummaryTable";
 import DetailedResultsTable from "@/components/result/DetailedResultsTable";
+import NativeBanner from "@/components/ads/NativeBanner";
 
 export default function ResultsPage() {
-  const [enrollmentNumber, setEnrollmentNumber] = useState("");
-  const [password, setPassword] = useState("");
-  const [captcha, setCaptcha] = useState("");
-  const [captchaImage, setCaptchaImage] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingCaptcha, setIsLoadingCaptcha] = useState(false);
+  const router = useRouter();
   const [rawResults, setRawResults] = useState<ResultAPIResponse[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<number | "OVERALL">(
     "OVERALL"
   );
-  const [error, setError] = useState<string>("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Process results data
   const processedData = useMemo<ProcessedData | null>(() => {
@@ -133,149 +126,47 @@ export default function ResultsPage() {
     return semester ? semester.subjects : [];
   }, [processedData, selectedSemester]);
 
-  // Fetch captcha image
-  const fetchCaptcha = async () => {
-    setIsLoadingCaptcha(true);
-    try {
-      const response = await fetch("/api/result/captcha", {
-        credentials: "include",
-      });
-      if (response.ok) {
-        const blob = await response.blob();
-        const imageUrl = URL.createObjectURL(blob);
-        setCaptchaImage(imageUrl);
-        setError("");
-      } else {
-        toast.error("Failed to load captcha. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error fetching captcha:", error);
-      toast.error("Failed to load captcha. Please try again.");
-    } finally {
-      setIsLoadingCaptcha(false);
-    }
-  };
-
+  // Load results from sessionStorage on mount
   useEffect(() => {
-    fetchCaptcha();
-    return () => {
-      if (captchaImage) {
-        URL.revokeObjectURL(captchaImage);
+    const storedResults = sessionStorage.getItem("resultData");
+    if (storedResults) {
+      try {
+        const results: ResultAPIResponse[] = JSON.parse(storedResults);
+        setRawResults(results);
+      } catch (error) {
+        console.error("Error parsing stored results:", error);
+        // If there's an error, redirect to login
+        router.push("/result/login");
       }
-    };
-  }, []);
-
-  const handleRefreshCaptcha = () => {
-    if (captchaImage) {
-      URL.revokeObjectURL(captchaImage);
+    } else {
+      // No results found, redirect to login
+      router.push("/result/login");
     }
-    fetchCaptcha();
-    setCaptcha("");
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    if (!enrollmentNumber || !password || !captcha) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/result/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          enrollmentNumber,
-          password,
-          captcha,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        const errorMessage =
-          data.error ||
-          data.message ||
-          `Login failed with status ${response.status}. Please check your credentials.`;
-        setError(errorMessage);
-        toast.error(errorMessage);
-        handleRefreshCaptcha();
-        setIsLoading(false);
-        return;
-      }
-
-      if (!data.results || data.results.length === 0) {
-        const errorMessage =
-          "No results found. Please check your enrollment number.";
-        setError(errorMessage);
-        toast.error(errorMessage);
-        setIsLoading(false);
-        return;
-      }
-
-      setRawResults(data.results || []);
-      setIsLoggedIn(true);
-      setSelectedSemester("OVERALL");
-      setError("");
-      toast.success("Results fetched successfully!");
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "An unexpected error occurred. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-      handleRefreshCaptcha();
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [router]);
 
   const handleReset = () => {
+    sessionStorage.removeItem("resultData");
     setRawResults([]);
-    setEnrollmentNumber("");
-    setPassword("");
-    setCaptcha("");
     setSelectedSemester("OVERALL");
-    setIsLoggedIn(false);
-    handleRefreshCaptcha();
+    router.push("/result/login");
   };
 
   return (
-    <div className="bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
-      <div
-        className={`w-full max-w-7xl mx-auto ${
-          !isLoggedIn
-            ? "min-h-[90vh] flex flex-col items-center justify-center"
-            : ""
-        }`}
-      >
-        {!isLoggedIn ? (
-          <LoginForm
-            enrollmentNumber={enrollmentNumber}
-            password={password}
-            captcha={captcha}
-            captchaImage={captchaImage}
-            isLoading={isLoading}
-            isLoadingCaptcha={isLoadingCaptcha}
-            error={error}
-            onEnrollmentChange={setEnrollmentNumber}
-            onPasswordChange={setPassword}
-            onCaptchaChange={setCaptcha}
-            onRefreshCaptcha={handleRefreshCaptcha}
-            onSubmit={handleSubmit}
-          />
-        ) : processedData ? (
+    <div className="min-h-[70vh] bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
+      <div className="w-full max-w-7xl mx-auto">
+        {processedData ? (
           <div className="space-y-6">
+            {/* Back Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={handleReset}
+                variant="outline"
+                className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
+              >
+                Check Another Result
+              </Button>
+            </div>
+
             <StudentHeader
               data={processedData}
               selectedSemester={selectedSemester}
@@ -308,13 +199,16 @@ export default function ResultsPage() {
             </div>
           </div>
         ) : (
-          <Card className="bg-zinc-900/95 border-zinc-800 max-w-2xl mx-auto">
-            <CardContent className="p-8 text-center text-zinc-400">
-              No results available
-            </CardContent>
-          </Card>
+          <div className="h-[70vh] flex items-center justify-center">
+            <Card className="bg-zinc-900/95 border-zinc-800 max-w-2xl mx-auto">
+              <CardContent className="p-8 text-center text-zinc-400">
+                Loading results...
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
+      <NativeBanner />
     </div>
   );
 }
