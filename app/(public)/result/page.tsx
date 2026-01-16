@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ResultAPIResponse, ProcessedData } from "./types";
@@ -11,10 +10,10 @@ import GPATrendChart from "@/components/result/GPATrendChart";
 import SemesterSummaryTable from "@/components/result/SemesterSummaryTable";
 import DetailedResultsTable from "@/components/result/DetailedResultsTable";
 import NativeBanner from "@/components/ads/NativeBanner";
-import Script from "next/script";
+import PopunderScript from "@/components/ads/PopunderScript";
+import { Loader2 } from "lucide-react";
 
 export default function ResultsPage() {
-  const router = useRouter();
   const [rawResults, setRawResults] = useState<ResultAPIResponse[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<number | "OVERALL">(
     "OVERALL"
@@ -137,84 +136,109 @@ export default function ResultsPage() {
       } catch (error) {
         console.error("Error parsing stored results:", error);
         // If there's an error, redirect to login
-        router.push("/result/login");
+        window.location.replace("/result/login");
       }
     } else {
       // No results found, redirect to login
-      router.push("/result/login");
+      window.location.replace("/result/login");
     }
-  }, [router]);
+  }, []);
 
   const handleReset = () => {
     sessionStorage.removeItem("resultData");
     setRawResults([]);
     setSelectedSemester("OVERALL");
-    router.push("/result/login");
+    window.location.replace("/result/login");
   };
 
   return (
-    <div className="min-h-[70vh] bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
-      {/* Ads popunder Script */}
-      <Script
-        src="https://pl28487228.effectivegatecpm.com/ba/4e/1c/ba4e1c01b787487794a1e048f03e4de5.js"
-        strategy="beforeInteractive"
-      />
-      <div className="w-full max-w-7xl mb-6 mx-auto">
-        {processedData ? (
-          <div className="space-y-6">
-            {/* Back Button */}
-            <div className="flex justify-center">
-              <Button
-                onClick={handleReset}
-                variant="outline"
-                className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
-              >
-                Check Another Result
-              </Button>
+    <>
+      <PopunderScript />
+      <div className="min-h-[70vh] bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
+        <div className="w-full max-w-7xl mb-6 mx-auto">
+          {processedData ? (
+            <div className="space-y-6">
+              {/* Back Button */}
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleReset}
+                  variant="outline"
+                  className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
+                >
+                  Check Another Result
+                </Button>
+              </div>
+
+              <StudentHeader
+                data={processedData}
+                selectedSemester={selectedSemester}
+                onSemesterChange={setSelectedSemester}
+              />
+
+              {/* Charts Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <GradeDistributionChart
+                  data={processedData.gradeDistribution}
+                />
+                <GPATrendChart data={processedData.gpaTrend} />
+              </div>
+
+              <SemesterSummaryTable semesters={processedData.semesters} />
+
+              <DetailedResultsTable
+                results={filteredResults}
+                selectedSemester={selectedSemester}
+                semesters={processedData.semesters}
+              />
+
+              {/* Back Button */}
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleReset}
+                  variant="outline"
+                  className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
+                >
+                  Check Another Result
+                </Button>
+              </div>
             </div>
+          ) : (
+            <div className="h-[70vh] flex items-center justify-center">
+              <Card className="bg-zinc-900/95 border-zinc-800 max-w-md mx-auto shadow-2xl backdrop-blur-sm">
+                <CardContent className="p-12 text-center">
+                  <div className="flex flex-col items-center gap-6">
+                    {/* Animated Spinner */}
+                    <div className="relative">
+                      <div className="absolute inset-0 rounded-full bg-lime-500/20 blur-xl animate-pulse"></div>
+                      <div className="relative bg-zinc-800 rounded-full p-4 border border-zinc-700">
+                        <Loader2 className="w-12 h-12 text-lime-500 animate-spin" />
+                      </div>
+                    </div>
 
-            <StudentHeader
-              data={processedData}
-              selectedSemester={selectedSemester}
-              onSemesterChange={setSelectedSemester}
-            />
+                    {/* Loading Text */}
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-semibold text-white">
+                        Loading Results
+                      </h3>
+                      <p className="text-sm text-zinc-400">
+                        Please wait while we fetch your data...
+                      </p>
+                    </div>
 
-            {/* Charts Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <GradeDistributionChart data={processedData.gradeDistribution} />
-              <GPATrendChart data={processedData.gpaTrend} />
+                    {/* Animated Dots */}
+                    <div className="flex gap-2">
+                      <div className="w-2 h-2 bg-lime-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                      <div className="w-2 h-2 bg-lime-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                      <div className="w-2 h-2 bg-lime-500 rounded-full animate-bounce"></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-
-            <SemesterSummaryTable semesters={processedData.semesters} />
-
-            <DetailedResultsTable
-              results={filteredResults}
-              selectedSemester={selectedSemester}
-              semesters={processedData.semesters}
-            />
-
-            {/* Back Button */}
-            <div className="flex justify-center">
-              <Button
-                onClick={handleReset}
-                variant="outline"
-                className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
-              >
-                Check Another Result
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="h-[70vh] flex items-center justify-center">
-            <Card className="bg-zinc-900/95 border-zinc-800 max-w-2xl mx-auto">
-              <CardContent className="p-8 text-center text-zinc-400">
-                Loading results...
-              </CardContent>
-            </Card>
-          </div>
-        )}
+          )}
+        </div>
+        <NativeBanner />
       </div>
-      <NativeBanner />
-    </div>
+    </>
   );
 }
