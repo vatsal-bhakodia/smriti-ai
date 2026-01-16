@@ -22,9 +22,9 @@ interface GPATrendChartProps {
 export default function GPATrendChart({ data }: GPATrendChartProps) {
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
-      <CardContent className="p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">
-          OVERALL STATISTICS (GPA TREND)
+      <CardContent className="px-6 pb-0">
+        <h3 className="md:text-left text-center text-lg font-semibold text-white mb-4">
+          OVERALL GPA TREND
         </h3>
         {data.length > 0 ? (
           <ChartContainer

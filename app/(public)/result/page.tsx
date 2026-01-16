@@ -3,21 +3,64 @@
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { ResultAPIResponse, ProcessedData } from "./types";
+import { marksToGrade } from "./utils";
 import StudentHeader from "@/components/result/StudentHeader";
 import GradeDistributionChart from "@/components/result/GradeDistributionChart";
 import GPATrendChart from "@/components/result/GPATrendChart";
 import SemesterSummaryTable from "@/components/result/SemesterSummaryTable";
 import DetailedResultsTable from "@/components/result/DetailedResultsTable";
+import SemesterStatsCard from "@/components/result/SemesterStatsCard";
+import SemesterBarChart from "@/components/result/SemesterBarChart";
+import GradeCircleChart from "@/components/result/GradeCircleChart";
 import NativeBanner from "@/components/ads/NativeBanner";
 import PopunderScript from "@/components/ads/PopunderScript";
 import { Loader2 } from "lucide-react";
+
+// Filter to only keep latest attempt for each subject code
+function filterLatestAttempts(
+  subjects: ResultAPIResponse[]
+): ResultAPIResponse[] {
+  const subjectMap = new Map<string, ResultAPIResponse>();
+
+  subjects.forEach((subject) => {
+    const existing = subjectMap.get(subject.papercode);
+
+    if (!existing) {
+      // First occurrence of this subject code
+      subjectMap.set(subject.papercode, subject);
+    } else {
+      // Compare dates to find the latest attempt
+      const existingDate = existing.declareddate
+        ? new Date(existing.declareddate)
+        : new Date(existing.ryear, existing.rmonth - 1);
+      const currentDate = subject.declareddate
+        ? new Date(subject.declareddate)
+        : new Date(subject.ryear, subject.rmonth - 1);
+
+      // If current date is later or if dates are equal but current has better marks
+      if (
+        currentDate > existingDate ||
+        (currentDate.getTime() === existingDate.getTime() &&
+          (parseFloat(subject.moderatedprint) || 0) >
+            (parseFloat(existing.moderatedprint) || 0))
+      ) {
+        subjectMap.set(subject.papercode, subject);
+      }
+    }
+  });
+
+  return Array.from(subjectMap.values());
+}
 
 export default function ResultsPage() {
   const [rawResults, setRawResults] = useState<ResultAPIResponse[]>([]);
   const [selectedSemester, setSelectedSemester] = useState<number | "OVERALL">(
     "OVERALL"
   );
+  const [showMarksBreakdown, setShowMarksBreakdown] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Process results data
   const processedData = useMemo<ProcessedData | null>(() => {
@@ -37,34 +80,31 @@ export default function ResultsPage() {
     // Process each semester
     const semesters = Array.from(semesterMap.entries())
       .map(([euno, subjects]) => {
+        // Filter to keep only latest attempts for credit calculation
+        const filteredSubjects = filterLatestAttempts(subjects);
+
         // Use eugpa directly from the response (all subjects in a semester have the same eugpa)
         const sgpa = subjects[0]?.eugpa || 0;
-        const totalMarks = subjects.reduce(
+        const totalMarks = filteredSubjects.reduce(
           (sum, sub) => sum + (parseFloat(sub.moderatedprint) || 0),
           0
         );
-        const credits = subjects.reduce((sum, sub) => {
+        // Calculate credits only from latest attempts (no duplicates)
+        const credits = filteredSubjects.reduce((sum, sub) => {
           const isLab = sub.papername.toLowerCase().includes("lab");
           return sum + (isLab ? 1 : 3);
         }, 0);
 
-        return { euno, subjects, totalMarks, sgpa, credits };
+        return { euno, subjects, filteredSubjects, totalMarks, sgpa, credits };
       })
       .sort((a, b) => a.euno - b.euno);
 
-    // Get all grades for grade distribution
-    const allGrades = rawResults.map((entry) => {
+    // Get all grades for grade distribution (using only latest attempts)
+    // First filter all results to get latest attempts only
+    const allLatestAttempts = filterLatestAttempts(rawResults);
+    const allGrades = allLatestAttempts.map((entry) => {
       const marks = parseFloat(entry.moderatedprint) || 0;
-      // Simple grade calculation inline
-      let grade = "F";
-      if (marks >= 90) grade = "O";
-      else if (marks >= 80) grade = "A+";
-      else if (marks >= 70) grade = "A";
-      else if (marks >= 60) grade = "B+";
-      else if (marks >= 50) grade = "B";
-      else if (marks >= 45) grade = "C";
-      else if (marks >= 40) grade = "D";
-      return grade;
+      return marksToGrade(marks);
     });
 
     // Count grade frequency
@@ -126,6 +166,25 @@ export default function ResultsPage() {
     return semester ? semester.subjects : [];
   }, [processedData, selectedSemester]);
 
+  // Detect mobile/desktop and set default for showMarksBreakdown (only on initial load)
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+    };
+
+    // Set initial default based on screen size
+    const initialMobile = window.innerWidth < 1024;
+    setIsMobile(initialMobile);
+    // On mobile, default to hidden; on desktop, default to shown
+    setShowMarksBreakdown(!initialMobile);
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   // Load results from sessionStorage on mount
   useEffect(() => {
     const storedResults = sessionStorage.getItem("resultData");
@@ -154,41 +213,107 @@ export default function ResultsPage() {
   return (
     <>
       <PopunderScript />
-      <div className="min-h-[70vh] bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
+      {/* Grid pattern overlay */}
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `linear-gradient(#a3ff19 1px, transparent 1px), linear-gradient(90deg, #a3ff19 1px, transparent 1px)`,
+          backgroundSize: "50px 50px",
+        }}
+      ></div>
+
+      <div className="min-h-[70vh] p-4 relative">
         <div className="w-full max-w-7xl mb-6 mx-auto">
           {processedData ? (
             <div className="space-y-6">
-              {/* Back Button */}
-              <div className="flex justify-center">
-                <Button
-                  onClick={handleReset}
-                  variant="outline"
-                  className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
-                >
-                  Check Another Result
-                </Button>
-              </div>
-
               <StudentHeader
                 data={processedData}
                 selectedSemester={selectedSemester}
                 onSemesterChange={setSelectedSemester}
+                onReset={handleReset}
               />
 
-              {/* Charts Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <GradeDistributionChart
-                  data={processedData.gradeDistribution}
-                />
-                <GPATrendChart data={processedData.gpaTrend} />
-              </div>
+              {selectedSemester === "OVERALL" ? (
+                <>
+                  {/* Charts Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <GPATrendChart data={processedData.gpaTrend} />
+                    <GradeDistributionChart
+                      data={processedData.gradeDistribution}
+                    />
+                  </div>
+                  <SemesterSummaryTable semesters={processedData.semesters} />
+                </>
+              ) : (
+                <>
+                  {/* Semester-specific views */}
+                  {(() => {
+                    const currentSemester = processedData.semesters.find(
+                      (s) => s.euno === selectedSemester
+                    );
+                    if (!currentSemester) return null;
 
-              <SemesterSummaryTable semesters={processedData.semesters} />
+                    const maxMarks =
+                      currentSemester.filteredSubjects.length * 100;
+                    const percentage =
+                      (currentSemester.totalMarks / maxMarks) * 100;
+
+                    return (
+                      <>
+                        {/* Stats Summary */}
+                        <SemesterStatsCard
+                          totalMarks={currentSemester.totalMarks}
+                          maxMarks={maxMarks}
+                          sgpa={currentSemester.sgpa}
+                          percentage={percentage}
+                          totalCredits={currentSemester.credits}
+                        />
+
+                        {/* Charts Row */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          <SemesterBarChart
+                            subjects={currentSemester.filteredSubjects}
+                          />
+                          {/* Grade Distribution */}
+                          <GradeCircleChart
+                            subjects={currentSemester.filteredSubjects}
+                          />
+                        </div>
+                      </>
+                    );
+                  })()}
+                </>
+              )}
+
+              {/* Toggle for showing/hiding marks breakdown */}
+              <Card className="bg-zinc-900/95 border-zinc-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-1">
+                      <label
+                        htmlFor="marks-breakdown-toggle"
+                        className="text-sm font-medium text-white cursor-pointer"
+                      >
+                        Show Internal & External Marks
+                      </label>
+                      <p className="text-xs text-zinc-400">
+                        Toggle to view detailed marks breakdown
+                      </p>
+                    </div>
+                    <Switch
+                      id="marks-breakdown-toggle"
+                      checked={showMarksBreakdown}
+                      onCheckedChange={setShowMarksBreakdown}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
 
               <DetailedResultsTable
                 results={filteredResults}
                 selectedSemester={selectedSemester}
                 semesters={processedData.semesters}
+                showMarksBreakdown={showMarksBreakdown}
               />
 
               {/* Back Button */}

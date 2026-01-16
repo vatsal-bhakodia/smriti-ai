@@ -2,6 +2,14 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   ResultAPIResponse,
   ProcessedSemester,
 } from "../../app/(public)/result/types";
@@ -11,12 +19,14 @@ interface DetailedResultsTableProps {
   results: ResultAPIResponse[];
   selectedSemester: number | "OVERALL";
   semesters: ProcessedSemester[];
+  showMarksBreakdown?: boolean;
 }
 
 export default function DetailedResultsTable({
   results,
   selectedSemester,
   semesters,
+  showMarksBreakdown = true,
 }: DetailedResultsTableProps) {
   const getGradeBadgeClass = (grade: string) => {
     switch (grade) {
@@ -104,70 +114,96 @@ export default function DetailedResultsTable({
                   </div>
 
                   {/* Semester Table */}
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-zinc-700 bg-zinc-900/50">
-                        <th className="text-left p-3 text-white font-semibold">
-                          PAPER CODE
-                        </th>
-                        <th className="text-left p-3 text-white font-semibold">
-                          SUBJECT NAME
-                        </th>
-                        <th className="text-center p-3 text-white font-semibold">
-                          INTERNAL
-                        </th>
-                        <th className="text-center p-3 text-white font-semibold">
-                          EXTERNAL
-                        </th>
-                        <th className="text-center p-3 text-white font-semibold">
-                          TOTAL
-                        </th>
-                        <th className="text-center p-3 text-white font-semibold">
-                          GRADE
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {semResults.map((result, index) => {
-                        const totalMarks =
-                          parseFloat(result.moderatedprint) || 0;
-                        const grade = marksToGrade(totalMarks);
-                        return (
-                          <tr
-                            key={`${result.papercode}-${index}`}
-                            className="border-b border-zinc-800 hover:bg-zinc-800/30 transition-colors"
-                          >
-                            <td className="p-3 text-zinc-300 font-mono text-sm">
-                              {result.papercode}
-                            </td>
-                            <td className="p-3 text-zinc-200">
-                              {result.papername}
-                            </td>
-                            <td className="p-3 text-center text-zinc-300">
-                              {result.minorprint === "-"
-                                ? "-"
-                                : result.minorprint}
-                            </td>
-                            <td className="p-3 text-center text-zinc-300">
-                              {result.majorprint}
-                            </td>
-                            <td className="p-3 text-center text-white font-semibold">
-                              {result.moderatedprint}
-                            </td>
-                            <td className="p-3 text-center">
-                              <span
-                                className={`px-2 py-1 rounded text-sm font-semibold ${getGradeBadgeClass(
-                                  grade
-                                )}`}
-                              >
-                                {grade}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  <div className="-mx-4 px-4">
+                    <Table className="w-full min-w-[600px]">
+                      <TableHeader>
+                        <TableRow className="border-b border-zinc-700 bg-zinc-900/50 hover:bg-zinc-900/50">
+                          {/* Mobile: Combined column, Desktop: Separate columns */}
+                          <TableHead className="text-left p-3 text-white font-semibold md:hidden w-[180px]">
+                            SUBJECT
+                          </TableHead>
+                          <TableHead className="text-left p-3 text-white font-semibold hidden md:table-cell">
+                            PAPER CODE
+                          </TableHead>
+                          <TableHead className="text-left p-3 text-white font-semibold hidden md:table-cell">
+                            SUBJECT NAME
+                          </TableHead>
+                          {showMarksBreakdown && (
+                            <>
+                              <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
+                                INTERNAL
+                              </TableHead>
+                              <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
+                                EXTERNAL
+                              </TableHead>
+                            </>
+                          )}
+                          <TableHead className="text-center p-3 text-white font-semibold w-[70px]">
+                            TOTAL
+                          </TableHead>
+                          <TableHead className="text-center p-3 text-white font-semibold">
+                            GRADE
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {semResults.map((result, index) => {
+                          const totalMarks =
+                            parseFloat(result.moderatedprint) || 0;
+                          const grade = marksToGrade(totalMarks);
+                          return (
+                            <TableRow
+                              key={`${result.papercode}-${index}`}
+                              className="border-b border-zinc-800 hover:bg-zinc-800/30 transition-colors"
+                            >
+                              {/* Mobile: Combined column */}
+                              <TableCell className="p-3 text-zinc-200 md:hidden min-w-0 max-w-[200px]">
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-xs text-zinc-400 font-mono mb-1">
+                                    {result.papercode}
+                                  </span>
+                                  <span className="text-sm md:text-base text-wrap">
+                                    {result.papername}
+                                  </span>
+                                </div>
+                              </TableCell>
+                              {/* Desktop: Separate columns */}
+                              <TableCell className="p-3 text-zinc-300 font-mono text-sm hidden md:table-cell">
+                                {result.papercode}
+                              </TableCell>
+                              <TableCell className="p-3 text-zinc-200 hidden md:table-cell">
+                                {result.papername}
+                              </TableCell>
+                              {showMarksBreakdown && (
+                                <>
+                                  <TableCell className="p-3 text-center text-zinc-300 hidden md:table-cell">
+                                    {result.minorprint === "-"
+                                      ? "-"
+                                      : result.minorprint}
+                                  </TableCell>
+                                  <TableCell className="p-3 text-center text-zinc-300 hidden md:table-cell">
+                                    {result.majorprint}
+                                  </TableCell>
+                                </>
+                              )}
+                              <TableCell className="p-3 text-center text-white font-semibold">
+                                {result.moderatedprint}
+                              </TableCell>
+                              <TableCell className="p-3 text-center">
+                                <span
+                                  className={`px-2 py-1 rounded text-sm font-semibold ${getGradeBadgeClass(
+                                    grade
+                                  )}`}
+                                >
+                                  {grade}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               );
             })}
@@ -187,53 +223,79 @@ export default function DetailedResultsTable({
         <p className="text-sm text-zinc-400 mb-4">
           Showing {results.length} subjects
         </p>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-zinc-700">
-                <th className="text-left p-3 text-white font-semibold">
+        <div className="-mx-6 px-6">
+          <Table className="w-full min-w-[600px]">
+            <TableHeader>
+              <TableRow className="border-b border-zinc-700 hover:bg-transparent">
+                {/* Mobile: Combined column, Desktop: Separate columns */}
+                <TableHead className="text-left p-3 text-white font-semibold md:hidden w-[180px]">
+                  SUBJECT
+                </TableHead>
+                <TableHead className="text-left p-3 text-white font-semibold hidden md:table-cell">
                   PAPER CODE
-                </th>
-                <th className="text-left p-3 text-white font-semibold">
+                </TableHead>
+                <TableHead className="text-left p-3 text-white font-semibold hidden md:table-cell">
                   SUBJECT NAME
-                </th>
-                <th className="text-center p-3 text-white font-semibold">
-                  MINOR
-                </th>
-                <th className="text-center p-3 text-white font-semibold">
-                  MAJOR
-                </th>
-                <th className="text-center p-3 text-white font-semibold">
+                </TableHead>
+                {showMarksBreakdown && (
+                  <>
+                    <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
+                      MINOR
+                    </TableHead>
+                    <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
+                      MAJOR
+                    </TableHead>
+                  </>
+                )}
+                <TableHead className="text-center p-3 text-white font-semibold w-[70px]">
                   TOTAL
-                </th>
-                <th className="text-center p-3 text-white font-semibold">
+                </TableHead>
+                <TableHead className="text-center p-3 text-white font-semibold">
                   GRADE
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {results.map((result, index) => {
                 const totalMarks = parseFloat(result.moderatedprint) || 0;
                 const grade = marksToGrade(totalMarks);
                 return (
-                  <tr
+                  <TableRow
                     key={`${result.papercode}-${index}`}
                     className="border-b border-zinc-800 hover:bg-zinc-800/50 transition-colors"
                   >
-                    <td className="p-3 text-zinc-300 font-mono text-sm">
+                    {/* Mobile: Combined column */}
+                    <TableCell className="p-3 text-zinc-200 md:hidden min-w-0 max-w-[200px]">
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs text-zinc-400 font-mono mb-1 break-words">
+                          {result.papercode}
+                        </span>
+                        <span className="text-sm md:text-base text-wrap">
+                          {result.papername}
+                        </span>
+                      </div>
+                    </TableCell>
+                    {/* Desktop: Separate columns */}
+                    <TableCell className="p-3 text-zinc-300 font-mono text-sm hidden md:table-cell">
                       {result.papercode}
-                    </td>
-                    <td className="p-3 text-zinc-200">{result.papername}</td>
-                    <td className="p-3 text-center text-zinc-300">
-                      {result.minorprint === "-" ? "-" : result.minorprint}
-                    </td>
-                    <td className="p-3 text-center text-zinc-300">
-                      {result.majorprint}
-                    </td>
-                    <td className="p-3 text-center text-white font-semibold">
+                    </TableCell>
+                    <TableCell className="p-3 text-zinc-200 hidden md:table-cell">
+                      {result.papername}
+                    </TableCell>
+                    {showMarksBreakdown && (
+                      <>
+                        <TableCell className="p-3 text-center text-zinc-300 hidden md:table-cell">
+                          {result.minorprint === "-" ? "-" : result.minorprint}
+                        </TableCell>
+                        <TableCell className="p-3 text-center text-zinc-300 hidden md:table-cell">
+                          {result.majorprint}
+                        </TableCell>
+                      </>
+                    )}
+                    <TableCell className="p-3 text-center text-white font-semibold w-[70px]">
                       {result.moderatedprint}
-                    </td>
-                    <td className="p-3 text-center">
+                    </TableCell>
+                    <TableCell className="p-3 text-center">
                       <span
                         className={`px-2 py-1 rounded text-sm font-semibold ${getGradeBadgeClass(
                           grade
@@ -241,12 +303,12 @@ export default function DetailedResultsTable({
                       >
                         {grade}
                       </span>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
           {results.length === 0 && (
             <div className="text-center py-8 text-zinc-400">
               No subjects found for the selected semester

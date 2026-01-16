@@ -24,6 +24,7 @@ export interface ResultAPIResponse {
 export interface ProcessedSemester {
   euno: number;
   subjects: ResultAPIResponse[];
+  filteredSubjects: ResultAPIResponse[];
   totalMarks: number;
   sgpa: number;
   credits: number;

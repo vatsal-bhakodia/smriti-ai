@@ -1,23 +1,27 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ProcessedData } from "../../app/(public)/result/types";
+import { ArrowLeft } from "lucide-react";
 
 interface StudentHeaderProps {
   data: ProcessedData;
   selectedSemester: number | "OVERALL";
   onSemesterChange: (semester: number | "OVERALL") => void;
+  onReset: () => void;
 }
 
 export default function StudentHeader({
   data,
   selectedSemester,
   onSemesterChange,
+  onReset,
 }: StudentHeaderProps) {
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
       <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-4 flex-wrap gap-6">
+        <div className="flex justify-between items-start flex-wrap gap-6">
           <div className="flex-1 min-w-[300px]">
             <h1 className="text-3xl font-bold text-white mb-2">
               {data.studentInfo.name}
@@ -40,43 +44,52 @@ export default function StudentHeader({
                 {data.studentInfo.yearOfAdmission}
               </p>
             </div>
+            {/* Semester Tabs */}
+            <div className="flex gap-2 flex-wrap mt-6">
+              <button
+                onClick={() => onSemesterChange("OVERALL")}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  selectedSemester === "OVERALL"
+                    ? "bg-primary text-black"
+                    : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                }`}
+              >
+                OVERALL
+              </button>
+              {data.semesters.map((sem) => (
+                <button
+                  key={sem.euno}
+                  onClick={() => onSemesterChange(sem.euno)}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    selectedSemester === sem.euno
+                      ? "bg-primary text-black"
+                      : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
+                  }`}
+                >
+                  SEM {sem.euno}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* CGPA Card */}
-          <div className="bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 rounded-lg p-6 min-w-[200px]">
-            <p className="text-sm text-zinc-400 mb-1">CUMULATIVE GPA</p>
-            <p className="text-5xl font-bold text-primary">
-              {data.cgpa.toFixed(2)}
-            </p>
-            <p className="text-xs text-zinc-500 mt-2">Out of 10.0</p>
-          </div>
-        </div>
-
-        {/* Semester Tabs */}
-        <div className="flex gap-2 flex-wrap mt-6">
-          <button
-            onClick={() => onSemesterChange("OVERALL")}
-            className={`px-4 py-2 rounded-md font-medium transition-colors ${
-              selectedSemester === "OVERALL"
-                ? "bg-primary text-black"
-                : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-            }`}
-          >
-            OVERALL
-          </button>
-          {data.semesters.map((sem) => (
-            <button
-              key={sem.euno}
-              onClick={() => onSemesterChange(sem.euno)}
-              className={`px-4 py-2 rounded-md font-medium transition-colors ${
-                selectedSemester === sem.euno
-                  ? "bg-primary text-black"
-                  : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700"
-              }`}
+          {/* CGPA Card with Button */}
+          <div className="flex flex-col gap-3 md:w-fit w-full">
+            <Button
+              onClick={onReset}
+              variant="outline"
+              className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white"
             >
-              SEM {sem.euno}
-            </button>
-          ))}
+              <ArrowLeft className="w-4 h-4" />
+              Check Another Result
+            </Button>
+            <div className="bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/30 rounded-lg p-6 min-w-[200px]">
+              <p className="text-sm text-neutral-100 mb-1">CUMULATIVE GPA</p>
+              <p className="text-5xl font-bold text-primary">
+                {data.cgpa.toFixed(2)}
+              </p>
+              <p className="text-xs text-neutral-100 mt-2">Out of 10.0</p>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

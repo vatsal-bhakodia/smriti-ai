@@ -9,14 +9,14 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const GRADE_COLORS: Record<string, string> = {
-  O: "#10b981", // green
-  "A+": "#3b82f6", // blue
-  A: "#8b5cf6", // purple
-  "B+": "#f59e0b", // amber
-  B: "#ef4444", // red
-  C: "#f97316", // orange
-  D: "#6b7280", // gray
-  F: "#dc2626", // dark red
+  O: "#d9f99d", // lime-200 - brightest (90-100)
+  "A+": "#bef264", // lime-300 (75-89)
+  A: "#a3e635", // lime-400 (65-74)
+  "B+": "#84cc16", // lime-500 (55-64)
+  B: "#65a30d", // lime-600 (50-54)
+  C: "#4d7c0f", // lime-700 (45-49)
+  P: "#65a30d", // lime-600 (40-44) - lighter for visibility
+  F: "#4d7c0f", // lime-700 (<40) - lighter but still darker than P
 };
 
 interface GradeDistributionChartProps {
@@ -28,18 +28,15 @@ export default function GradeDistributionChart({
 }: GradeDistributionChartProps) {
   const chartData = data.map((item) => ({
     ...item,
-    fill: GRADE_COLORS[item.grade] || "#6b7280",
+    fill: GRADE_COLORS[item.grade] || "#65a30d",
   }));
 
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
-      <CardContent className="p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">
+      <CardContent className="px-6">
+        <h3 className="md:text-left text-center text-lg font-semibold text-white mb-4">
           GRADE DISTRIBUTION
         </h3>
-        <p className="text-sm text-zinc-400 mb-4">
-          FREQUENCY OF GRADES ACROSS ALL SEMESTERS
-        </p>
         {chartData.length > 0 ? (
           <ChartContainer config={{}} className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">

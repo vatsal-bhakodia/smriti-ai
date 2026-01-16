@@ -126,7 +126,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
+    <div className="p-4">
+      {/* Grid pattern overlay */}
+      <div
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `linear-gradient(#a3ff19 1px, transparent 1px), linear-gradient(90deg, #a3ff19 1px, transparent 1px)`,
+          backgroundSize: "50px 50px",
+        }}
+      ></div>
+
       <div className="w-full max-w-7xl mx-auto pb-8 flex flex-col items-center justify-center">
         <Banner className="mb-6" />
         <LoginForm

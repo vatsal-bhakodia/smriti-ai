@@ -42,7 +42,7 @@ export default function LoginForm({
   return (
     <>
       {/* Password Information Warning Box */}
-      <Card className="w-full max-w-xl mx-auto py-1.5 mb-4 border-orange-500/30 bg-orange-950/20">
+      <Card className="w-full max-w-xl mx-auto py-1.5 mb-4 border-orange-500/30 bg-orange-950/20 relative">
         <CardContent className="p-3">
           <div className="flex items-start gap-2">
             <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
@@ -56,7 +56,7 @@ export default function LoginForm({
               <ul className="text-white text-xs space-y-1 list-disc list-inside">
                 <li>
                   Default password is your{" "}
-                  <span className="text-lime-400 font-semibold">
+                  <span className="text-yellow-500 font-semibold">
                     father's full name in CAPITAL LETTERS
                   </span>
                 </li>
@@ -74,16 +74,22 @@ export default function LoginForm({
       </Card>
 
       {/* Login Form Card */}
-      <Card className="bg-zinc-900/95 border-zinc-800 w-full max-w-xl mx-auto">
+      <Card className="bg-zinc-900 border-zinc-800 w-full max-w-xl mx-auto relative">
         <CardContent className="p-6">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-black mb-3">
-              <Brain className="h-6 w-6" />
+          {/* Header Section */}
+          <div className="text-center mb-8">
+            {/* Logo */}
+            <div className="relative inline-flex mb-5">
+              <div className="absolute inset-0 bg-primary rounded-2xl blur-xl opacity-50 animate-pulse"></div>
+              <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-black shadow-xl transform transition-transform hover:scale-110 duration-300">
+                <Brain className="h-8 w-8" strokeWidth={2.5} />
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-white mb-1.5">
+
+            <h1 className="text-3xl font-black text-white tracking-tight mb-2">
               GGSIPU Results
             </h1>
-            <p className="text-zinc-400 text-sm">
+            <p className="text-zinc-400 text-sm font-medium">
               Enter your credentials to view your result analysis
             </p>
           </div>
