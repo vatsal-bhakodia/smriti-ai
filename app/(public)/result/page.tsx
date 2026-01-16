@@ -153,7 +153,7 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-[70vh] bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
-      <div className="w-full max-w-7xl mx-auto">
+      <div className="w-full max-w-7xl mb-6 mx-auto">
         {processedData ? (
           <div className="space-y-6">
             {/* Back Button */}
