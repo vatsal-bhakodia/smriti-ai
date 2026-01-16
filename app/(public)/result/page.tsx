@@ -11,6 +11,7 @@ import GPATrendChart from "@/components/result/GPATrendChart";
 import SemesterSummaryTable from "@/components/result/SemesterSummaryTable";
 import DetailedResultsTable from "@/components/result/DetailedResultsTable";
 import NativeBanner from "@/components/ads/NativeBanner";
+import Script from "next/script";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -153,6 +154,11 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-[70vh] bg-black bg-[radial-gradient(circle_at_1px_1px,rgba(132,204,22,0.15)_1px,transparent_0)] bg-[length:20px_20px] p-4">
+      {/* Ads popunder Script */}
+      <Script
+        src="https://pl28487228.effectivegatecpm.com/ba/4e/1c/ba4e1c01b787487794a1e048f03e4de5.js"
+        strategy="beforeInteractive"
+      />
       <div className="w-full max-w-7xl mb-6 mx-auto">
         {processedData ? (
           <div className="space-y-6">
