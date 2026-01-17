@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -20,6 +21,7 @@ interface DetailedResultsTableProps {
   selectedSemester: number | "OVERALL";
   semesters: ProcessedSemester[];
   showMarksBreakdown?: boolean;
+  onToggleMarksBreakdown?: (value: boolean) => void;
 }
 
 export default function DetailedResultsTable({
@@ -27,6 +29,7 @@ export default function DetailedResultsTable({
   selectedSemester,
   semesters,
   showMarksBreakdown = true,
+  onToggleMarksBreakdown,
 }: DetailedResultsTableProps) {
   const getGradeBadgeClass = (grade: string) => {
     switch (grade) {
@@ -66,12 +69,31 @@ export default function DetailedResultsTable({
     return (
       <Card className="bg-zinc-900/95 border-zinc-800">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-white mb-2">
-            DETAILED RESULTS - ALL SEMESTERS
-          </h3>
-          <p className="text-sm text-zinc-400 mb-4">
-            Showing all {results.length} subjects across all semesters
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">
+                DETAILED RESULTS - ALL SEMESTERS
+              </h3>
+              <p className="text-sm text-zinc-400">
+                Showing all {results.length} subjects across all semesters
+              </p>
+            </div>
+            {onToggleMarksBreakdown && (
+              <div className="flex items-center gap-3 shrink-0">
+                <label
+                  htmlFor="marks-breakdown-toggle-overall"
+                  className="text-sm text-zinc-400 cursor-pointer"
+                >
+                  Show Marks Breakdown
+                </label>
+                <Switch
+                  id="marks-breakdown-toggle-overall"
+                  checked={showMarksBreakdown}
+                  onCheckedChange={onToggleMarksBreakdown}
+                />
+              </div>
+            )}
+          </div>
           <div className="overflow-x-auto space-y-6">
             {sortedSemesters.map((semNum) => {
               const semResults = groupedBySemester[semNum];
@@ -217,12 +239,31 @@ export default function DetailedResultsTable({
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
       <CardContent className="p-6">
-        <h3 className="text-lg font-semibold text-white mb-2">
-          SEMESTER {selectedSemester} - DETAILED RESULTS
-        </h3>
-        <p className="text-sm text-zinc-400 mb-4">
-          Showing {results.length} subjects
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-white mb-1">
+              SEMESTER {selectedSemester} - DETAILED RESULTS
+            </h3>
+            <p className="text-sm text-zinc-400">
+              Showing {results.length} subjects
+            </p>
+          </div>
+          {onToggleMarksBreakdown && (
+            <div className="flex items-center gap-3 shrink-0">
+              <label
+                htmlFor="marks-breakdown-toggle-semester"
+                className="text-sm text-zinc-400 cursor-pointer"
+              >
+                Show Marks Breakdown
+              </label>
+              <Switch
+                id="marks-breakdown-toggle-semester"
+                checked={showMarksBreakdown}
+                onCheckedChange={onToggleMarksBreakdown}
+              />
+            </div>
+          )}
+        </div>
         <div className="-mx-6 px-6">
           <Table className="w-full min-w-[600px]">
             <TableHeader>
@@ -240,10 +281,10 @@ export default function DetailedResultsTable({
                 {showMarksBreakdown && (
                   <>
                     <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
-                      MINOR
+                      INTERNAL
                     </TableHead>
                     <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
-                      MAJOR
+                      EXTERNAL
                     </TableHead>
                   </>
                 )}

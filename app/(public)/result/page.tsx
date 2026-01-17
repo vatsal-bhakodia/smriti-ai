@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { ResultAPIResponse, ProcessedData } from "./types";
 import { marksToGrade } from "./utils";
 import StudentHeader from "@/components/result/StudentHeader";
@@ -372,6 +371,7 @@ export default function ResultsPage() {
                 selectedSemester={selectedSemester}
                 onSemesterChange={setSelectedSemester}
                 onReset={handleReset}
+                showMarksBreakdown={showMarksBreakdown}
               />
 
               {selectedSemester === "OVERALL" ? (
@@ -426,35 +426,12 @@ export default function ResultsPage() {
                 </>
               )}
 
-              {/* Toggle for showing/hiding marks breakdown */}
-              <Card className="bg-zinc-900/95 border-zinc-800">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col gap-1">
-                      <label
-                        htmlFor="marks-breakdown-toggle"
-                        className="text-sm font-medium text-white cursor-pointer"
-                      >
-                        Show Internal & External Marks
-                      </label>
-                      <p className="text-xs text-zinc-400">
-                        Toggle to view detailed marks breakdown
-                      </p>
-                    </div>
-                    <Switch
-                      id="marks-breakdown-toggle"
-                      checked={showMarksBreakdown}
-                      onCheckedChange={setShowMarksBreakdown}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
               <DetailedResultsTable
                 results={filteredResults}
                 selectedSemester={selectedSemester}
                 semesters={processedData.semesters}
                 showMarksBreakdown={showMarksBreakdown}
+                onToggleMarksBreakdown={setShowMarksBreakdown}
               />
 
               {/* Back Button */}
