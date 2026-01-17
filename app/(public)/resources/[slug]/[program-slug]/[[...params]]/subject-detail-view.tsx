@@ -17,7 +17,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ChevronDown, Maximize2, Download } from "lucide-react";
-import Banner from "@/components/ads/Banner";
 
 interface Subject {
   id: string;
@@ -109,13 +108,6 @@ export function SubjectDetailView({
     }, 0);
 
     return (checkedCount / totalTopics) * 100;
-  };
-
-  const getResourceUrl = (resource: StudyResource): string => {
-    if (resource.storageType === "google_drive") {
-      return `https://drive.google.com/file/d/${resource.link}/view?usp=drivesdk`;
-    }
-    return resource.link;
   };
 
   const getResourcePreviewUrl = (resource: StudyResource): string => {
@@ -387,36 +379,34 @@ export function SubjectDetailView({
       </Card>
 
       {/* Right Section: Subject Details Card */}
-      <div className="flex flex-col gap-6">
-        <Card className="max-h-fit">
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between border-b">
-              <span className="text-sm font-medium">Theory Code</span>
+      <Card className="max-h-fit">
+        <CardHeader>
+          <CardTitle className="text-xl">Subject Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between py-2 border-b">
+            <span className="text-sm font-medium">Theory Code</span>
+            <span className="text-sm text-muted-foreground">
+              {subject.code}
+            </span>
+          </div>
+          <div className="flex items-center justify-between py-2 border-b">
+            <span className="text-sm font-medium">Theory Credits</span>
+            <span className="text-sm text-muted-foreground">
+              {subject.theoryCredits}
+            </span>
+          </div>
+          {subject.practicalCredits && subject.practicalCredits > 0 && (
+            <div className="flex items-center justify-between py-2 border-b">
+              <span className="text-sm font-medium">Practical Credits</span>
               <span className="text-sm text-muted-foreground">
-                {subject.code}
+                {subject.practicalCredits}
               </span>
             </div>
-            <div className="flex items-center justify-between border-b">
-              <span className="text-sm font-medium">Theory Credits</span>
-              <span className="text-sm text-muted-foreground">
-                {subject.theoryCredits}
-              </span>
-            </div>
-            {subject.practicalCredits && subject.practicalCredits > 0 && (
-              <div className="flex items-center justify-between border-b">
-                <span className="text-sm font-medium">Practical Credits</span>
-                <span className="text-sm text-muted-foreground">
-                  {subject.practicalCredits}
-                </span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        {/* banner ad */}
-        <Card className="p-2">
-          <Banner size="300x250" />
-        </Card>
-      </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Resource Viewer Modal */}
       <Dialog
         open={selectedResource !== null}

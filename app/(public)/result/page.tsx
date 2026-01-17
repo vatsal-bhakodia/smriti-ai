@@ -14,9 +14,9 @@ import DetailedResultsTable from "@/components/result/DetailedResultsTable";
 import SemesterStatsCard from "@/components/result/SemesterStatsCard";
 import SemesterBarChart from "@/components/result/SemesterBarChart";
 import GradeCircleChart from "@/components/result/GradeCircleChart";
-import NativeBanner from "@/components/ads/NativeBanner";
-import PopunderScript from "@/components/ads/PopunderScript";
+import LoginForm from "@/components/result/LoginForm";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 // Filter to only keep latest attempt for each subject code
 function filterLatestAttempts(
@@ -61,6 +61,15 @@ export default function ResultsPage() {
   );
   const [showMarksBreakdown, setShowMarksBreakdown] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Login form state
+  const [enrollmentNumber, setEnrollmentNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [captcha, setCaptcha] = useState("");
+  const [captchaImage, setCaptchaImage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingCaptcha, setIsLoadingCaptcha] = useState(false);
+  const [error, setError] = useState<string>("");
 
   // Process results data
   const processedData = useMemo<ProcessedData | null>(() => {
@@ -166,6 +175,29 @@ export default function ResultsPage() {
     return semester ? semester.subjects : [];
   }, [processedData, selectedSemester]);
 
+  // Fetch captcha image
+  const fetchCaptcha = async () => {
+    setIsLoadingCaptcha(true);
+    try {
+      const response = await fetch("/api/result/captcha", {
+        credentials: "include",
+      });
+      if (response.ok) {
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setCaptchaImage(imageUrl);
+        setError("");
+      } else {
+        toast.error("Failed to load captcha. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error fetching captcha:", error);
+      toast.error("Failed to load captcha. Please try again.");
+    } finally {
+      setIsLoadingCaptcha(false);
+    }
+  };
+
   // Detect mobile/desktop and set default for showMarksBreakdown (only on initial load)
   useEffect(() => {
     const checkScreenSize = () => {
@@ -185,7 +217,7 @@ export default function ResultsPage() {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // Load results from sessionStorage on mount
+  // Load results from sessionStorage on mount and fetch captcha if no results
   useEffect(() => {
     const storedResults = sessionStorage.getItem("resultData");
     if (storedResults) {
@@ -194,25 +226,116 @@ export default function ResultsPage() {
         setRawResults(results);
       } catch (error) {
         console.error("Error parsing stored results:", error);
-        // If there's an error, redirect to login
-        window.location.replace("/result/login");
+        // If there's an error, show login form
+        fetchCaptcha();
       }
     } else {
-      // No results found, redirect to login
-      window.location.replace("/result/login");
+      // No results found, show login form
+      fetchCaptcha();
     }
   }, []);
+
+  // Cleanup captcha image URL on unmount or when it changes
+  useEffect(() => {
+    return () => {
+      if (captchaImage) {
+        URL.revokeObjectURL(captchaImage);
+      }
+    };
+  }, [captchaImage]);
+
+  const handleRefreshCaptcha = () => {
+    if (captchaImage) {
+      URL.revokeObjectURL(captchaImage);
+    }
+    fetchCaptcha();
+    setCaptcha("");
+  };
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    if (!enrollmentNumber || !password || !captcha) {
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/result/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          enrollmentNumber,
+          password,
+          captcha,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorMessage =
+          data.error ||
+          data.message ||
+          `Login failed with status ${response.status}. Please check your credentials.`;
+        setError(errorMessage);
+        toast.error(errorMessage);
+        handleRefreshCaptcha();
+        setIsLoading(false);
+        return;
+      }
+
+      if (!data.results || data.results.length === 0) {
+        const errorMessage =
+          "No results found. Please check your enrollment number.";
+        setError(errorMessage);
+        toast.error(errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
+      // Store results in sessionStorage
+      sessionStorage.setItem("resultData", JSON.stringify(data.results));
+
+      // Set results and clear form
+      setRawResults(data.results);
+      setEnrollmentNumber("");
+      setPassword("");
+      setCaptcha("");
+      toast.success("Results fetched successfully!");
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      handleRefreshCaptcha();
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleReset = () => {
     sessionStorage.removeItem("resultData");
     setRawResults([]);
     setSelectedSemester("OVERALL");
-    window.location.replace("/result/login");
+    setEnrollmentNumber("");
+    setPassword("");
+    setCaptcha("");
+    setError("");
+    fetchCaptcha();
   };
 
   return (
     <>
-      <PopunderScript />
       {/* Grid pattern overlay */}
       <div
         className="absolute inset-0 opacity-5"
@@ -224,7 +347,25 @@ export default function ResultsPage() {
 
       <div className="min-h-[70vh] p-4 relative">
         <div className="w-full max-w-7xl mb-6 mx-auto">
-          {processedData ? (
+          {!processedData && rawResults.length === 0 ? (
+            // Show login form when no results
+            <div className="w-full max-w-7xl mx-auto pb-8 flex flex-col items-center justify-center">
+              <LoginForm
+                enrollmentNumber={enrollmentNumber}
+                password={password}
+                captcha={captcha}
+                captchaImage={captchaImage}
+                isLoading={isLoading}
+                isLoadingCaptcha={isLoadingCaptcha}
+                error={error}
+                onEnrollmentChange={setEnrollmentNumber}
+                onPasswordChange={setPassword}
+                onCaptchaChange={setCaptcha}
+                onRefreshCaptcha={handleRefreshCaptcha}
+                onSubmit={handleLoginSubmit}
+              />
+            </div>
+          ) : processedData ? (
             <div className="space-y-6">
               <StudentHeader
                 data={processedData}
@@ -362,7 +503,6 @@ export default function ResultsPage() {
             </div>
           )}
         </div>
-        <NativeBanner />
       </div>
     </>
   );

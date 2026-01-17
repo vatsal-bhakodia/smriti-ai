@@ -44,7 +44,7 @@ export default async function UniversityPage({ params }: UniversityPageProps) {
   const programs = await getProgramsByUniversityId(university.id);
 
   return (
-    <section className="max-w-7xl mx-auto pb-32 px-6 pt-8 md:pt-12 min-h-[65vh]">
+    <section className="max-w-7xl mx-auto pb-32 px-6 pt-8 md:pt-12 min-h-[68vh]">
       <UniversityHeader university={university} />
       <ProgramsGrid programs={programs} universitySlug={university.slug} />
     </section>

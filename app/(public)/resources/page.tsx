@@ -22,7 +22,7 @@ export default async function ResourcesPage() {
   const universities = await getUniversities();
 
   return (
-    <section className="max-w-7xl mx-auto pb-32 px-4 sm:px-6 pt-8 md:pt-12 min-h-[65vh]">
+    <section className="max-w-7xl mx-auto pb-32 px-4 sm:px-6 pt-8 md:pt-12 min-h-[68vh]">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
