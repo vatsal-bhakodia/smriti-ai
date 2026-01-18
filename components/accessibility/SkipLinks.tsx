@@ -16,7 +16,7 @@ export function SkipLinks({ links }: SkipLinksProps) {
   const skipLinks = links || defaultLinks;
 
   return (
-    <nav aria-label="Skip navigation" className="sr-only focus-within:not-sr-only">
+    <nav aria-label="Skip navigation" className="sr-only focus-within:not-sr-only focus-within:fixed focus-within:top-0 focus-within:left-0 focus-within:right-0 focus-within:z-60">
       <ul className="flex gap-2 p-4 bg-background border-b">
         {skipLinks.map((link) => (
           <li key={link.href}>
