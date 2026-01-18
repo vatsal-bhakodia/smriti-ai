@@ -99,9 +99,9 @@ const Footer = () => {
 
   const footerLinks = {
     product: [
-      { name: "AI Quizes", href: "/quiz" },
-      { name: "AI Mind Maps", href: "/mindmap" },
-      { name: "AI FLashcards", href: "/quiz" },
+      { name: "AI Quizes", href: "/tools/text-to-quiz" },
+      { name: "AI Mind Maps", href: "/tools/text-to-mindmap" },
+      { name: "AI Flashcards", href: "/tools/text-to-quiz" },
     ],
     company: [
       { name: "Blogs", href: "/blogs" },

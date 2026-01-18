@@ -106,8 +106,7 @@ const navigationLinks = [
   { href: "/#", label: "Home" },
   { href: "/resources", label: "Study Resources" },
   { href: "/result", label: "GGSIPU Result" },
-  // { href: "/#pricing", label: "Pricing" },
-  { href: "/contact", label: "Contact" },
+  { href: "/#pricing", label: "Pricing" },
 ];
 
 // ---------------- Reusable Nav Button ----------------
@@ -150,9 +149,11 @@ const NavButton = ({
 type MegaMenuProps = {
   isOpen: boolean;
   onClose: () => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 };
 
-const MegaMenu = ({ isOpen, onClose }: MegaMenuProps) => {
+const MegaMenu = ({ isOpen, onClose, onMouseEnter, onMouseLeave }: MegaMenuProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -182,7 +183,8 @@ const MegaMenu = ({ isOpen, onClose }: MegaMenuProps) => {
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
         className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-[90vw] max-w-5xl bg-background border border-border rounded-lg shadow-lg p-8"
-        onMouseLeave={onClose}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         <div className="grid grid-cols-3 gap-8">
           {Object.values(toolsData).map((category) => {
@@ -206,7 +208,7 @@ const MegaMenu = ({ isOpen, onClose }: MegaMenuProps) => {
                           className="group block p-3 rounded-lg bg-neutral-900 hover:bg-neutral-800 transition-all duration-200"
                         >
                           <div className="flex items-start gap-3">
-                            <div className="flex-shrink-0">
+                            <div className="shrink-0">
                               <div className="p-1.5 rounded-md bg-primary/10 group-hover:bg-primary/20 transition-colors duration-200">
                                 <IconComponent className="h-4 w-4 text-primary" />
                               </div>
@@ -240,9 +242,33 @@ export default function Navbar() {
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isMobileToolsOpen, setIsMobileToolsOpen] = useState(false);
   const pathname = usePathname();
+  const megaMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (megaMenuTimeoutRef.current) {
+        clearTimeout(megaMenuTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Close mobile menu on route change
   useEffect(() => setIsMenuOpen(false), [pathname]);
+
+  const handleMegaMenuEnter = () => {
+    if (megaMenuTimeoutRef.current) {
+      clearTimeout(megaMenuTimeoutRef.current);
+      megaMenuTimeoutRef.current = null;
+    }
+    setIsMegaMenuOpen(true);
+  };
+
+  const handleMegaMenuLeave = () => {
+    megaMenuTimeoutRef.current = setTimeout(() => {
+      setIsMegaMenuOpen(false);
+    }, 150); // 150ms delay before closing
+  };
 
   return (
     <nav className="fixed top-0 w-full z-50 backdrop-blur-md bg-background/50 border-b border-border">
@@ -262,7 +288,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center justify-center gap-4 w-3/5 relative">
+          <div className="hidden min-[945px]:flex items-center justify-center gap-4 w-3/5 relative">
             {/* Home */}
             <NavButton
               href={navigationLinks[0].href}
@@ -270,9 +296,8 @@ export default function Navbar() {
             />
             {/* Tools Mega Menu Trigger */}
             <div
-              className="relative"
-              onMouseEnter={() => setIsMegaMenuOpen(true)}
-              onMouseLeave={() => setIsMegaMenuOpen(false)}
+              onMouseEnter={handleMegaMenuEnter}
+              onMouseLeave={handleMegaMenuLeave}
             >
               <Button
                 variant="ghost"
@@ -281,22 +306,25 @@ export default function Navbar() {
                 Tools
                 <ChevronDown className="h-4 w-4" />
               </Button>
-              <MegaMenu
-                isOpen={isMegaMenuOpen}
-                onClose={() => setIsMegaMenuOpen(false)}
-              />
             </div>
-            {/* Pricing and Contact */}
+            {/* Remaining nav items: GGSIPU Result, Pricing */}
             {navigationLinks.slice(1).map((link) => (
               <NavButton key={link.href} href={link.href} label={link.label} />
             ))}
+            {/* Mega Menu - positioned relative to the center nav container */}
+            <MegaMenu
+              isOpen={isMegaMenuOpen}
+              onClose={() => setIsMegaMenuOpen(false)}
+              onMouseEnter={handleMegaMenuEnter}
+              onMouseLeave={handleMegaMenuLeave}
+            />
           </div>
 
           {/* Right-side buttons */}
           <div className="flex items-center justify-end gap-2 w-1/5">
             {/* Dashboard (Desktop) */}
             <SignedIn>
-              <div className="hidden md:flex items-center">
+              <div className="hidden min-[945px]:flex items-center">
                 <ActionButton
                   href="/dashboard"
                   label="Dashboard"
@@ -309,7 +337,7 @@ export default function Navbar() {
 
             {/* Sign In / Sign Up (Desktop) */}
             <SignedOut>
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden min-[945px]:flex items-center gap-2">
                 <ActionButton
                   href="/sign-in"
                   label="Sign In"
@@ -332,7 +360,7 @@ export default function Navbar() {
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden flex items-center p-2 rounded-full hover:bg-primary/10"
+              className="min-[945px]:hidden flex items-center p-2 rounded-full hover:bg-primary/10"
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6 text-primary" />
@@ -351,7 +379,7 @@ export default function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden bg-background/98 backdrop-blur-lg border-t border-border shadow-lg"
+              className="min-[945px]:hidden overflow-hidden bg-background/98 backdrop-blur-lg border-t border-border shadow-lg"
             >
               <motion.div
                 initial={{ y: -20 }}
@@ -361,13 +389,15 @@ export default function Navbar() {
                 className="py-6 px-4 space-y-1"
               >
                 {/* Mobile Navigation Links */}
-                <div className="space-y-1">
-                  {navigationLinks.map((link) => (
+                <div>
+                  {navigationLinks.map((link, index) => (
                     <Link
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsMenuOpen(false)}
-                      className="block px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200 text-sm font-medium text-foreground"
+                      className={`block px-4 py-3 hover:bg-primary/10 hover:text-primary transition-all duration-200 text-sm font-medium text-foreground border-border ${
+                        index !== 0 ? "border-t" : ""
+                      }`}
                     >
                       {link.label}
                     </Link>
@@ -375,15 +405,12 @@ export default function Navbar() {
                 </div>
 
                 {/* Mobile Tools Dropdown */}
-                <div className="border-b border-t border-border">
+                <div className="border-t border-border">
                   <button
                     onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-primary/10 hover:text-primary transition-all duration-200 text-sm font-semibold text-foreground"
+                    className="w-full flex items-center justify-between px-4 py-3 hover:bg-primary/10 hover:text-primary transition-all duration-200 text-sm font-semibold text-foreground"
                   >
-                    <span className="flex items-center gap-2">
-                      <Layers className="h-4 w-4" />
                       Tools
-                    </span>
                     <motion.div
                       animate={{ rotate: isMobileToolsOpen ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
@@ -425,7 +452,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Dashboard Link */}
-                <div className="space-y-1">
+                <div className="border-t border-border">
                   <SignedIn>
                     <ActionButton
                       href="/dashboard"
@@ -433,7 +460,7 @@ export default function Navbar() {
                       icon={LayoutDashboard}
                       variant="outline"
                       external={true}
-                      className="w-full rounded-lg flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-primary/10 hover:border-primary transition-all duration-200 mt-2"
+                      className="w-full rounded-lg flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-primary/10 hover:border-primary transition-all duration-200 mt-3"
                     />
                   </SignedIn>
                 </div>
