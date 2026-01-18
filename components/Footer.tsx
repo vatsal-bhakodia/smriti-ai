@@ -75,8 +75,13 @@ const Footer = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash) {
-      const el = document.querySelector(window.location.hash);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      const hash = window.location.hash;
+      // Only attempt to scroll if the hash is a valid simple ID selector
+      // This avoids errors with complex hashes like Clerk's SSO callback URLs
+      if (/^#[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash)) {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }
     }
   }, [pathname]);
 

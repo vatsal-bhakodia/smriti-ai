@@ -9,6 +9,7 @@ import {
   generateMetadataUtil,
   generateViewport,
 } from "@/utils/generateMetadata";
+import { clerkAppearance } from "./clerkAppearance";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,50 +25,6 @@ export const metadata = generateMetadataUtil({
 });
 
 export const viewport = generateViewport();
-
-// Clerk appearance config matching the app theme
-const clerkAppearance = {
-  variables: {
-    colorBackground: "#171717",
-    colorPrimary: "#a3ff19",
-    colorPrimaryForeground: "#222",
-    colorForeground: "#fff",
-    colorInput: "#222",
-    colorBorder: "#333",
-    fontSize: "14px",
-  },
-  elements: {
-    cardBox: {
-      boxShadow: "none",
-    },
-    card: {
-      width: "100%",
-    },
-    formFieldInput: {
-      backgroundColor: "#222",
-      color: "#fff",
-      border: "1px solid #fff",
-      height: "35px",
-    },
-    formButtonPrimary: {
-      background: "#a3ff19",
-      color: "#333",
-      border: "none",
-      boxShadow: "0 0 10px #39FF14, 0 0 20px #39FF14",
-      fontWeight: 700,
-    },
-    formFieldLabel: { color: "#eee" },
-    socialButtonsBlockButton__google: {
-      backgroundColor: "#222",
-      transition: "all 0.2s",
-      height: "40px",
-      margin: "0 auto",
-    },
-    socialButtonsBlockButtonText: {
-      color: "#fff",
-    },
-  },
-};
 
 export default function RootLayout({
   children,
