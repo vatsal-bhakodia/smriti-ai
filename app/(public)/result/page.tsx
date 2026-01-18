@@ -3,8 +3,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ResultAPIResponse, ProcessedData } from "./types";
-import { marksToGrade } from "./utils";
+import { ResultAPIResponse, ProcessedData, CreditsMap } from "./types";
+import { marksToGrade, getSubjectCredits, normalizePaperCode } from "./utils";
 import StudentHeader from "@/components/result/StudentHeader";
 import GradeDistributionChart from "@/components/result/GradeDistributionChart";
 import GPATrendChart from "@/components/result/GPATrendChart";
@@ -16,6 +16,16 @@ import GradeCircleChart from "@/components/result/GradeCircleChart";
 import LoginForm from "@/components/result/LoginForm";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+
+// Normalize paper codes in all subjects
+function normalizeResultsPaperCodes(
+  results: ResultAPIResponse[]
+): ResultAPIResponse[] {
+  return results.map((result) => ({
+    ...result,
+    papercode: normalizePaperCode(result.papercode),
+  }));
+}
 
 // Filter to only keep latest attempt for each subject code
 function filterLatestAttempts(
@@ -55,6 +65,7 @@ function filterLatestAttempts(
 
 export default function ResultsPage() {
   const [rawResults, setRawResults] = useState<ResultAPIResponse[]>([]);
+  const [creditsMap, setCreditsMap] = useState<CreditsMap>({});
   const [selectedSemester, setSelectedSemester] = useState<number | "OVERALL">(
     "OVERALL"
   );
@@ -75,6 +86,7 @@ export default function ResultsPage() {
     if (!rawResults || rawResults.length === 0) return null;
 
     const firstEntry = rawResults[0];
+    const programName = firstEntry.prgname || "";
     const semesterMap = new Map<number, ResultAPIResponse[]>();
 
     // Group by semester
@@ -84,6 +96,9 @@ export default function ResultsPage() {
       }
       semesterMap.get(entry.euno)!.push(entry);
     });
+
+    // Track if any subject is missing credits (only matters for non-B.Tech/BCA programs)
+    let hasCompleteCredits = true;
 
     // Process each semester
     const semesters = Array.from(semesterMap.entries())
@@ -97,13 +112,18 @@ export default function ResultsPage() {
           (sum, sub) => sum + (parseFloat(sub.moderatedprint) || 0),
           0
         );
-        // Calculate credits only from latest attempts (no duplicates)
-        const credits = filteredSubjects.reduce((sum, sub) => {
-          const isLab = sub.papername.toLowerCase().includes("lab");
-          return sum + (isLab ? 1 : 3);
-        }, 0);
+        // Calculate credits using CMS data with fallback for B.Tech/BCA
+        let semesterCredits = 0;
+        for (const sub of filteredSubjects) {
+          const subCredits = getSubjectCredits(sub, creditsMap, programName);
+          if (subCredits === null) {
+            hasCompleteCredits = false;
+          } else {
+            semesterCredits += subCredits.total;
+          }
+        }
 
-        return { euno, subjects, filteredSubjects, totalMarks, sgpa, credits };
+        return { euno, subjects, filteredSubjects, totalMarks, sgpa, credits: semesterCredits };
       })
       .sort((a, b) => a.euno - b.euno);
 
@@ -135,12 +155,16 @@ export default function ResultsPage() {
     }));
 
     // Calculate CGPA from SGPA values (weighted by credits)
-    const totalCredits = semesters.reduce((sum, sem) => sum + sem.credits, 0);
-    const weightedSGPA = semesters.reduce(
-      (sum, sem) => sum + sem.sgpa * sem.credits,
-      0
-    );
-    const cgpa = totalCredits > 0 ? weightedSGPA / totalCredits : 0;
+    // Only calculate if all credits are known
+    let cgpa: number | null = null;
+    if (hasCompleteCredits) {
+      const totalCredits = semesters.reduce((sum, sem) => sum + sem.credits, 0);
+      const weightedSGPA = semesters.reduce(
+        (sum, sem) => sum + sem.sgpa * sem.credits,
+        0
+      );
+      cgpa = totalCredits > 0 ? weightedSGPA / totalCredits : 0;
+    }
 
     return {
       studentInfo: {
@@ -156,9 +180,10 @@ export default function ResultsPage() {
       gradeDistribution,
       gpaTrend,
       cgpa,
+      hasCompleteCredits,
       allResults: rawResults,
     };
-  }, [rawResults]);
+  }, [rawResults, creditsMap]);
 
   // Filter results based on selected semester
   const filteredResults = useMemo(() => {
@@ -174,6 +199,38 @@ export default function ResultsPage() {
     return semester ? semester.subjects : [];
   }, [processedData, selectedSemester]);
 
+  // Fetch subject credits from CMS
+  const fetchCredits = async (results: ResultAPIResponse[]) => {
+    try {
+      // Get unique paper codes
+      const paperCodes = [...new Set(results.map((r) => r.papercode))];
+
+      if (paperCodes.length === 0) return;
+
+      const response = await fetch("/api/result/credits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ paperCodes }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setCreditsMap(data.credits || {});
+      }
+    } catch (error) {
+      console.error("Error fetching subject credits:", error);
+    }
+  };
+
+  // Fetch credits when results change
+  useEffect(() => {
+    if (rawResults.length > 0) {
+      fetchCredits(rawResults);
+    }
+  }, [rawResults]);
+
   // Fetch captcha image
   const fetchCaptcha = async () => {
     setIsLoadingCaptcha(true);
@@ -185,13 +242,12 @@ export default function ResultsPage() {
         const blob = await response.blob();
         const imageUrl = URL.createObjectURL(blob);
         setCaptchaImage(imageUrl);
-        setError("");
       } else {
-        toast.error("Failed to load captcha. Please try again.");
+        setError("Failed to load captcha. Please try again.");
       }
     } catch (error) {
       console.error("Error fetching captcha:", error);
-      toast.error("Failed to load captcha. Please try again.");
+      setError("Failed to load captcha. Please try again.");
     } finally {
       setIsLoadingCaptcha(false);
     }
@@ -222,6 +278,7 @@ export default function ResultsPage() {
     if (storedResults) {
       try {
         const results: ResultAPIResponse[] = JSON.parse(storedResults);
+        // Paper codes are already normalized when stored, so just set them
         setRawResults(results);
       } catch (error) {
         console.error("Error parsing stored results:", error);
@@ -284,7 +341,6 @@ export default function ResultsPage() {
           data.message ||
           `Login failed with status ${response.status}. Please check your credentials.`;
         setError(errorMessage);
-        toast.error(errorMessage);
         handleRefreshCaptcha();
         setIsLoading(false);
         return;
@@ -294,16 +350,18 @@ export default function ResultsPage() {
         const errorMessage =
           "No results found. Please check your enrollment number.";
         setError(errorMessage);
-        toast.error(errorMessage);
         setIsLoading(false);
         return;
       }
 
-      // Store results in sessionStorage
-      sessionStorage.setItem("resultData", JSON.stringify(data.results));
+      // Normalize paper codes once when data is received
+      const normalizedResults = normalizeResultsPaperCodes(data.results);
+
+      // Store normalized results in sessionStorage
+      sessionStorage.setItem("resultData", JSON.stringify(normalizedResults));
 
       // Set results and clear form
-      setRawResults(data.results);
+      setRawResults(normalizedResults);
       setEnrollmentNumber("");
       setPassword("");
       setCaptcha("");
@@ -315,7 +373,6 @@ export default function ResultsPage() {
           ? error.message
           : "An unexpected error occurred. Please try again.";
       setError(errorMessage);
-      toast.error(errorMessage);
       handleRefreshCaptcha();
     } finally {
       setIsLoading(false);
@@ -362,6 +419,7 @@ export default function ResultsPage() {
                 onCaptchaChange={setCaptcha}
                 onRefreshCaptcha={handleRefreshCaptcha}
                 onSubmit={handleLoginSubmit}
+                onDismissError={() => setError("")}
               />
             </div>
           ) : processedData ? (
@@ -432,6 +490,8 @@ export default function ResultsPage() {
                 semesters={processedData.semesters}
                 showMarksBreakdown={showMarksBreakdown}
                 onToggleMarksBreakdown={setShowMarksBreakdown}
+                creditsMap={creditsMap}
+                programName={processedData.studentInfo.program}
               />
 
               {/* Back Button */}

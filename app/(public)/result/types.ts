@@ -21,6 +21,34 @@ export interface ResultAPIResponse {
   eugpa: number;
 }
 
+export interface SubjectCreditsResponse {
+  credits: Record<
+    string,
+    {
+      theoryCredits: number;
+      practicalCredits: number | null;
+      totalCredits: number;
+    }
+  >;
+  found: number;
+  requested: number;
+}
+
+export interface SubjectCredits {
+  theoryCredits: number;
+  practicalCredits: number | null;
+  totalCredits: number;
+}
+
+export type CreditsMap = Record<string, SubjectCredits>;
+
+export interface DetailedCredits {
+  total: number;
+  theory: number;
+  practical: number | null;
+  isFallback: boolean;
+}
+
 export interface ProcessedSemester {
   euno: number;
   subjects: ResultAPIResponse[];
@@ -43,6 +71,7 @@ export interface ProcessedData {
   semesters: ProcessedSemester[];
   gradeDistribution: { grade: string; count: number }[];
   gpaTrend: { semester: string; sgpa: number }[];
-  cgpa: number;
+  cgpa: number | null; // null if any subject is missing credits
+  hasCompleteCredits: boolean; // true only if all subjects have credits from CMS
   allResults: ResultAPIResponse[];
 }

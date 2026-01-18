@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, RefreshCw, Brain, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, RefreshCw, Brain, Eye, EyeOff, X } from "lucide-react";
 
 interface LoginFormProps {
   enrollmentNumber: string;
@@ -21,6 +21,7 @@ interface LoginFormProps {
   onCaptchaChange: (value: string) => void;
   onRefreshCaptcha: () => void;
   onSubmit: (e: React.FormEvent) => void;
+  onDismissError: () => void;
 }
 
 export default function LoginForm({
@@ -36,6 +37,7 @@ export default function LoginForm({
   onCaptchaChange,
   onRefreshCaptcha,
   onSubmit,
+  onDismissError,
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -45,7 +47,7 @@ export default function LoginForm({
       <Card className="w-full max-w-xl mx-auto py-1.5 mb-4 border-orange-500/30 bg-orange-950/20 relative">
         <CardContent className="p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />
             <div className="flex-1">
               <h3 className="font-bold text-white text-sm mb-1.5">
                 Password Information
@@ -187,13 +189,21 @@ export default function LoginForm({
             </div>
 
             {error && (
-              <div className="p-4 bg-primary/10 border border-primary/50 rounded text-primary text-sm">
+              <div className="p-4 bg-red-500/10 border border-red-500/50 rounded text-red-400 text-sm">
                 <div className="flex items-start gap-2">
-                  <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-red-500" />
                   <div className="flex-1">
-                    <p className="font-semibold mb-1">Error</p>
+                    <p className="font-semibold mb-1 text-red-500">Error</p>
                     <p>{error}</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={onDismissError}
+                    className="shrink-0 p-1 hover:bg-red-500/20 rounded transition-colors"
+                    aria-label="Dismiss error"
+                  >
+                    <X className="h-4 w-4 text-red-500" />
+                  </button>
                 </div>
               </div>
             )}

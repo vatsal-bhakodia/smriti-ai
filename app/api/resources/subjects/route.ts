@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const cmsUrl = process.env.CMS_URL;
+    const cmsUrl = process.env.BACKEND_URL;
     if (!cmsUrl) {
       return NextResponse.json(
         { message: "CMS URL not configured" },

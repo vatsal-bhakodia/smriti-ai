@@ -134,28 +134,30 @@ export async function exportResultToPDF({
     infoStartY + lineHeight * 2
   );
 
-  // CGPA Card - Lime accent
-  const cgpaBoxX = 150;
-  const cgpaBoxY = yPosition + 6;
-  const cgpaBoxW = 40;
-  const cgpaBoxH = 33;
+  // CGPA Card - Lime accent (only show if cgpa is available)
+  if (cgpa !== null) {
+    const cgpaBoxX = 150;
+    const cgpaBoxY = yPosition + 6;
+    const cgpaBoxW = 40;
+    const cgpaBoxH = 33;
 
-  // CGPA background with lime color
-  doc.setFillColor(...primaryLime);
-  doc.roundedRect(cgpaBoxX, cgpaBoxY, cgpaBoxW, cgpaBoxH, 4, 4, "F");
+    // CGPA background with lime color
+    doc.setFillColor(...primaryLime);
+    doc.roundedRect(cgpaBoxX, cgpaBoxY, cgpaBoxW, cgpaBoxH, 4, 4, "F");
 
-  // CGPA Label
-  doc.setTextColor(...darkBg);
-  doc.setFontSize(8);
-  doc.setFont("helvetica", "bold");
-  doc.text("CGPA", cgpaBoxX + cgpaBoxW / 2, cgpaBoxY + 10, { align: "center" });
+    // CGPA Label
+    doc.setTextColor(...darkBg);
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.text("CGPA", cgpaBoxX + cgpaBoxW / 2, cgpaBoxY + 10, { align: "center" });
 
-  // CGPA Value
-  doc.setFontSize(20);
-  doc.setFont("helvetica", "bold");
-  doc.text(cgpa.toFixed(2), cgpaBoxX + cgpaBoxW / 2, cgpaBoxY + 25, {
-    align: "center",
-  });
+    // CGPA Value
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text(cgpa.toFixed(2), cgpaBoxX + cgpaBoxW / 2, cgpaBoxY + 25, {
+      align: "center",
+    });
+  }
 
   yPosition += 55;
 
@@ -172,8 +174,10 @@ export async function exportResultToPDF({
       );
     });
 
-    // Add summary table
-    yPosition = addSummaryTable(doc, semesters, yPosition, cgpa);
+    // Add summary table (only if cgpa is available)
+    if (cgpa !== null) {
+      yPosition = addSummaryTable(doc, semesters, yPosition, cgpa);
+    }
   } else {
     // Export specific semester
     const selectedSemester = semesters.find((s) => s.euno === semester);

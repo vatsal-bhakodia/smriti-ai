@@ -215,13 +215,15 @@ export default function StudentHeader({
                 </SignInButton>
               )}
             </div>
-            <div className="bg-linear-to-br from-primary/20 to-primary/5 border border-primary/30 rounded-lg p-6 min-w-[200px]">
-              <p className="text-sm text-neutral-100 mb-1">CUMULATIVE GPA</p>
-              <p className="text-5xl font-bold text-primary">
-                {data.cgpa.toFixed(2)}
-              </p>
-              <p className="text-xs text-neutral-100 mt-2">Out of 10.0</p>
-            </div>
+            {data.cgpa !== null && (
+              <div className="bg-linear-to-br from-primary/20 to-primary/5 border border-primary/30 rounded-lg p-6 min-w-[200px]">
+                <p className="text-sm text-neutral-100 mb-1">CUMULATIVE GPA</p>
+                <p className="text-5xl font-bold text-primary">
+                  {data.cgpa.toFixed(2)}
+                </p>
+                <p className="text-xs text-neutral-100 mt-2">Out of 10.0</p>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

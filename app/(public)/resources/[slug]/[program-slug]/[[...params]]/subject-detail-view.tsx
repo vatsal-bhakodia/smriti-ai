@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -21,7 +21,8 @@ import { ChevronDown, Maximize2, Download } from "lucide-react";
 interface Subject {
   id: string;
   programId: string;
-  code: string;
+  theoryCode: string;
+  practicalCode: string | null;
   name: string;
   slug: string;
   theoryCredits: number;
@@ -64,10 +65,13 @@ function ResourceButton({ resource, onClick }: ResourceButtonProps) {
       className="flex items-center justify-between gap-2 p-3 border rounded-md hover:bg-accent transition-colors text-left w-full"
     >
       <span className="text-sm flex-1">{resource.name}</span>
-      <Download className="size-4 text-muted-foreground flex-shrink-0" />
+      <Download className="size-4 text-muted-foreground shrink-0" />
     </button>
   );
 }
+
+// LocalStorage key prefix for progress
+const PROGRESS_STORAGE_KEY = "smriti_subject_progress_";
 
 export function SubjectDetailView({
   subject,
@@ -80,18 +84,50 @@ export function SubjectDetailView({
   const [selectedResource, setSelectedResource] =
     useState<StudyResource | null>(null);
 
+  // Load progress from localStorage on mount
+  useEffect(() => {
+    const storageKey = `${PROGRESS_STORAGE_KEY}${subject.id}`;
+    try {
+      const savedProgress = localStorage.getItem(storageKey);
+      if (savedProgress) {
+        const parsed = JSON.parse(savedProgress);
+        setCheckedTopics(parsed);
+      }
+    } catch (error) {
+      console.error("Failed to load progress from localStorage:", error);
+    }
+  }, [subject.id]);
+
+  // Save progress to localStorage whenever it changes
+  const saveProgress = useCallback(
+    (newProgress: Record<number, Record<number, boolean>>) => {
+      const storageKey = `${PROGRESS_STORAGE_KEY}${subject.id}`;
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(newProgress));
+      } catch (error) {
+        console.error("Failed to save progress to localStorage:", error);
+      }
+    },
+    [subject.id]
+  );
+
   const toggleUnit = (index: number) => {
     setOpenUnits((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
   const toggleTopic = (unitIndex: number, topicIndex: number) => {
-    setCheckedTopics((prev) => ({
-      ...prev,
-      [unitIndex]: {
-        ...prev[unitIndex],
-        [topicIndex]: !prev[unitIndex]?.[topicIndex],
-      },
-    }));
+    setCheckedTopics((prev) => {
+      const newState = {
+        ...prev,
+        [unitIndex]: {
+          ...prev[unitIndex],
+          [topicIndex]: !prev[unitIndex]?.[topicIndex],
+        },
+      };
+      // Save to localStorage
+      saveProgress(newState);
+      return newState;
+    });
   };
 
   const calculateProgress = (
@@ -118,7 +154,9 @@ export function SubjectDetailView({
     return resource.link;
   };
 
-  const hasLab = subject.practicalCredits && subject.practicalCredits > 0;
+  const hasLab =
+    (subject.practicalCredits && subject.practicalCredits > 0) ||
+    (subject.practicalTopics && Array.isArray(subject.practicalTopics) && subject.practicalTopics.length > 0);
   const hasSyllabus = subject.syllabus && Array.isArray(subject.syllabus);
   const hasPracticalTopics =
     subject.practicalTopics && Array.isArray(subject.practicalTopics);
@@ -166,71 +204,93 @@ export function SubjectDetailView({
             {/* Theory Tab */}
             <TabsContent value="theory" className="space-y-3">
               {hasSyllabus ? (
-                subject.syllabus.map((unit: any, index: number) => (
-                  <Collapsible
-                    key={index}
-                    open={openUnits[index]}
-                    onOpenChange={() => toggleUnit(index)}
-                  >
-                    <CollapsibleTrigger className="w-full">
-                      <div className="flex items-center justify-between w-full p-4 bg-secondary hover:bg-secondary/90 rounded-md transition-colors">
-                        <span className="font-semibold">
-                          Unit {unit.unit || index + 1}
-                        </span>
-                        <ChevronDown
-                          className={`size-5 transition-transform ${
-                            openUnits[index] ? "transform rotate-180" : ""
-                          }`}
-                        />
-                      </div>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <div className="border border-t-0 rounded-b-md overflow-hidden">
-                        {unit.topics && (
-                          <>
-                            <Progress
-                              value={calculateProgress(index, unit.topics)}
-                              className="h-2 rounded-none bg-transparent"
-                            />
-                            {/* Checkboxes */}
-                            <div className="p-4 space-y-2">
-                              {Array.isArray(unit.topics) ? (
-                                unit.topics.map(
-                                  (topic: string, idx: number) => (
-                                    <label
-                                      key={idx}
-                                      className="p-2 border-2 border-muted-foreground/10 rounded-md flex items-center gap-4 text-white/70 cursor-pointer hover:text-foreground transition-colors"
-                                    >
-                                      <Checkbox
-                                        checked={
-                                          checkedTopics[index]?.[idx] || false
-                                        }
-                                        onCheckedChange={() =>
-                                          toggleTopic(index, idx)
-                                        }
-                                      />
-                                      <span>{topic}</span>
-                                    </label>
-                                  )
-                                )
-                              ) : (
-                                <label className="flex items-center gap-2 text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
-                                  <Checkbox
-                                    checked={checkedTopics[index]?.[0] || false}
-                                    onCheckedChange={() =>
-                                      toggleTopic(index, 0)
-                                    }
-                                  />
-                                  <span>{unit.topics}</span>
-                                </label>
-                              )}
+                subject.syllabus.map((unit: any, index: number) => {
+                  const progress = calculateProgress(index, unit.topics);
+                  const topicsArray = Array.isArray(unit.topics)
+                    ? unit.topics
+                    : [unit.topics];
+                  const completedCount = topicsArray.reduce(
+                    (count: number, _: any, idx: number) =>
+                      count + (checkedTopics[index]?.[idx] ? 1 : 0),
+                    0
+                  );
+
+                  return (
+                    <Collapsible
+                      key={index}
+                      open={openUnits[index]}
+                      onOpenChange={() => toggleUnit(index)}
+                    >
+                      <CollapsibleTrigger className="w-full">
+                        <div className="flex items-center justify-between w-full p-4 bg-secondary hover:bg-secondary/90 rounded-md transition-colors group">
+                          <div className="flex items-center gap-3">
+                            <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <span className="text-primary font-bold text-sm">
+                                {unit.unit || index + 1}
+                              </span>
                             </div>
-                          </>
-                        )}
-                      </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                ))
+                            <div className="text-left">
+                              <div className="font-semibold text-sm">
+                                Unit {unit.unit || index + 1}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {completedCount} / {topicsArray.length} topics completed
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="text-xs font-medium text-muted-foreground">
+                              {Math.round(progress)}%
+                            </div>
+                            <ChevronDown className="size-5 transition-transform group-data-[state=open]:rotate-180" />
+                          </div>
+                        </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <div className="border border-t-0 rounded-b-md overflow-hidden">
+                          <Progress
+                            value={progress}
+                            className="h-1.5 rounded-none"
+                          />
+                          <div className="p-4 space-y-2">
+                            {Array.isArray(unit.topics) ? (
+                              unit.topics.map((topic: string, idx: number) => (
+                                <label
+                                  key={idx}
+                                  className="group/item p-3 border rounded-lg flex items-start gap-3 cursor-pointer hover:bg-accent/50 transition-all duration-200"
+                                >
+                                  <Checkbox
+                                    checked={
+                                      checkedTopics[index]?.[idx] || false
+                                    }
+                                    onCheckedChange={() =>
+                                      toggleTopic(index, idx)
+                                    }
+                                    className="mt-0.5"
+                                  />
+                                  <span className="text-sm leading-relaxed flex-1">
+                                    {topic}
+                                  </span>
+                                </label>
+                              ))
+                            ) : (
+                              <label className="group/item p-3 border rounded-lg flex items-start gap-3 cursor-pointer hover:bg-accent/50 transition-all duration-200">
+                                <Checkbox
+                                  checked={checkedTopics[index]?.[0] || false}
+                                  onCheckedChange={() => toggleTopic(index, 0)}
+                                  className="mt-0.5"
+                                />
+                                <span className="text-sm leading-relaxed flex-1">
+                                  {unit.topics}
+                                </span>
+                              </label>
+                            )}
+                          </div>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  );
+                })
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
                   No syllabus information available.
@@ -241,7 +301,7 @@ export function SubjectDetailView({
             {/* Lab Tab */}
             <TabsContent value="lab" className="space-y-3">
               {hasPracticalTopics ? (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {subject.practicalTopics.map(
                     (experiment: any, index: number) => {
                       // Handle different data structures
@@ -257,37 +317,97 @@ export function SubjectDetailView({
                             `Experiment ${experimentNumber}`);
                       const steps =
                         experiment.aim?.steps || experiment.steps || [];
+                      
+                      // External link can be in aim object or at experiment level
+                      const externalLink =
+                        experiment.aim?.externalLinks ||
+                        experiment.externalLinks ||
+                        null;
+                      const storageType =
+                        experiment.aim?.storageType ||
+                        experiment.storageType ||
+                        null;
+
+                      // Construct Google Drive embed URL from file ID
+                      const getEmbedUrl = (fileId: string) => {
+                        return `https://drive.google.com/file/d/${fileId}/preview`;
+                      };
 
                       return (
-                        <div
-                          key={index}
-                          className="p-4 border rounded-md space-y-2"
-                        >
-                          <div className="font-semibold text-base">
-                            Experiment {experimentNumber}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {objective}
-                          </div>
-                          {steps &&
-                            Array.isArray(steps) &&
-                            steps.length > 0 && (
-                              <div className="mt-2 space-y-1">
-                                <div className="text-xs font-medium text-muted-foreground">
-                                  Steps:
+                        <Collapsible key={index}>
+                          <CollapsibleTrigger className="w-full">
+                            <div className="flex items-center justify-between w-full p-4 bg-secondary hover:bg-secondary/90 rounded-md transition-colors group">
+                              <div className="flex items-center gap-3">
+                                <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                                  {experimentNumber}
                                 </div>
-                                <ul className="list-disc list-inside space-y-1 text-xs text-muted-foreground ml-2">
-                                  {steps.map((step: any, stepIndex: number) => (
-                                    <li key={stepIndex}>
-                                      {typeof step === "string"
-                                        ? step
-                                        : step.description || step.step || step}
-                                    </li>
-                                  ))}
-                                </ul>
+                                <div className="text-left">
+                                  <div className="font-semibold text-sm">
+                                    Experiment {experimentNumber}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground line-clamp-1">
+                                    {objective}
+                                  </div>
+                                </div>
                               </div>
-                            )}
-                        </div>
+                              <ChevronDown className="size-5 transition-transform group-data-[state=open]:rotate-180" />
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="border border-t-0 rounded-b-md p-4 space-y-4">
+                              {/* Objective */}
+                              <div>
+                                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                  Objective
+                                </div>
+                                <p className="text-sm leading-relaxed">
+                                  {objective}
+                                </p>
+                              </div>
+
+                              {/* Steps */}
+                              {steps &&
+                                Array.isArray(steps) &&
+                                steps.length > 0 && (
+                                  <div>
+                                    <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                      Steps
+                                    </div>
+                                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                                      {steps.map((step: any, stepIndex: number) => (
+                                        <li key={stepIndex} className="leading-relaxed">
+                                          {typeof step === "string"
+                                            ? step
+                                            : step.description || step.step || step}
+                                        </li>
+                                      ))}
+                                    </ol>
+                                  </div>
+                                )}
+
+                              {/* Resources */}
+                              {externalLink && (
+                                <div>
+                                  <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                                    Resources
+                                  </div>
+                                  <div className="rounded-lg overflow-hidden border bg-card">
+                                    <iframe
+                                      src={
+                                        storageType === "google_drive"
+                                          ? getEmbedUrl(externalLink)
+                                          : externalLink
+                                      }
+                                      className="w-full h-[500px]"
+                                      allow="autoplay"
+                                      allowFullScreen
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
                       );
                     }
                   )}
@@ -387,7 +507,7 @@ export function SubjectDetailView({
           <div className="flex items-center justify-between py-2 border-b">
             <span className="text-sm font-medium">Theory Code</span>
             <span className="text-sm text-muted-foreground">
-              {subject.code}
+              {subject.theoryCode}
             </span>
           </div>
           <div className="flex items-center justify-between py-2 border-b">
@@ -396,6 +516,14 @@ export function SubjectDetailView({
               {subject.theoryCredits}
             </span>
           </div>
+          {subject.practicalCode && (
+            <div className="flex items-center justify-between py-2 border-b">
+              <span className="text-sm font-medium">Practical Code</span>
+              <span className="text-sm text-muted-foreground">
+                {subject.practicalCode}
+              </span>
+            </div>
+          )}
           {subject.practicalCredits && subject.practicalCredits > 0 && (
             <div className="flex items-center justify-between py-2 border-b">
               <span className="text-sm font-medium">Practical Credits</span>
