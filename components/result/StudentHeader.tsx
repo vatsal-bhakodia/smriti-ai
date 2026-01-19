@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ProcessedData } from "@/types/result";
+import { ProcessedData, CreditsMap } from "@/types/result";
 import { ArrowLeft, Download, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
@@ -22,7 +22,7 @@ interface StudentHeaderProps {
   selectedSemester: number | "OVERALL";
   onSemesterChange: (semester: number | "OVERALL") => void;
   onReset: () => void;
-  showMarksBreakdown: boolean;
+  creditsMap: CreditsMap;
 }
 
 export default function StudentHeader({
@@ -30,7 +30,7 @@ export default function StudentHeader({
   selectedSemester,
   onSemesterChange,
   onReset,
-  showMarksBreakdown,
+  creditsMap,
 }: StudentHeaderProps) {
   const { isSignedIn } = useUser();
   const pathname = usePathname();
@@ -173,13 +173,13 @@ export default function StudentHeader({
                         await exportResultToPDF({
                           processedData: data,
                           semester: "OVERALL",
-                          showMarksBreakdown,
+                          creditsMap,
                         });
                         toast.success("PDF exported successfully!");
                       }}
                     >
                       <span className="w-2 h-2 rounded-full bg-primary" />
-                      Complete Result (All Semesters)
+                      All Semesters
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-zinc-700" />
                     {data.semesters.map((sem) => (
@@ -190,7 +190,7 @@ export default function StudentHeader({
                           await exportResultToPDF({
                             processedData: data,
                             semester: sem.euno,
-                            showMarksBreakdown,
+                            creditsMap,
                           });
                           toast.success(
                             `Semester ${sem.euno} PDF exported successfully!`

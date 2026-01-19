@@ -40,7 +40,7 @@ export default function ResultsView({
         selectedSemester={selectedSemester}
         onSemesterChange={onSemesterChange}
         onReset={onReset}
-        showMarksBreakdown={showMarksBreakdown}
+        creditsMap={creditsMap}
       />
 
       {selectedSemester === "OVERALL" ? (
