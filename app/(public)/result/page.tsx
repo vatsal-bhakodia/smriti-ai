@@ -242,12 +242,13 @@ export default function ResultsPage() {
         const blob = await response.blob();
         const imageUrl = URL.createObjectURL(blob);
         setCaptchaImage(imageUrl);
+        setError(""); // Clear any previous error
       } else {
-        setError("Failed to load captcha. Please try again.");
+        setError("IPU Portal is currently down. Please try again later.");
       }
     } catch (error) {
       console.error("Error fetching captcha:", error);
-      setError("Failed to load captcha. Please try again.");
+      setError("IPU Portal is currently down. Please try again later.");
     } finally {
       setIsLoadingCaptcha(false);
     }
