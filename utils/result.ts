@@ -20,12 +20,37 @@ export function normalizePaperCode(code: string): string {
     .replace(/([A-Z]+)(\d)/, "$1-$2");
 }
 
-export function isBTechOrBCA(programName: string): boolean {
+export function checkAvailableCreditData(programName: string): boolean {
   const upperProgram = programName.toUpperCase();
-  return (
-    upperProgram.startsWith("BACHELOR OF TECHNOLOGY") ||
-    upperProgram.startsWith("BACHELOR OF COMPUTER APPLICATION")
-  );
+
+  const branchesAvailable = [
+    "CE", "CSE", "CST", "ECE", "EE", "EEE",
+    "ICE", "IT", "ITE", "MAE", "ME",
+  ];
+
+  // Check BCA directly
+  if (upperProgram.startsWith("BACHELOR OF COMPUTER APPLICATION")) {
+    return true;
+  }
+
+  // Check BTech + valid branch
+  if (upperProgram.startsWith("BACHELOR OF TECHNOLOGY")) {
+    // Extract branch name inside brackets
+    const match = upperProgram.match(/\(([^)]+)\)/);
+    if (!match) return false;
+
+    const branchName = match[1].trim();
+
+    // Convert branch name to short form
+    const branchShortForm = branchName
+      .split(/\s+/)
+      .map(word => word.charAt(0))
+      .join("");
+
+    return branchesAvailable.includes(branchShortForm);
+  }
+
+  return false;
 }
 
 // Helper function to get credits for a subject
@@ -45,8 +70,8 @@ export function getSubjectCredits(
     };
   }
 
-  // Fallback: If program isBTechOrBCA and credits not found, use 1 credit
-  if (isBTechOrBCA(programName)) {
+  // Fallback: If program credits not found, use 1 credit
+  if (checkAvailableCreditData(programName)) {
     return {
       total: 1,
       theory: 1,
