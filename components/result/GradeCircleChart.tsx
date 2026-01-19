@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ResultAPIResponse } from "../../app/(public)/result/types";
-import { marksToGrade } from "../../app/(public)/result/utils";
+import { ResultAPIResponse } from "@/types/result";
+import { marksToGrade } from "@/utils/result";
 import {
   ChartContainer,
   ChartTooltip,

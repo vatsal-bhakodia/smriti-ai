@@ -1,4 +1,4 @@
-import { ResultAPIResponse, CreditsMap, DetailedCredits } from "./types";
+import { ResultAPIResponse, CreditsMap, DetailedCredits } from "@/types/result";
 
 // Convert marks to grade
 export function marksToGrade(marks: number): string {

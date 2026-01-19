@@ -11,7 +11,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import { ResultAPIResponse } from "../../app/(public)/result/types";
+import { ResultAPIResponse } from "@/types/result";
 
 interface SemesterBarChartProps {
   subjects: ResultAPIResponse[];

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { ProcessedSemester } from "../../app/(public)/result/types";
+import { ProcessedSemester } from "@/types/result";
 
 interface SemesterSummaryTableProps {
   semesters: ProcessedSemester[];

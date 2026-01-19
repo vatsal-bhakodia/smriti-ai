@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ProcessedData, ProcessedSemester } from "@/app/(public)/result/types";
-import { marksToGrade } from "@/app/(public)/result/utils";
+import { ProcessedData, ProcessedSemester } from "@/types/result";
+import { marksToGrade } from "@/utils/result";
 
 interface ExportOptions {
   processedData: ProcessedData;

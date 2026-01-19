@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { normalizePaperCode } from "@/app/(public)/result/utils";
-import { SubjectCreditsResponse } from "@/app/(public)/result/types";
+import { normalizePaperCode } from "@/utils/result";
+import { SubjectCreditsResponse } from "@/types/result";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 

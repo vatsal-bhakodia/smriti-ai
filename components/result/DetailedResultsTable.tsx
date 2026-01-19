@@ -14,8 +14,8 @@ import {
   ResultAPIResponse,
   ProcessedSemester,
   CreditsMap,
-} from "../../app/(public)/result/types";
-import { marksToGrade, getSubjectCredits } from "../../app/(public)/result/utils";
+} from "@/types/result";
+import { marksToGrade, getSubjectCredits } from "@/utils/result";
 
 interface DetailedResultsTableProps {
   results: ResultAPIResponse[];

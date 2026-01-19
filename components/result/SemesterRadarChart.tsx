@@ -14,7 +14,7 @@ import {
   PolarRadiusAxis,
   Radar,
 } from "recharts";
-import { ResultAPIResponse } from "../../app/(public)/result/types";
+import { ResultAPIResponse } from "@/types/result";
 
 interface SemesterRadarChartProps {
   subjects: ResultAPIResponse[];

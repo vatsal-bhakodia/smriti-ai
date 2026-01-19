@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ProcessedData } from "../../app/(public)/result/types";
+import { ProcessedData } from "@/types/result";
 import { ArrowLeft, Download, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
