@@ -16,6 +16,7 @@ import GradeCircleChart from "@/components/result/GradeCircleChart";
 import LoginForm from "@/components/result/LoginForm";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import SyllabusPromo from "@/components/result/SyllabusPromo";
 
 // Normalize paper codes in all subjects
 function normalizeResultsPaperCodes(
@@ -406,7 +407,7 @@ export default function ResultsPage() {
         <div className="w-full max-w-7xl mb-6 mx-auto">
           {!processedData && rawResults.length === 0 ? (
             // Show login form when no results
-            <div className="w-full max-w-7xl mx-auto pb-8 flex flex-col items-center justify-center">
+            <div className="w-full max-w-7xl mx-auto pb-8 flex flex-col items-center justify-center space-y-6">
               <LoginForm
                 enrollmentNumber={enrollmentNumber}
                 password={password}
@@ -422,6 +423,7 @@ export default function ResultsPage() {
                 onSubmit={handleLoginSubmit}
                 onDismissError={() => setError("")}
               />
+              <SyllabusPromo/>
             </div>
           ) : processedData ? (
             <div className="space-y-6">
