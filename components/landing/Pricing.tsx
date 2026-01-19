@@ -76,7 +76,7 @@ export const Pricing = () => {
           return (
             <div
               key={plan.title}
-              className="rounded-xl px-8 py-10 shadow-lg backdrop-blur-md transition bg-white/5 border border-white/10 hover:border-primary hover:scale-[1.02]"
+              className="flex flex-col rounded-xl px-8 py-10 shadow-lg backdrop-blur-md transition bg-white/5 border border-white/10 hover:border-primary hover:scale-[1.02]"
             >
               <h3 className="text-2xl font-extrabold mb-2 text-primary">
                 {plan.title}
@@ -90,11 +90,13 @@ export const Pricing = () => {
                   </li>
                 ))}
               </ul>
-              <Link href={buttonLink}>
-                <button className="w-full text-center py-3 rounded-xl font-semibold transition bg-transparent border border-white/20 hover:bg-white hover:text-black hover:border-white">
-                  {plan.cta}
-                </button>
-              </Link>
+              <div className="mt-auto">
+                <Link href={buttonLink}>
+                  <button className="w-full text-center py-3 rounded-xl font-semibold transition bg-transparent border border-white/20 hover:bg-white hover:text-black hover:border-white">
+                    {plan.cta}
+                  </button>
+                </Link>
+              </div>
             </div>
           );
         })}
