@@ -176,9 +176,12 @@ export function useResultsData(): UseResultsDataReturn {
     }));
 
     // Calculate CGPA from SGPA values (weighted by credits)
-    // Only calculate if all credits are known
+    // Only calculate if all credits are known OR if there's only one semester (SGPA = CGPA)
     let cgpa: number | null = null;
-    if (hasCompleteCredits) {
+    if (semesters.length === 1) {
+      // If only one semester, SGPA equals CGPA
+      cgpa = semesters[0].sgpa;
+    } else if (hasCompleteCredits) {
       const totalCredits = semesters.reduce((sum, sem) => sum + sem.credits, 0);
       const weightedSGPA = semesters.reduce(
         (sum, sem) => sum + sem.sgpa * sem.credits,
