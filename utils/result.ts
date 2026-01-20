@@ -44,7 +44,12 @@ export function checkAvailableCreditData(programName: string): boolean {
     // Convert branch name to short form
     const branchShortForm = branchName
       .split(/\s+/)
-      .map(word => word.charAt(0))
+      .map(word => {
+        // Filter to only alphabetic characters and take first character
+        const alphabeticChars = word.match(/[A-Za-z]/g);
+        return alphabeticChars ? alphabeticChars[0].toUpperCase() : "";
+      })
+      .filter(char => char !== "")
       .join("");
 
     return branchesAvailable.includes(branchShortForm);
