@@ -1,6 +1,6 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
+import { ClerkProviderWrapper } from "@/components/ClerkProviderWrapper";
 import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
 import BackToTopButton from "@/components/ui/BackToTopButton";
@@ -9,7 +9,8 @@ import {
   generateMetadataUtil,
   generateViewport,
 } from "@/utils/generateMetadata";
-import { clerkAppearance } from "./clerkAppearance";
+
+const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,35 +32,41 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ClerkProvider appearance={clerkAppearance}>
-      <html lang="en" className="dark" suppressHydrationWarning>
-        <body
-          className={`${poppins.variable} antialiased`}
-          suppressHydrationWarning
-        >
-          {/* Skip Links for keyboard navigation */}
-          <SkipLinks />
+  const appTree = (
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body
+        className={`${poppins.variable} antialiased`}
+        suppressHydrationWarning
+      >
+        {/* Skip Links for keyboard navigation */}
+        <SkipLinks />
 
-          {/* Google Analytics */}
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-K0Q80X3Y6D"
-            strategy="afterInteractive"
-          />
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-K0Q80X3Y6D"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-K0Q80X3Y6D');
             `}
-          </Script>
+        </Script>
 
-          {children}
-          <Toaster />
-          <BackToTopButton />
-        </body>
-      </html>
-    </ClerkProvider>
+        {children}
+        <Toaster />
+        <BackToTopButton />
+      </body>
+    </html>
+  );
+
+  // Use wrapper that conditionally renders ClerkProvider only if key is valid
+  // Components using Clerk hooks should use useSafeClerk hook for safe access
+  return (
+    <ClerkProviderWrapper publishableKey={clerkPublishableKey}>
+      {appTree}
+    </ClerkProviderWrapper>
   );
 }

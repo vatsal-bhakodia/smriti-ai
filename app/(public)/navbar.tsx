@@ -20,6 +20,8 @@ import { useEffect, useState, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import { ActionButton } from "@/components/ActionButton";
 
+const hasClerk = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
 // ---------------- Tools Data Structure ----------------
 const toolsData = {
   flashcard: {
@@ -323,39 +325,45 @@ export default function Navbar() {
           {/* Right-side buttons */}
           <div className="flex items-center justify-end gap-2 w-1/5">
             {/* Dashboard (Desktop) */}
-            <SignedIn>
-              <div className="hidden min-[945px]:flex items-center">
-                <ActionButton
-                  href="/dashboard"
-                  label="Dashboard"
-                  icon={LayoutDashboard}
-                  variant="outline"
-                  className="rounded-full flex items-center gap-2 cursor-pointer border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black hover:border-primary transition-all duration-300 hover:scale-105"
-                />
-              </div>
-            </SignedIn>
+            {hasClerk && (
+              <SignedIn>
+                <div className="hidden min-[945px]:flex items-center">
+                  <ActionButton
+                    href="/dashboard"
+                    label="Dashboard"
+                    icon={LayoutDashboard}
+                    variant="outline"
+                    className="rounded-full flex items-center gap-2 cursor-pointer border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black hover:border-primary transition-all duration-300 hover:scale-105"
+                  />
+                </div>
+              </SignedIn>
+            )}
 
             {/* Sign In / Sign Up (Desktop) */}
-            <SignedOut>
-              <div className="hidden min-[945px]:flex items-center gap-2">
-                <ActionButton
-                  href="/sign-in"
-                  label="Sign In"
-                  variant="outline"
-                  className="rounded-full flex items-center gap-2 border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black hover:border-primary transition-all duration-300 hover:scale-105 px-4 py-2"
-                />
-                <ActionButton
-                  href="/sign-up"
-                  label="Sign Up"
-                  className="rounded-full bg-linear-to-r from-primary to-primary-dark text-black hover:text-black transition-all duration-300 hover:scale-105 px-4 py-2"
-                />
-              </div>
-            </SignedOut>
+            {hasClerk && (
+              <SignedOut>
+                <div className="hidden min-[945px]:flex items-center gap-2">
+                  <ActionButton
+                    href="/sign-in"
+                    label="Sign In"
+                    variant="outline"
+                    className="rounded-full flex items-center gap-2 border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black hover:border-primary transition-all duration-300 hover:scale-105 px-4 py-2"
+                  />
+                  <ActionButton
+                    href="/sign-up"
+                    label="Sign Up"
+                    className="rounded-full bg-linear-to-r from-primary to-primary-dark text-black hover:text-black transition-all duration-300 hover:scale-105 px-4 py-2"
+                  />
+                </div>
+              </SignedOut>
+            )}
 
             {/* Profile */}
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
+            {hasClerk && (
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            )}
 
             {/* Mobile Menu Toggle */}
             <button
@@ -453,16 +461,18 @@ export default function Navbar() {
 
                 {/* Dashboard Link */}
                 <div className="border-t border-border">
-                  <SignedIn>
-                    <ActionButton
-                      href="/dashboard"
-                      label="Dashboard"
-                      icon={LayoutDashboard}
-                      variant="outline"
-                      external={true}
-                      className="w-full rounded-lg flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-primary/10 hover:border-primary transition-all duration-200 mt-3"
-                    />
-                  </SignedIn>
+                  {hasClerk && (
+                    <SignedIn>
+                      <ActionButton
+                        href="/dashboard"
+                        label="Dashboard"
+                        icon={LayoutDashboard}
+                        variant="outline"
+                        external={true}
+                        className="w-full rounded-lg flex items-center justify-center gap-2 border-primary/30 text-primary hover:bg-primary/10 hover:border-primary transition-all duration-200 mt-3"
+                      />
+                    </SignedIn>
+                  )}
                 </div>
               </motion.div>
             </motion.div>

@@ -1,5 +1,8 @@
 "use client";
 
+// Mark as dynamic to prevent build-time errors when Clerk key is missing
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";

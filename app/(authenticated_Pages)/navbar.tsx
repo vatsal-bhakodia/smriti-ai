@@ -8,6 +8,8 @@ import { useContext } from "react";
 import { SidebarContext } from "@/contexts/SidebarContext";
 import { ActionButton } from "@/components/ActionButton";
 
+const hasClerk = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
 // ---------------- Authenticated Navbar Component ----------------
 export default function Navbar() {
   const pathname = usePathname();
@@ -46,7 +48,7 @@ export default function Navbar() {
               className="rounded-full flex items-center gap-2 cursor-pointer border-primary/30 text-primary hover:bg-linear-to-r hover:from-primary hover:to-primary-dark hover:text-black hover:border-primary transition-all duration-300 hover:scale-105"
             />
             {/* Profile */}
-            <UserButton />
+            {hasClerk && <UserButton />}
 
             {/* Mobile Sidebar Toggle (only for resource pages without desktop toggle) */}
             {isResourcePage && sidebarContext && (

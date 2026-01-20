@@ -22,6 +22,7 @@ interface LoginFormProps {
   onRefreshCaptcha: () => void;
   onSubmit: (e: React.FormEvent) => void;
   onDismissError: () => void;
+  onDemoMode?: () => void;
 }
 
 export default function LoginForm({
@@ -38,6 +39,7 @@ export default function LoginForm({
   onRefreshCaptcha,
   onSubmit,
   onDismissError,
+  onDemoMode,
 }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -216,6 +218,27 @@ export default function LoginForm({
               {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
+
+          {onDemoMode && (
+            <div className="mt-4">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-zinc-700" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-zinc-900 px-2 text-zinc-500">Or</span>
+                </div>
+              </div>
+              <Button
+                type="button"
+                onClick={onDemoMode}
+                variant="outline"
+                className="w-full mt-4 border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold"
+              >
+                Try Demo Mode
+              </Button>
+            </div>
+          )}
 
           <p className="text-center text-zinc-500 text-xs mt-4">
             Data is fetched directly from GGSIPU Exam Portal.

@@ -1,7 +1,7 @@
 "use client";
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs"; // Clerk hook
+import { useSafeClerk } from "@/hooks/useSafeClerk";
 
 const pricingPlans = [
   {
@@ -46,7 +46,10 @@ const pricingPlans = [
 ];
 
 export const Pricing = () => {
-  const { isSignedIn } = useUser(); // check Clerk auth
+  // Always call the hook (React rules)
+  // In production, ClerkProvider will be rendered (key will be set), so this works
+  // In dev without key, this will throw, but the page is marked as dynamic so it won't break build
+  const { isSignedIn } = useSafeClerk();
 
   return (
     <section

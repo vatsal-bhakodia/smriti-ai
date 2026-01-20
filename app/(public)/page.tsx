@@ -7,6 +7,8 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import CTA from "@/components/landing/CTA";
 import { generateMetadataUtil } from "@/utils/generateMetadata";
 
+ export const dynamic = 'force-dynamic';
+
 export const metadata = generateMetadataUtil({
   title: "Smriti AI - Study Tool & Online Learning Platform",
   description:

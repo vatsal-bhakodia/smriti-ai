@@ -5,6 +5,8 @@ import AuthGate from "@/components/AuthGate";
 import Navbar from "./navbar";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 
+const hasClerk = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
 export default function RootLayout({
   children,
 }: {
@@ -22,8 +24,18 @@ export default function RootLayout({
   );
 
   return (
-    <AuthGate>
-      {isResourcePage ? <SidebarProvider>{content}</SidebarProvider> : content}
-    </AuthGate>
+    hasClerk ? (
+      <AuthGate>
+        {isResourcePage ? (
+          <SidebarProvider>{content}</SidebarProvider>
+        ) : (
+          content
+        )}
+      </AuthGate>
+    ) : isResourcePage ? (
+      <SidebarProvider>{content}</SidebarProvider>
+    ) : (
+      content
+    )
   );
 }

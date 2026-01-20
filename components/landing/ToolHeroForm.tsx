@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useSafeClerk } from "@/hooks/useSafeClerk";
 import { ArrowRightIcon } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
@@ -29,7 +29,7 @@ const ToolHeroForm = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const { isSignedIn, isLoaded, user } = useUser();
+  const { isSignedIn, isLoaded, user } = useSafeClerk();
 
   // Get the base path for navigation (e.g., youtube-to-flashcards, pdf-to-flashcards)
   const getPathForInputType = (type: "youtube" | "text" | "pdf") => {

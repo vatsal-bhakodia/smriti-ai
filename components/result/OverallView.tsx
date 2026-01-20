@@ -4,6 +4,7 @@ import { ProcessedData } from "@/types/result";
 import GPATrendChart from "@/components/result/GPATrendChart";
 import GradeDistributionChart from "@/components/result/GradeDistributionChart";
 import SemesterSummaryTable from "@/components/result/SemesterSummaryTable";
+import OverallCGPACard from "@/components/result/OverallCGPACard";
 
 interface OverallViewProps {
   data: ProcessedData;
@@ -18,6 +19,9 @@ export default function OverallView({ data }: OverallViewProps) {
         <GradeDistributionChart data={data.gradeDistribution} />
       </div>
       <SemesterSummaryTable semesters={data.semesters} />
+      
+      {/* Overall CGPA Calculation */}
+      <OverallCGPACard data={data} />
     </>
   );
 }

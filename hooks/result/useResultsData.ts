@@ -54,6 +54,7 @@ interface UseResultsDataReturn {
   rawResults: ResultAPIResponse[];
   setRawResults: React.Dispatch<React.SetStateAction<ResultAPIResponse[]>>;
   creditsMap: CreditsMap;
+  setCreditsMap: React.Dispatch<React.SetStateAction<CreditsMap>>;
   processedData: ProcessedData | null;
   selectedSemester: number | "OVERALL";
   setSelectedSemester: React.Dispatch<React.SetStateAction<number | "OVERALL">>;
@@ -72,6 +73,15 @@ export function useResultsData(): UseResultsDataReturn {
 
   // Fetch subject credits from CMS
   const fetchCredits = async (results: ResultAPIResponse[]) => {
+    // Skip fetching if in demo mode
+    const isDemoMode = typeof window !== 'undefined' 
+      ? sessionStorage.getItem("isDemoMode") === "true"
+      : false;
+    
+    if (isDemoMode) {
+      return;
+    }
+
     try {
       // Get unique paper codes
       const paperCodes = [...new Set(results.map((r) => r.papercode))];
@@ -98,7 +108,16 @@ export function useResultsData(): UseResultsDataReturn {
   // Fetch credits when results change
   useEffect(() => {
     if (rawResults.length > 0) {
-      fetchCredits(rawResults);
+      // Check if credits are already set (e.g., from demo mode)
+      const hasCredits = Object.keys(creditsMap).length > 0;
+      const isDemoMode = typeof window !== 'undefined' 
+        ? sessionStorage.getItem("isDemoMode") === "true"
+        : false;
+      
+      // Only fetch credits if not in demo mode and credits not already set
+      if (!isDemoMode && !hasCredits) {
+        fetchCredits(rawResults);
+      }
     }
   }, [rawResults]);
 
@@ -224,6 +243,7 @@ export function useResultsData(): UseResultsDataReturn {
     rawResults,
     setRawResults,
     creditsMap,
+    setCreditsMap,
     processedData,
     selectedSemester,
     setSelectedSemester,
