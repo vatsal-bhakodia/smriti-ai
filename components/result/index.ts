@@ -4,3 +4,4 @@ export { default as SemesterDetailView } from "./SemesterDetailView";
 export { default as OverallView } from "./OverallView";
 export { default as LoginForm } from "./LoginForm";
 export { default as SyllabusPromo } from "./SyllabusPromo";
+export { default as CumulativeResultBreakdown } from "./CumulativeResultBreakdown";

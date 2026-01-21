@@ -3,7 +3,9 @@
 import { ProcessedData } from "@/types/result";
 import GPATrendChart from "@/components/result/GPATrendChart";
 import GradeDistributionChart from "@/components/result/GradeDistributionChart";
-import SemesterSummaryTable from "@/components/result/SemesterSummaryTable";
+import ResultBreakdown from "@/components/result/ResultBreakdown";
+import YearwiseResultBreakdown from "@/components/result/YearwiseResultBreakdown";
+import CumulativeResultBreakdown from "@/components/result/CumulativeResultBreakdown";
 
 interface OverallViewProps {
   data: ProcessedData;
@@ -17,7 +19,18 @@ export default function OverallView({ data }: OverallViewProps) {
         <GPATrendChart data={data.gpaTrend} />
         <GradeDistributionChart data={data.gradeDistribution} />
       </div>
-      <SemesterSummaryTable semesters={data.semesters} />
+      <ResultBreakdown 
+        semesters={data.semesters} 
+        hasCompleteCredits={data.hasCompleteCredits} 
+      />
+      <YearwiseResultBreakdown 
+        semesters={data.semesters} 
+        hasCompleteCredits={data.hasCompleteCredits} 
+      />
+      <CumulativeResultBreakdown 
+        semesters={data.semesters} 
+        hasCompleteCredits={data.hasCompleteCredits} 
+      />
     </>
   );
 }
