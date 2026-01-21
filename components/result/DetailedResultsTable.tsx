@@ -15,7 +15,8 @@ import {
   ProcessedSemester,
   CreditsMap,
 } from "@/types/result";
-import { marksToGrade, getSubjectCredits } from "@/utils/result";
+import { marksToGrade, getSubjectCredits, getUniqueSubjectsLatestAttempt, calculateTotalMarks, calculateSemesterCreditsFromSubjects } from "@/utils/result";
+import { ManualCreditsData } from "./CGPACalculatorModal";
 
 interface DetailedResultsTableProps {
   results: ResultAPIResponse[];
@@ -25,6 +26,8 @@ interface DetailedResultsTableProps {
   onToggleMarksBreakdown?: (value: boolean) => void;
   creditsMap?: CreditsMap;
   programName?: string;
+  hasCreditsData?: boolean;
+  manualCredits?: ManualCreditsData | null;
 }
 
 // Reusable table component for displaying results
@@ -34,6 +37,8 @@ interface ResultsTableProps {
   creditsMap: CreditsMap;
   programName: string;
   getGradeBadgeClass: (grade: string) => string;
+  hasCreditsData: boolean;
+  manualCredits?: ManualCreditsData | null;
 }
 
 function ResultsTable({
@@ -42,7 +47,26 @@ function ResultsTable({
   creditsMap,
   programName,
   getGradeBadgeClass,
+  hasCreditsData,
+  manualCredits,
 }: ResultsTableProps) {
+  // Helper to get credits for a subject
+  const getCreditsForSubject = (result: ResultAPIResponse, euno: number): number | null => {
+    // If manual credits exist and it's subject mode, use those
+    if (manualCredits?.type === "subject") {
+      const key = `${euno}-${result.papercode}`;
+      const credits = manualCredits.subjectCredits?.[key];
+      if (credits && credits > 0) return credits;
+    }
+    
+    // Otherwise use CMS credits
+    const credits = getSubjectCredits(result, creditsMap, programName);
+    return credits ? credits.total : null;
+  };
+
+  // Only show credits column if hasCreditsData AND (no manual credits OR manual credits are subject-level)
+  const showCreditsColumn = hasCreditsData && (!manualCredits || manualCredits.type === "subject");
+
   return (
     <Table className="w-full min-w-[600px]">
       <TableHeader>
@@ -57,9 +81,11 @@ function ResultsTable({
           <TableHead className="text-left p-3 text-white font-semibold hidden md:table-cell">
             SUBJECT NAME
           </TableHead>
-          <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
-            CREDITS
-          </TableHead>
+          {showCreditsColumn && (
+            <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
+              CREDITS
+            </TableHead>
+          )}
           {showMarksBreakdown && (
             <>
               <TableHead className="text-center p-3 text-white font-semibold hidden md:table-cell">
@@ -82,7 +108,7 @@ function ResultsTable({
         {results.map((result, index) => {
           const totalMarks = parseFloat(result.moderatedprint) || 0;
           const grade = marksToGrade(totalMarks);
-          const credits = getSubjectCredits(result, creditsMap, programName);
+          const credits = getCreditsForSubject(result, result.euno);
           return (
             <TableRow
               key={`${result.papercode}-${index}`}
@@ -106,17 +132,17 @@ function ResultsTable({
               <TableCell className="p-3 text-zinc-200 hidden md:table-cell">
                 {result.papername}
               </TableCell>
-              <TableCell className="p-3 text-center text-zinc-300 hidden md:table-cell">
-                {credits ? (
-                  <span>
-                    {credits.total}
-                  </span>
-                ) : (
-                  <span className="text-zinc-500" title="Credit not found">
-                    -
-                  </span>
-                )}
-              </TableCell>
+              {showCreditsColumn && (
+                <TableCell className="p-3 text-center text-zinc-300 hidden md:table-cell">
+                  {credits !== null ? (
+                    <span>{credits}</span>
+                  ) : (
+                    <span className="text-zinc-500" title="Credit not found">
+                      -
+                    </span>
+                  )}
+                </TableCell>
+              )}
               {showMarksBreakdown && (
                 <>
                   <TableCell className="p-3 text-center text-zinc-300 hidden md:table-cell">
@@ -153,6 +179,8 @@ export default function DetailedResultsTable({
   onToggleMarksBreakdown,
   creditsMap = {},
   programName = "",
+  hasCreditsData = false,
+  manualCredits,
 }: DetailedResultsTableProps) {
   const getGradeBadgeClass = (grade: string) => {
     switch (grade) {
@@ -238,28 +266,46 @@ export default function DetailedResultsTable({
                       <h4 className="text-white font-semibold text-lg">
                         SEMESTER {semNum}
                       </h4>
-                      {semData && (
-                        <div className="flex gap-4 text-sm">
-                          <span className="text-zinc-400">
-                            Total:{" "}
-                            <span className="text-white font-medium">
-                              {semData.totalMarks}
+                      {semData && (() => {
+                        // Calculate max marks based on unique subjects
+                        const uniqueSubjects = getUniqueSubjectsLatestAttempt(semResults);
+                        const maxMarks = uniqueSubjects.length * 100;
+                        return (
+                          <div className="flex gap-4 text-sm">
+                            <span className="text-zinc-400">
+                              Total:{" "}
+                              <span className="text-white font-medium">
+                                {semData.totalMarks} / {maxMarks}
+                              </span>
                             </span>
-                          </span>
-                          <span className="text-zinc-400">
-                            SGPA:{" "}
+                            <span className="text-zinc-400">
+                              SGPA:{" "}
                             <span className="text-primary font-semibold">
                               {semData.sgpa.toFixed(2)}
                             </span>
                           </span>
-                          <span className="text-zinc-400">
-                            Credits:{" "}
-                            <span className="text-white font-medium">
-                              {semData.credits}
+                          {(hasCreditsData || manualCredits !== null) && (
+                            <span className="text-zinc-400">
+                              Credits:{" "}
+                              <span className="text-white font-medium">
+                                {(() => {
+                                  if (manualCredits?.type === "semester" && manualCredits.semesterCredits?.[semNum]) {
+                                    return manualCredits.semesterCredits[semNum];
+                                  } else if (manualCredits?.type === "subject" && manualCredits.subjectCredits) {
+                                    // Calculate total from subject-level manual credits
+                                    const uniqueSubjects = getUniqueSubjectsLatestAttempt(semData.subjects);
+                                    return calculateSemesterCreditsFromSubjects(semNum, uniqueSubjects, manualCredits);
+                                  } else if (hasCreditsData) {
+                                    return semData.credits;
+                                  }
+                                  return "-";
+                                })()}
+                              </span>
                             </span>
-                          </span>
-                        </div>
-                      )}
+                          )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
 
@@ -271,6 +317,8 @@ export default function DetailedResultsTable({
                       creditsMap={creditsMap}
                       programName={programName}
                       getGradeBadgeClass={getGradeBadgeClass}
+                      hasCreditsData={hasCreditsData}
+                      manualCredits={manualCredits}
                     />
                   </div>
                 </div>
@@ -298,6 +346,8 @@ export default function DetailedResultsTable({
             creditsMap={creditsMap}
             programName={programName}
             getGradeBadgeClass={getGradeBadgeClass}
+            hasCreditsData={hasCreditsData}
+            manualCredits={manualCredits}
           />
           {results.length === 0 && (
             <div className="text-center py-8 text-zinc-400">

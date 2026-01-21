@@ -4,6 +4,7 @@ import { useEffect, useCallback } from "react";
 import { ResultAPIResponse } from "@/types/result";
 import { useResultsData, useCaptcha, useLoginForm } from "@/hooks/result";
 import { LoadingCard, ResultsView, LoginForm, SyllabusPromo } from "@/components/result";
+import { STORAGE_KEYS } from "@/utils/result";
 
 export default function ResultsPage() {
   // Results data hook
@@ -56,7 +57,10 @@ export default function ResultsPage() {
 
   // Handle reset
   const handleReset = useCallback(() => {
-    sessionStorage.removeItem("resultData");
+    sessionStorage.removeItem(STORAGE_KEYS.RESULT_DATA);
+    sessionStorage.removeItem(STORAGE_KEYS.CREDITS_DATA);
+    sessionStorage.removeItem(STORAGE_KEYS.MANUAL_CREDITS);
+    sessionStorage.removeItem(STORAGE_KEYS.MANUAL_CGPA);
     setRawResults([]);
     setSelectedSemester("OVERALL");
     resetForm();
@@ -71,7 +75,7 @@ export default function ResultsPage() {
 
   // Load results from sessionStorage on mount and fetch captcha if no results
   useEffect(() => {
-    const storedResults = sessionStorage.getItem("resultData");
+    const storedResults = sessionStorage.getItem(STORAGE_KEYS.RESULT_DATA);
     if (storedResults) {
       try {
         const results: ResultAPIResponse[] = JSON.parse(storedResults);
@@ -88,16 +92,17 @@ export default function ResultsPage() {
 
   return (
     <>
-      {/* Grid pattern overlay */}
+      {/* Grid pattern overlay - fixed background covering entire viewport */}
       <div
-        className="absolute inset-0 opacity-5"
+        className="fixed inset-0 opacity-5 -z-10"
         style={{
           backgroundImage: `linear-gradient(#a3ff19 1px, transparent 1px), linear-gradient(90deg, #a3ff19 1px, transparent 1px)`,
           backgroundSize: "50px 50px",
+          backgroundRepeat: "repeat",
         }}
       ></div>
 
-      <div className="min-h-[70vh] p-4 relative">
+      <div className="min-h-[70vh] p-4 relative z-0">
         <div className="w-full max-w-7xl mb-6 mx-auto">
           {!processedData && rawResults.length === 0 ? (
             // Show login form when no results

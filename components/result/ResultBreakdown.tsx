@@ -2,41 +2,11 @@
 
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ProcessedSemester, ResultAPIResponse } from "@/types/result";
+import { ProcessedSemester } from "@/types/result";
+import { getUniqueSubjectsLatestAttempt, calculateTotalMarks } from "@/utils/result";
 
 interface ResultBreakdownProps {
   semesters: ProcessedSemester[];
-  hasCompleteCredits: boolean;
-}
-
-// Helper function to get unique subjects by taking the latest attempt for each paper code
-function getUniqueSubjectsLatestAttempt(subjects: ResultAPIResponse[]): ResultAPIResponse[] {
-  const subjectMap = new Map<string, ResultAPIResponse>();
-  
-  subjects.forEach((subject) => {
-    const existingSubject = subjectMap.get(subject.papercode);
-    if (!existingSubject) {
-      subjectMap.set(subject.papercode, subject);
-    } else {
-      // Compare by declared date (ryear and rmonth) to get the latest attempt
-      const existingDate = new Date(existingSubject.ryear, existingSubject.rmonth - 1);
-      const currentDate = new Date(subject.ryear, subject.rmonth - 1);
-      if (currentDate > existingDate) {
-        subjectMap.set(subject.papercode, subject);
-      }
-    }
-  });
-  
-  return Array.from(subjectMap.values());
-}
-
-// Helper function to calculate total marks from subjects
-function calculateTotalMarks(subjects: ResultAPIResponse[]): number {
-  return subjects.reduce((total, subject) => {
-    const minor = parseInt(subject.minorprint) || 0;
-    const major = parseInt(subject.majorprint) || 0;
-    return total + minor + major;
-  }, 0);
 }
 
 interface SemesterRowData {
@@ -50,7 +20,6 @@ interface SemesterRowData {
 
 export default function ResultBreakdown({
   semesters,
-  hasCompleteCredits,
 }: ResultBreakdownProps) {
   // Calculate semester data with unique subjects (latest attempt only)
   const semesterData: SemesterRowData[] = useMemo(() => {
@@ -90,11 +59,7 @@ export default function ResultBreakdown({
                 <th className="text-left p-3 text-white font-semibold">
                   PERCENTAGE
                 </th>
-                {hasCompleteCredits && (
-                  <>
-                    <th className="text-left p-3 text-white font-semibold">SGPA</th>
-                  </>
-                )}
+                <th className="text-left p-3 text-white font-semibold">SGPA</th>
               </tr>
             </thead>
             <tbody>
@@ -107,13 +72,9 @@ export default function ResultBreakdown({
                   <td className="p-3 text-zinc-300">
                     {sem.percentage.toFixed(2)}%
                   </td>
-                  {hasCompleteCredits && (
-                    <>
-                      <td className="p-3 text-primary font-semibold">
-                        {sem.sgpa.toFixed(2)}
-                      </td>
-                    </>
-                  )}
+                  <td className="p-3 text-primary font-semibold">
+                    {sem.sgpa.toFixed(2)}
+                  </td>
                 </tr>
               ))}
             </tbody>

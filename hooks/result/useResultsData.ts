@@ -2,53 +2,16 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { ResultAPIResponse, ProcessedData, CreditsMap } from "@/types/result";
-import { marksToGrade, getSubjectCredits, normalizePaperCode } from "../../utils/result";
+import {
+  marksToGrade,
+  getSubjectCredits,
+  checkAvailableCreditData,
+  filterLatestAttempts,
+  STORAGE_KEYS,
+} from "@/utils/result";
 
-// Normalize paper codes in all subjects
-export function normalizeResultsPaperCodes(
-  results: ResultAPIResponse[]
-): ResultAPIResponse[] {
-  return results.map((result) => ({
-    ...result,
-    papercode: normalizePaperCode(result.papercode),
-  }));
-}
-
-// Filter to only keep latest attempt for each subject code
-export function filterLatestAttempts(
-  subjects: ResultAPIResponse[]
-): ResultAPIResponse[] {
-  const subjectMap = new Map<string, ResultAPIResponse>();
-
-  subjects.forEach((subject) => {
-    const existing = subjectMap.get(subject.papercode);
-
-    if (!existing) {
-      // First occurrence of this subject code
-      subjectMap.set(subject.papercode, subject);
-    } else {
-      // Compare dates to find the latest attempt
-      const existingDate = existing.declareddate
-        ? new Date(existing.declareddate)
-        : new Date(existing.ryear, existing.rmonth - 1);
-      const currentDate = subject.declareddate
-        ? new Date(subject.declareddate)
-        : new Date(subject.ryear, subject.rmonth - 1);
-
-      // If current date is later or if dates are equal but current has better marks
-      if (
-        currentDate > existingDate ||
-        (currentDate.getTime() === existingDate.getTime() &&
-          (parseFloat(subject.moderatedprint) || 0) >
-            (parseFloat(existing.moderatedprint) || 0))
-      ) {
-        subjectMap.set(subject.papercode, subject);
-      }
-    }
-  });
-
-  return Array.from(subjectMap.values());
-}
+// Re-export for backward compatibility
+export { normalizeResultsPaperCodes, filterLatestAttempts } from "@/utils/result";
 
 interface UseResultsDataReturn {
   rawResults: ResultAPIResponse[];
@@ -70,9 +33,45 @@ export function useResultsData(): UseResultsDataReturn {
   );
   const [showMarksBreakdown, setShowMarksBreakdown] = useState(true);
 
-  // Fetch subject credits from CMS
+  // Load credits from sessionStorage
+  const loadCachedCredits = (): CreditsMap | null => {
+    try {
+      const cached = sessionStorage.getItem(STORAGE_KEYS.CREDITS_DATA);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (error) {
+      console.error("Error loading cached credits:", error);
+    }
+    return null;
+  };
+
+  // Save credits to sessionStorage
+  const saveCachedCredits = (credits: CreditsMap) => {
+    try {
+      sessionStorage.setItem(STORAGE_KEYS.CREDITS_DATA, JSON.stringify(credits));
+    } catch (error) {
+      console.error("Error saving credits to cache:", error);
+    }
+  };
+
+  // Fetch subject credits from CMS (only for programs with available credit data)
   const fetchCredits = async (results: ResultAPIResponse[]) => {
     try {
+      // Check if we have credit data available for this program
+      const programName = results[0]?.prgname || "";
+      if (!checkAvailableCreditData(programName)) {
+        // No credit data available for this program, skip API call
+        return;
+      }
+
+      // Check sessionStorage first
+      const cachedCredits = loadCachedCredits();
+      if (cachedCredits && Object.keys(cachedCredits).length > 0) {
+        setCreditsMap(cachedCredits);
+        return;
+      }
+
       // Get unique paper codes
       const paperCodes = [...new Set(results.map((r) => r.papercode))];
 
@@ -88,7 +87,10 @@ export function useResultsData(): UseResultsDataReturn {
 
       if (response.ok) {
         const data = await response.json();
-        setCreditsMap(data.credits || {});
+        const credits = data.credits || {};
+        setCreditsMap(credits);
+        // Cache credits to sessionStorage
+        saveCachedCredits(credits);
       }
     } catch (error) {
       console.error("Error fetching subject credits:", error);

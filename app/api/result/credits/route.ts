@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { normalizePaperCode } from "@/utils/result";
-import { SubjectCreditsResponse } from "@/types/result";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const data: SubjectCreditsResponse = await response.json();
+    const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error in credits proxy:", error);

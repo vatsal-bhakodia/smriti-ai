@@ -8,6 +8,8 @@ interface SemesterStatsCardProps {
   sgpa: number;
   percentage: number;
   totalCredits: number;
+  hasCreditsData?: boolean;
+  manualCredits?: number | null;
 }
 
 export default function SemesterStatsCard({
@@ -16,7 +18,12 @@ export default function SemesterStatsCard({
   sgpa,
   percentage,
   totalCredits,
+  hasCreditsData = false,
+  manualCredits,
 }: SemesterStatsCardProps) {
+  // Use manual credits if provided, otherwise use totalCredits
+  const displayCredits = manualCredits ?? (hasCreditsData ? totalCredits : null);
+
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
       <CardContent className="p-6">
@@ -35,7 +42,7 @@ export default function SemesterStatsCard({
           {/* SGPA */}
           <div className="space-y-2">
             <p className="text-xs text-zinc-500 uppercase tracking-wider">SGPA</p>
-            <p className="text-3xl font-bold text-primary">{sgpa.toFixed(3)}</p>
+            <p className="text-3xl font-bold text-primary">{sgpa.toFixed(2)}</p>
             <p className="text-xs text-zinc-400">Semester Grade Point Average</p>
           </div>
 
@@ -55,8 +62,14 @@ export default function SemesterStatsCard({
             <p className="text-xs text-zinc-500 uppercase tracking-wider">
               Total Credits
             </p>
-            <p className="text-3xl font-bold text-primary">{totalCredits}</p>
-            <p className="text-xs text-zinc-400">Total Credits for the Semester</p>
+            <p className="text-3xl font-bold text-primary">
+              {displayCredits !== null ? displayCredits : "-"}
+            </p>
+            <p className="text-xs text-zinc-400">
+              {manualCredits !== null && manualCredits !== undefined
+                ? "Manually Added"
+                : "Total Credits for the Semester"}
+            </p>
           </div>
         </div>
       </CardContent>

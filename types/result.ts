@@ -22,25 +22,10 @@ export interface ResultAPIResponse {
 }
 
 export interface SubjectCreditsResponse {
-  credits: Record<
-    string,
-    {
-      theoryCredits: number;
-      practicalCredits: number | null;
-      totalCredits: number;
-    }
-  >;
-  found: number;
-  requested: number;
+  credits: Record<string, { credits: number }>;
 }
 
-export interface SubjectCredits {
-  theoryCredits: number;
-  practicalCredits: number | null;
-  totalCredits: number;
-}
-
-export type CreditsMap = Record<string, SubjectCredits>;
+export type CreditsMap = Record<string, { credits: number }>;
 
 export interface DetailedCredits {
   total: number;

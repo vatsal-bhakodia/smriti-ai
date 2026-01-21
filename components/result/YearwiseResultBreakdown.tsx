@@ -2,41 +2,14 @@
 
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ProcessedSemester, ResultAPIResponse } from "@/types/result";
+import { ProcessedSemester } from "@/types/result";
+import { filterLatestAttempts, calculateTotalMarks, calculateSemesterCreditsFromSubjects } from "@/utils/result";
+import { ManualCreditsData } from "./CGPACalculatorModal";
 
 interface YearwiseResultBreakdownProps {
   semesters: ProcessedSemester[];
   hasCompleteCredits: boolean;
-}
-
-// Helper function to get unique subjects by taking the latest attempt for each paper code
-function getUniqueSubjectsLatestAttempt(subjects: ResultAPIResponse[]): ResultAPIResponse[] {
-  const subjectMap = new Map<string, ResultAPIResponse>();
-  
-  subjects.forEach((subject) => {
-    const existingSubject = subjectMap.get(subject.papercode);
-    if (!existingSubject) {
-      subjectMap.set(subject.papercode, subject);
-    } else {
-      // Compare by declared date (ryear and rmonth) to get the latest attempt
-      const existingDate = new Date(existingSubject.ryear, existingSubject.rmonth - 1);
-      const currentDate = new Date(subject.ryear, subject.rmonth - 1);
-      if (currentDate > existingDate) {
-        subjectMap.set(subject.papercode, subject);
-      }
-    }
-  });
-  
-  return Array.from(subjectMap.values());
-}
-
-// Helper function to calculate total marks from subjects
-function calculateTotalMarks(subjects: ResultAPIResponse[]): number {
-  return subjects.reduce((total, subject) => {
-    const minor = parseInt(subject.minorprint) || 0;
-    const major = parseInt(subject.majorprint) || 0;
-    return total + minor + major;
-  }, 0);
+  manualCredits?: ManualCreditsData | null;
 }
 
 interface YearRowData {
@@ -51,6 +24,7 @@ interface YearRowData {
 export default function YearwiseResultBreakdown({
   semesters,
   hasCompleteCredits,
+  manualCredits,
 }: YearwiseResultBreakdownProps) {
   // Sort semesters by semester number
   const sortedSemesters = useMemo(() => 
@@ -75,14 +49,25 @@ export default function YearwiseResultBreakdown({
 
       yearSemesters.forEach((sem) => {
         // Get unique subjects (latest attempt only)
-        const uniqueSubjects = getUniqueSubjectsLatestAttempt(sem.subjects);
+        const uniqueSubjects = filterLatestAttempts(sem.subjects);
         const semesterMarks = calculateTotalMarks(uniqueSubjects);
         const semesterMaxMarks = uniqueSubjects.length * 100;
         
         yearMarks += semesterMarks;
         yearMaxMarks += semesterMaxMarks;
-        yearCredits += sem.credits;
-        yearGradePoints += sem.sgpa * sem.credits;
+        
+        // Calculate semester credits based on manual credits type
+        let semCredits = sem.credits;
+        if (manualCredits?.type === "semester" && manualCredits.semesterCredits?.[sem.euno]) {
+          // Use semester-level manual credits
+          semCredits = manualCredits.semesterCredits[sem.euno];
+        } else if (manualCredits?.type === "subject" && manualCredits.subjectCredits) {
+          // Calculate total from subject-level manual credits
+          semCredits = calculateSemesterCreditsFromSubjects(sem.euno, uniqueSubjects, manualCredits);
+        }
+        
+        yearCredits += semCredits;
+        yearGradePoints += sem.sgpa * semCredits;
       });
 
       const yearGPA = yearCredits > 0 ? yearGradePoints / yearCredits : 0;
@@ -99,7 +84,7 @@ export default function YearwiseResultBreakdown({
     }
 
     return data;
-  }, [sortedSemesters]);
+  }, [sortedSemesters, manualCredits]);
 
   // Don't render if we don't have at least 2 semesters (1 complete year)
   if (sortedSemesters.length < 2) {

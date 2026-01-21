@@ -5,3 +5,4 @@ export { default as OverallView } from "./OverallView";
 export { default as LoginForm } from "./LoginForm";
 export { default as SyllabusPromo } from "./SyllabusPromo";
 export { default as CumulativeResultBreakdown } from "./CumulativeResultBreakdown";
+export { default as CGPACalculatorModal } from "./CGPACalculatorModal";

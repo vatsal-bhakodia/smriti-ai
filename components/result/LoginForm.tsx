@@ -44,7 +44,7 @@ export default function LoginForm({
   return (
     <>
       {/* Password Information Warning Box */}
-      <Card className="w-full max-w-xl mx-auto py-1.5 mb-4 border-orange-500/30 bg-orange-950/20 relative">
+      <Card className="w-full max-w-xl mx-auto py-1.5 mb-4 border-orange-500/30 bg-orange-950/20 backdrop-blur-sm relative">
         <CardContent className="p-3">
           <div className="flex items-start gap-2">
             <AlertCircle className="h-4 w-4 text-yellow-500 shrink-0 mt-0.5" />
@@ -179,9 +179,8 @@ export default function LoginForm({
                     className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700"
                   >
                     <RefreshCw
-                      className={`h-4 w-4 ${
-                        isLoadingCaptcha ? "animate-spin" : ""
-                      }`}
+                      className={`h-4 w-4 ${isLoadingCaptcha ? "animate-spin" : ""
+                        }`}
                     />
                   </Button>
                 </div>

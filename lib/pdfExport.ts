@@ -3,20 +3,33 @@ import autoTable from "jspdf-autotable";
 import { marksToGrade, getSubjectCredits } from "@/utils/result";
 import { ProcessedData, ProcessedSemester, CreditsMap } from "@/types/result";
 
+interface ManualCreditsData {
+  type: "semester" | "subject";
+  semesterCredits?: Record<number, number>;
+  subjectCredits?: Record<string, number>;
+}
+
 interface ExportOptions {
   processedData: ProcessedData;
   semester: number | "OVERALL";
   creditsMap?: CreditsMap;
+  manualCGPA?: number | null;
+  manualCredits?: ManualCreditsData | null;
 }
 
 export async function exportResultToPDF({
   processedData,
   semester,
   creditsMap = {},
+  manualCGPA,
+  manualCredits,
 }: ExportOptions): Promise<void> {
   const doc = new jsPDF();
-  const { studentInfo, semesters, cgpa } = processedData;
+  const { studentInfo, semesters, cgpa: systemCGPA } = processedData;
   const hasCreditsData = Object.keys(creditsMap).length > 0;
+  
+  // Use manual CGPA if available, otherwise use system CGPA
+  const cgpa = manualCGPA ?? systemCGPA;
 
   // Colors - Dark theme with lime accent
   const primaryLime: [number, number, number] = [163, 255, 25]; // #a3ff19 - lime green
@@ -205,13 +218,14 @@ export async function exportResultToPDF({
         yPosition,
         index > 0,
         hasCreditsData ? creditsMap : undefined,
-        studentInfo.program
+        studentInfo.program,
+        manualCredits
       );
     });
 
     // Add summary table on a new page (only if cgpa is available)
     if (cgpa !== null) {
-      yPosition = addSummaryTable(doc, semesters, cgpa);
+      yPosition = addSummaryTable(doc, semesters, cgpa, manualCredits);
     }
   } else {
     // Export specific semester
@@ -223,7 +237,8 @@ export async function exportResultToPDF({
         yPosition,
         false,
         hasCreditsData ? creditsMap : undefined,
-        studentInfo.program
+        studentInfo.program,
+        manualCredits
       );
     }
   }
@@ -246,7 +261,8 @@ function addSemesterTable(
   startY: number,
   addPageBreak: boolean,
   creditsMap?: CreditsMap,
-  programName?: string
+  programName?: string,
+  manualCredits?: ManualCreditsData | null
 ): number {
   const primaryLime: [number, number, number] = [163, 255, 25];
   const darkBg: [number, number, number] = [0, 0, 0];
@@ -255,7 +271,12 @@ function addSemesterTable(
   const textWhite: [number, number, number] = [255, 255, 255];
   const borderGray: [number, number, number] = [64, 64, 64];
 
-  const showCredits = !!creditsMap && Object.keys(creditsMap).length > 0;
+  // Show credits column only if:
+  // 1. We have creditsMap data from API, OR
+  // 2. User has entered subject-level manual credits (not just semester totals)
+  const hasCreditsMapData = !!creditsMap && Object.keys(creditsMap).length > 0;
+  const hasSubjectLevelManualCredits = manualCredits?.type === "subject";
+  const showCredits = hasCreditsMapData || hasSubjectLevelManualCredits;
 
   // Check if we need a new page
   if (addPageBreak || startY > 230) {
@@ -294,7 +315,18 @@ function addSemesterTable(
   doc.setTextColor(...textWhite);
   doc.setFontSize(8);
   doc.setFont("helvetica", "normal");
-  const statsText = `SGPA: ${semester.sgpa.toFixed(2)}  |  Total: ${semester.totalMarks}  |  Credits: ${semester.credits}`;
+  
+  // Use manual credits if available (semester-level), otherwise use semester.credits
+  const displayCredits = manualCredits?.type === "semester" && manualCredits.semesterCredits?.[semester.euno]
+    ? manualCredits.semesterCredits[semester.euno]
+    : semester.credits;
+  
+  // Show credits in header if we have any credit data (semester or subject level) or API data
+  const showCreditsInHeader = hasCreditsMapData || !!manualCredits;
+  
+  const statsText = showCreditsInHeader 
+    ? `SGPA: ${semester.sgpa.toFixed(2)}  |  Total: ${semester.totalMarks}  |  Credits: ${displayCredits}`
+    : `SGPA: ${semester.sgpa.toFixed(2)}  |  Total: ${semester.totalMarks}`;
   doc.text(statsText, tableMarginLeft + tableWidth - headerPaddingX, textY, { align: "right" });
 
   startY += totalHeaderHeight + 4;
@@ -311,13 +343,21 @@ function addSemesterTable(
     
     // Get credits breakdown if available
     let creditsStr = "-";
-    if (showCredits && programName) {
-      const subjectCredits = getSubjectCredits(subject, creditsMap, programName);
-      if (subjectCredits) {
-        if (subjectCredits.practical !== null && subjectCredits.practical > 0 && subjectCredits.theory > 0) {
-          creditsStr = `${subjectCredits.theory}+${subjectCredits.practical}`;
-        } else {
-          creditsStr = `${subjectCredits.total}`;
+    if (showCredits) {
+      // Check for manual subject-level credits first
+      // Manual credits are stored with key format: `${semesterNumber}-${papercode}`
+      const manualCreditKey = `${semester.euno}-${subject.papercode}`;
+      if (manualCredits?.type === "subject" && manualCredits.subjectCredits?.[manualCreditKey]) {
+        creditsStr = `${manualCredits.subjectCredits[manualCreditKey]}`;
+      } else if (hasCreditsMapData && programName) {
+        // Fall back to creditsMap if no manual credits for this subject
+        const subjectCredits = getSubjectCredits(subject, creditsMap, programName);
+        if (subjectCredits) {
+          if (subjectCredits.practical !== null && subjectCredits.practical > 0 && subjectCredits.theory > 0) {
+            creditsStr = `${subjectCredits.theory}+${subjectCredits.practical}`;
+          } else {
+            creditsStr = `${subjectCredits.total}`;
+          }
         }
       }
     }
@@ -493,7 +533,8 @@ async function addFooterToAllPages(doc: jsPDF): Promise<void> {
 function addSummaryTable(
   doc: jsPDF,
   semesters: ProcessedSemester[],
-  cgpa: number
+  cgpa: number,
+  manualCredits?: ManualCreditsData | null
 ): number {
   const primaryLime: [number, number, number] = [163, 255, 25];
   const darkBg: [number, number, number] = [0, 0, 0];
@@ -536,20 +577,32 @@ function addSummaryTable(
 
   startY += totalHeaderHeight + 4;
 
-  const summaryData = semesters.map((sem) => [
-    `Semester ${sem.euno}`,
-    sem.filteredSubjects.length.toString(),
-    sem.credits.toString(),
-    sem.totalMarks.toString(),
-    sem.sgpa.toFixed(2),
-  ]);
+  const summaryData = semesters.map((sem) => {
+    // Use manual credits if available (semester-level), otherwise use sem.credits
+    const credits = manualCredits?.type === "semester" && manualCredits.semesterCredits?.[sem.euno]
+      ? manualCredits.semesterCredits[sem.euno]
+      : sem.credits;
+    
+    return [
+      `Semester ${sem.euno}`,
+      sem.filteredSubjects.length.toString(),
+      credits.toString(),
+      sem.totalMarks.toString(),
+      sem.sgpa.toFixed(2),
+    ];
+  });
 
   // Add CGPA row
   const totalSubjects = semesters.reduce(
     (sum, s) => sum + s.filteredSubjects.length,
     0
   );
-  const totalCredits = semesters.reduce((sum, s) => sum + s.credits, 0);
+  const totalCredits = semesters.reduce((sum, s) => {
+    const credits = manualCredits?.type === "semester" && manualCredits.semesterCredits?.[s.euno]
+      ? manualCredits.semesterCredits[s.euno]
+      : s.credits;
+    return sum + credits;
+  }, 0);
   const totalMarks = semesters.reduce((sum, s) => sum + s.totalMarks, 0);
 
   summaryData.push([
