@@ -22,6 +22,7 @@
     "@langchain/textsplitters": "^1.0.1",
     "@mdxeditor/editor": "^3.50.0",
     "@prisma/client": "^6.14.0",
+    "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.7",
     "@radix-ui/react-checkbox": "^1.1.5",
     "@radix-ui/react-collapsible": "^1.1.12",

@@ -329,7 +329,6 @@ export default function StudentHeader({
                 <CGPACalculatorModal
                   semesters={data.semesters}
                   onCGPACalculated={handleCGPACalculated}
-                  calculatedCGPA={manualCGPA}
                   open={isModalOpen}
                   onOpenChange={setIsModalOpen}
                 />
