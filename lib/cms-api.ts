@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const getCmsUrl = () => {
-  const cmsUrl = process.env.CMS_URL;
+  const cmsUrl = process.env.BACKEND_URL;
   if (!cmsUrl) {
-    throw new Error("CMS_URL environment variable is not set");
+    throw new Error("BACKEND_URL environment variable is not set");
   }
   return cmsUrl.replace(/\/$/, "");
 };
@@ -37,7 +37,8 @@ export interface Branch {
 export interface Subject {
   id: string;
   programId: string;
-  code: string;
+  theoryCode: string;
+  practicalCode: string | null;
   name: string;
   slug: string;
   theoryCredits: number;

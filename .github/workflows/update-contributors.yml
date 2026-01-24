@@ -30,11 +30,11 @@ jobs:
         # Create public directory if it doesn't exist
         mkdir -p public
         
-        # Fetch contributors data
+        # Fetch contributors data into a temporary file
         curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
              -H "Accept: application/vnd.github.v3+json" \
              "https://api.github.com/repos/vatsal-bhakodia/smriti-ai/contributors" \
-             > public/contributors.json
+             > /tmp/contributors_temp.json
              
         # Check if the API call was successful
         if [ $? -ne 0 ]; then
@@ -43,30 +43,34 @@ jobs:
         fi
         
         # Verify the response is valid JSON and not an error
-        if ! jq empty public/contributors.json 2>/dev/null; then
+        if ! jq empty /tmp/contributors_temp.json 2>/dev/null; then
           echo "Invalid JSON response"
-          cat public/contributors.json
+          cat /tmp/contributors_temp.json
           exit 1
         fi
         
         # Check if it's an error response
-        if jq -e '.message' public/contributors.json > /dev/null 2>&1; then
+        if jq -e '.message' /tmp/contributors_temp.json > /dev/null 2>&1; then
           echo "GitHub API error:"
-          cat public/contributors.json
+          cat /tmp/contributors_temp.json
           exit 1
         fi
         
         echo "Successfully fetched contributors data"
         
-        # Create lastUpdated.json with current timestamp
-        echo "{\"lastUpdated\":\"$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")\"}" > public/lastUpdated.json
+        # Create a single JSON file with both contributors and lastUpdated
+        jq -n \
+          --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")" \
+          --slurpfile contributors /tmp/contributors_temp.json \
+          '{lastUpdated: $timestamp, contributors: $contributors[0]}' \
+          > public/contributors.json
         
-        echo "Created timestamp file"
+        echo "Created combined contributors.json with timestamp"
         
     - name: Check for changes
       id: check_changes
       run: |
-        if git diff --quiet public/contributors.json public/lastUpdated.json; then
+        if git diff --quiet public/contributors.json; then
           echo "No changes detected"
           echo "changes=false" >> $GITHUB_OUTPUT
         else
@@ -79,12 +83,12 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add public/contributors.json public/lastUpdated.json
-        git commit -m "🤖 Update contributors data - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+        git add public/contributors.json
+        git commit -m "Update contributors data - $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
         git push
         
     - name: Summary
       run: |
         echo "Contributors update completed!"
-        echo "Total contributors: $(jq length public/contributors.json)"
-        echo "Last updated: $(jq -r '.lastUpdated' public/lastUpdated.json)"
+        echo "Total contributors: $(jq '.contributors | length' public/contributors.json)"
+        echo "Last updated: $(jq -r '.lastUpdated' public/contributors.json)"

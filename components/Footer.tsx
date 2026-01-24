@@ -75,8 +75,13 @@ const Footer = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.location.hash) {
-      const el = document.querySelector(window.location.hash);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      const hash = window.location.hash;
+      // Only attempt to scroll if the hash is a valid simple ID selector
+      // This avoids errors with complex hashes like Clerk's SSO callback URLs
+      if (/^#[a-zA-Z][a-zA-Z0-9_-]*$/.test(hash)) {
+        const el = document.querySelector(hash);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }
     }
   }, [pathname]);
 
@@ -94,9 +99,9 @@ const Footer = () => {
 
   const footerLinks = {
     product: [
-      { name: "AI Quizes", href: "/quiz" },
-      { name: "AI Mind Maps", href: "/mindmap" },
-      { name: "AI FLashcards", href: "/quiz" },
+      { name: "AI Quizes", href: "/tools/text-to-quiz" },
+      { name: "AI Mind Maps", href: "/tools/text-to-mindmap" },
+      { name: "AI Flashcards", href: "/tools/text-to-quiz" },
     ],
     company: [
       { name: "Blogs", href: "/blogs" },
@@ -118,7 +123,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-black border-t border-neutral-900">
+    <footer className="bg-black border-t border-neutral-900 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Branding & Social Links */}

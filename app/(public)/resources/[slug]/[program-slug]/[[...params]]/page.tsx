@@ -38,7 +38,8 @@ interface Branch {
 interface Subject {
   id: string;
   programId: string;
-  code: string;
+  theoryCode: string;
+  practicalCode: string | null;
   name: string;
   slug: string;
   theoryCredits: number;
@@ -68,7 +69,7 @@ interface ProgramPageProps {
 
 async function getProgramData(universitySlug: string, programSlug: string) {
   try {
-    const cmsUrl = process.env.CMS_URL;
+    const cmsUrl = process.env.BACKEND_URL;
     if (!cmsUrl) {
       throw new Error("CMS URL not configured");
     }
@@ -95,7 +96,7 @@ async function getSubjectDetails(
   branchSlug?: string
 ) {
   try {
-    const cmsUrl = process.env.CMS_URL;
+    const cmsUrl = process.env.BACKEND_URL;
     if (!cmsUrl) {
       throw new Error("CMS URL not configured");
     }
@@ -244,7 +245,7 @@ export async function generateMetadata({
     return generateMetadataUtil({
       title: `${subjectData.subject.name} | ${program.name}${branchName} ${semesterLabel} Syllabus & Notes`,
       description: `Download ${subjectData.subject.name} (${
-        subjectData.subject.code
+        subjectData.subject.theoryCode
       }) syllabus, notes, PYQs, books & practicals for ${
         program.name
       }${branchName} ${semesterLabel} at ${universitySlugCaps}. ${
@@ -254,7 +255,7 @@ export async function generateMetadata({
       }`,
       keywords: [
         subjectData.subject.name,
-        subjectData.subject.code,
+        subjectData.subject.theoryCode,
         `${program.name} ${semesterLabel}`,
         `${selectedBranch?.name || ""} syllabus`,
         universitySlugCaps,
@@ -447,13 +448,13 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
   }
 
   return (
-    <section className="max-w-7xl mx-auto pb-32 px-6 pt-8 min-h-[68vh]">
+    <section className="max-w-7xl mx-auto px-6 pt-8 min-h-[65vh] pb-20">
       {/* H1 for SEO */}
       <h1 className="sr-only">{h1Title}</h1>
 
       {/* Breadcrumbs */}
       <div className="mb-8">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mb-2">
           <Link href="/resources" className="hover:underline">
             Universities
           </Link>
@@ -462,7 +463,7 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
             href={`/resources/${universitySlug}`}
             className="hover:underline"
           >
-            {university.name}
+            {universitySlugCaps}
           </Link>
           <ChevronRight size={16} />
           <Link

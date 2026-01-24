@@ -9,6 +9,7 @@ import {
   generateMetadataUtil,
   generateViewport,
 } from "@/utils/generateMetadata";
+import { clerkAppearance } from "./clerkAppearance";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -31,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={clerkAppearance}>
       <html lang="en" className="dark" suppressHydrationWarning>
         <body
           className={`${poppins.variable} antialiased`}

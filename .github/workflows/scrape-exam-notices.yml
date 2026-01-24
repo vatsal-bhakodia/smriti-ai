@@ -1,0 +1,61 @@
+name: Scrape Examination Notices
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  scrape-notices:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Scrape examination notices
+      run: npm run scrape:notices
+      env:
+        NODE_ENV: production
+        
+    - name: Check for changes
+      id: check_changes
+      run: |
+        if git diff --quiet public/exam-notices.json; then
+          echo "No changes detected"
+          echo "changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changes detected"
+          echo "changes=true" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Commit and push changes
+      if: steps.check_changes.outputs.changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add public/exam-notices.json
+        git commit -m "Update examination notices - $(date -u +"%Y-%m-%d %H:%M:%S UTC")" || exit 0
+        git push || exit 0
+        
+    - name: Summary
+      run: |
+        if [ -f public/exam-notices.json ]; then
+          echo "Examination notices update completed!"
+          echo "Total notices: $(jq '.total' public/exam-notices.json)"
+          echo "Last updated: $(jq -r '.lastUpdated' public/exam-notices.json)"
+        else
+          echo "No notices file found"
+        fi
