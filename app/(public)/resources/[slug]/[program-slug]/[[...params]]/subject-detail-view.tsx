@@ -108,7 +108,7 @@ export function SubjectDetailView({
         console.error("Failed to save progress to localStorage:", error);
       }
     },
-    [subject.id]
+    [subject.id],
   );
 
   const toggleUnit = (index: number) => {
@@ -132,7 +132,7 @@ export function SubjectDetailView({
 
   const calculateProgress = (
     unitIndex: number,
-    topics: string[] | string
+    topics: string[] | string,
   ): number => {
     if (!topics) return 0;
     const topicsArray = Array.isArray(topics) ? topics : [topics];
@@ -156,7 +156,9 @@ export function SubjectDetailView({
 
   const hasLab =
     (subject.practicalCredits && subject.practicalCredits > 0) ||
-    (subject.practicalTopics && Array.isArray(subject.practicalTopics) && subject.practicalTopics.length > 0);
+    (subject.practicalTopics &&
+      Array.isArray(subject.practicalTopics) &&
+      subject.practicalTopics.length > 0);
   const hasSyllabus = subject.syllabus && Array.isArray(subject.syllabus);
   const hasPracticalTopics =
     subject.practicalTopics && Array.isArray(subject.practicalTopics);
@@ -173,7 +175,7 @@ export function SubjectDetailView({
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="theory" className="w-full">
-            <TabsList className="grid w-full grid-cols-6 mb-4">
+            <TabsList className="grid w-full h-full grid-cols-3 sm:grid-cols-6 mb-4">
               <TabsTrigger value="theory">Theory</TabsTrigger>
               <TabsTrigger value="lab" disabled={!hasLab}>
                 Lab
@@ -212,7 +214,7 @@ export function SubjectDetailView({
                   const completedCount = topicsArray.reduce(
                     (count: number, _: any, idx: number) =>
                       count + (checkedTopics[index]?.[idx] ? 1 : 0),
-                    0
+                    0,
                   );
 
                   return (
@@ -222,27 +224,27 @@ export function SubjectDetailView({
                       onOpenChange={() => toggleUnit(index)}
                     >
                       <CollapsibleTrigger className="w-full">
-                        <div className="flex items-center justify-between w-full p-4 bg-secondary hover:bg-secondary/90 rounded-md transition-colors group">
-                          <div className="flex items-center gap-3">
-                            <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                              <span className="text-primary font-bold text-sm">
+                        <div className="flex items-center justify-between w-full p-3 sm:p-4 bg-secondary hover:bg-secondary/90 rounded-md transition-colors group gap-2 sm:gap-3">
+                          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                            <div className="size-8 sm:size-10 min-w-8 sm:min-w-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <span className="text-primary font-bold text-xs sm:text-sm">
                                 {unit.unit || index + 1}
                               </span>
                             </div>
-                            <div className="text-left">
-                              <div className="font-semibold text-sm">
+                            <div className="text-left min-w-0">
+                              <div className="font-semibold text-sm truncate">
                                 Unit {unit.unit || index + 1}
                               </div>
                               <div className="text-xs text-muted-foreground">
-                                {completedCount} / {topicsArray.length} topics completed
+                                {completedCount} / {topicsArray.length} topics
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                             <div className="text-xs font-medium text-muted-foreground">
                               {Math.round(progress)}%
                             </div>
-                            <ChevronDown className="size-5 transition-transform group-data-[state=open]:rotate-180" />
+                            <ChevronDown className="size-4 sm:size-5 transition-transform group-data-[state=open]:rotate-180" />
                           </div>
                         </div>
                       </CollapsibleTrigger>
@@ -317,7 +319,7 @@ export function SubjectDetailView({
                             `Experiment ${experimentNumber}`);
                       const steps =
                         experiment.aim?.steps || experiment.steps || [];
-                      
+
                       // External link can be in aim object or at experiment level
                       const externalLink =
                         experiment.aim?.externalLinks ||
@@ -336,12 +338,12 @@ export function SubjectDetailView({
                       return (
                         <Collapsible key={index}>
                           <CollapsibleTrigger className="w-full">
-                            <div className="flex items-center justify-between w-full p-4 bg-secondary hover:bg-secondary/90 rounded-md transition-colors group">
-                              <div className="flex items-center gap-3">
-                                <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                            <div className="flex items-center justify-between w-full p-3 sm:p-4 bg-secondary hover:bg-secondary/90 rounded-md transition-colors group gap-2 sm:gap-3">
+                              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                                <div className="size-8 min-w-8 shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
                                   {experimentNumber}
                                 </div>
-                                <div className="text-left">
+                                <div className="text-left min-w-0">
                                   <div className="font-semibold text-sm">
                                     Experiment {experimentNumber}
                                   </div>
@@ -350,7 +352,7 @@ export function SubjectDetailView({
                                   </div>
                                 </div>
                               </div>
-                              <ChevronDown className="size-5 transition-transform group-data-[state=open]:rotate-180" />
+                              <ChevronDown className="size-4 sm:size-5 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
                             </div>
                           </CollapsibleTrigger>
                           <CollapsibleContent>
@@ -374,13 +376,20 @@ export function SubjectDetailView({
                                       Steps
                                     </div>
                                     <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                                      {steps.map((step: any, stepIndex: number) => (
-                                        <li key={stepIndex} className="leading-relaxed">
-                                          {typeof step === "string"
-                                            ? step
-                                            : step.description || step.step || step}
-                                        </li>
-                                      ))}
+                                      {steps.map(
+                                        (step: any, stepIndex: number) => (
+                                          <li
+                                            key={stepIndex}
+                                            className="leading-relaxed"
+                                          >
+                                            {typeof step === "string"
+                                              ? step
+                                              : step.description ||
+                                                step.step ||
+                                                step}
+                                          </li>
+                                        ),
+                                      )}
                                     </ol>
                                   </div>
                                 )}
@@ -409,7 +418,7 @@ export function SubjectDetailView({
                           </CollapsibleContent>
                         </Collapsible>
                       );
-                    }
+                    },
                   )}
                 </div>
               ) : (
@@ -504,29 +513,31 @@ export function SubjectDetailView({
           <CardTitle className="text-xl">Subject Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b">
-            <span className="text-sm font-medium">Theory Code</span>
+          <div className="flex items-center justify-between flex-wrap gap-2 py-2 border-b">
+            <span className="text-sm font-medium w-32">Theory Code</span>
             <span className="text-sm text-muted-foreground">
               {subject.theoryCode}
             </span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b">
-            <span className="text-sm font-medium">Theory Credits</span>
+          <div className="flex items-center justify-between flex-wrap gap-2 py-2 border-b">
+            <span className="text-sm font-medium w-32">Theory Credits</span>
             <span className="text-sm text-muted-foreground">
               {subject.theoryCredits}
             </span>
           </div>
           {subject.practicalCode && (
-            <div className="flex items-center justify-between py-2 border-b">
-              <span className="text-sm font-medium">Practical Code</span>
+            <div className="flex items-center justify-between flex-wrap gap-2 py-2 border-b">
+              <span className="text-sm font-medium w-32">Practical Code</span>
               <span className="text-sm text-muted-foreground">
                 {subject.practicalCode}
               </span>
             </div>
           )}
           {subject.practicalCredits && subject.practicalCredits > 0 && (
-            <div className="flex items-center justify-between py-2 border-b">
-              <span className="text-sm font-medium">Practical Credits</span>
+            <div className="flex items-center justify-between flex-wrap gap-2 py-2 border-b">
+              <span className="text-sm font-medium w-32">
+                Practical Credits
+              </span>
               <span className="text-sm text-muted-foreground">
                 {subject.practicalCredits}
               </span>

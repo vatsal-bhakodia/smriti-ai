@@ -80,7 +80,7 @@ export function SubjectSelector({
 
   // Filter out current subject from recent list
   const filteredRecentSubjects = recentSubjects.filter(
-    (s) => s.url !== currentSubject?.url
+    (s) => s.url !== currentSubject?.url,
   );
 
   return (
@@ -129,7 +129,7 @@ export function SubjectSelector({
               <Clock className="size-4" />
               <span className="font-medium">Recent Subjects</span>
             </div>
-            <div className="flex gap-4 overflow-hidden">
+            <div className="flex gap-4 overflow-y-auto">
               {filteredRecentSubjects.slice(0, 4).map((subject, index) => (
                 <Link key={index} href={subject.url}>
                   <Button variant="secondary" className="py-2 px-3">
@@ -147,8 +147,8 @@ export function SubjectSelector({
             {!semester
               ? "Start by selecting a semester above"
               : hasBranch && !branchSlug
-              ? "Select a branch to continue"
-              : "No subjects viewed yet"}
+                ? "Select a branch to continue"
+                : "No subjects viewed yet"}
           </div>
         )}
       </CardContent>
