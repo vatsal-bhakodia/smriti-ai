@@ -3,7 +3,11 @@
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProcessedSemester } from "@/types/result";
-import { filterLatestAttempts, calculateTotalMarks, calculateSemesterCreditsFromSubjects } from "@/utils/result";
+import {
+  filterLatestAttempts,
+  calculateTotalMarks,
+  calculateSemesterCreditsFromSubjects,
+} from "@/utils/result";
 import { ManualCreditsData } from "./CGPACalculatorModal";
 
 interface YearwiseResultBreakdownProps {
@@ -27,21 +31,21 @@ export default function YearwiseResultBreakdown({
   manualCredits,
 }: YearwiseResultBreakdownProps) {
   // Sort semesters by semester number
-  const sortedSemesters = useMemo(() => 
-    [...semesters].sort((a, b) => a.euno - b.euno),
-    [semesters]
+  const sortedSemesters = useMemo(
+    () => [...semesters].sort((a, b) => a.euno - b.euno),
+    [semesters],
   );
 
   // Calculate year-wise data (2 semesters per year, only complete years)
   const yearData: YearRowData[] = useMemo(() => {
     const data: YearRowData[] = [];
-    
+
     // Group semesters by year (2 semesters per year)
     // Only include complete years (years with exactly 2 semesters)
     for (let i = 0; i + 1 < sortedSemesters.length; i += 2) {
       const yearNumber = Math.floor(i / 2) + 1;
       const yearSemesters = sortedSemesters.slice(i, i + 2);
-      
+
       let yearMarks = 0;
       let yearMaxMarks = 0;
       let yearCredits = 0;
@@ -52,26 +56,37 @@ export default function YearwiseResultBreakdown({
         const uniqueSubjects = filterLatestAttempts(sem.subjects);
         const semesterMarks = calculateTotalMarks(uniqueSubjects);
         const semesterMaxMarks = uniqueSubjects.length * 100;
-        
+
         yearMarks += semesterMarks;
         yearMaxMarks += semesterMaxMarks;
-        
+
         // Calculate semester credits based on manual credits type
         let semCredits = sem.credits;
-        if (manualCredits?.type === "semester" && manualCredits.semesterCredits?.[sem.euno]) {
+        if (
+          manualCredits?.type === "semester" &&
+          manualCredits.semesterCredits?.[sem.euno]
+        ) {
           // Use semester-level manual credits
           semCredits = manualCredits.semesterCredits[sem.euno];
-        } else if (manualCredits?.type === "subject" && manualCredits.subjectCredits) {
+        } else if (
+          manualCredits?.type === "subject" &&
+          manualCredits.subjectCredits
+        ) {
           // Calculate total from subject-level manual credits
-          semCredits = calculateSemesterCreditsFromSubjects(sem.euno, uniqueSubjects, manualCredits);
+          semCredits = calculateSemesterCreditsFromSubjects(
+            sem.euno,
+            uniqueSubjects,
+            manualCredits,
+          );
         }
-        
+
         yearCredits += semCredits;
         yearGradePoints += sem.sgpa * semCredits;
       });
 
       const yearGPA = yearCredits > 0 ? yearGradePoints / yearCredits : 0;
-      const yearPercentage = yearMaxMarks > 0 ? (yearMarks / yearMaxMarks) * 100 : 0;
+      const yearPercentage =
+        yearMaxMarks > 0 ? (yearMarks / yearMaxMarks) * 100 : 0;
 
       data.push({
         year: yearNumber,
@@ -93,7 +108,7 @@ export default function YearwiseResultBreakdown({
 
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
-      <CardContent className="p-6">
+      <CardContent className="px-6">
         <h3 className="text-lg font-semibold text-white mb-4">
           Yearwise Result Breakdown
         </h3>
@@ -101,9 +116,7 @@ export default function YearwiseResultBreakdown({
           <table className="w-full">
             <thead>
               <tr className="border-b border-zinc-700">
-                <th className="text-left p-3 text-white font-semibold">
-                  YEAR
-                </th>
+                <th className="text-left p-3 text-white font-semibold">YEAR</th>
                 <th className="text-left p-3 text-white font-semibold">
                   TOTAL MARKS
                 </th>
@@ -111,7 +124,9 @@ export default function YearwiseResultBreakdown({
                   PERCENTAGE
                 </th>
                 {hasCompleteCredits && (
-                  <th className="text-left p-3 text-white font-semibold">GPA</th>
+                  <th className="text-left p-3 text-white font-semibold">
+                    GPA
+                  </th>
                 )}
               </tr>
             </thead>

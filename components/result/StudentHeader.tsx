@@ -19,6 +19,7 @@ import { useUser, SignInButton } from "@clerk/nextjs";
 import { usePathname, useSearchParams } from "next/navigation";
 import CGPACalculatorModal, { ManualCreditsData } from "./CGPACalculatorModal";
 import { STORAGE_KEYS } from "@/utils/result";
+import { getShortProgramName } from "@/lib/result";
 
 interface StudentHeaderProps {
   data: ProcessedData;
@@ -48,22 +49,28 @@ export default function StudentHeader({
   // State for modal open/close
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCGPACalculated = useCallback((cgpa: number | null, credits?: ManualCreditsData) => {
-    setManualCGPA(cgpa);
+  const handleCGPACalculated = useCallback(
+    (cgpa: number | null, credits?: ManualCreditsData) => {
+      setManualCGPA(cgpa);
 
-    // Save to sessionStorage
-    if (cgpa !== null && credits) {
-      sessionStorage.setItem(STORAGE_KEYS.MANUAL_CGPA, JSON.stringify(cgpa));
-      sessionStorage.setItem(STORAGE_KEYS.MANUAL_CREDITS, JSON.stringify(credits));
-    } else {
-      sessionStorage.removeItem(STORAGE_KEYS.MANUAL_CGPA);
-      sessionStorage.removeItem(STORAGE_KEYS.MANUAL_CREDITS);
-    }
+      // Save to sessionStorage
+      if (cgpa !== null && credits) {
+        sessionStorage.setItem(STORAGE_KEYS.MANUAL_CGPA, JSON.stringify(cgpa));
+        sessionStorage.setItem(
+          STORAGE_KEYS.MANUAL_CREDITS,
+          JSON.stringify(credits),
+        );
+      } else {
+        sessionStorage.removeItem(STORAGE_KEYS.MANUAL_CGPA);
+        sessionStorage.removeItem(STORAGE_KEYS.MANUAL_CREDITS);
+      }
 
-    if (onManualCreditsChange) {
-      onManualCreditsChange(credits || null);
-    }
-  }, [onManualCreditsChange]);
+      if (onManualCreditsChange) {
+        onManualCreditsChange(credits || null);
+      }
+    },
+    [onManualCreditsChange],
+  );
 
   // Load manual CGPA and credits from sessionStorage on mount
   useEffect(() => {
@@ -91,7 +98,7 @@ export default function StudentHeader({
 
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
-      <CardContent className="p-6">
+      <CardContent className="px-6">
         <div className="flex justify-between items-start flex-wrap gap-6">
           <div className="flex-1 min-w-[300px]">
             <h1 className="text-3xl font-bold text-white mb-3">
@@ -122,7 +129,17 @@ export default function StudentHeader({
                   Institute
                 </span>
                 <span className="text-sm text-zinc-200 leading-snug block">
-                  {data.studentInfo.institute}
+                  {/* Full institute name on md+ screens */}
+                  <span className="hidden md:inline">
+                    {data.studentInfo.institute}
+                  </span>
+                  {/* Acronym on mobile */}
+                  <span className="md:hidden">
+                    {data.studentInfo.institute
+                      .split(/\s+/)
+                      .map((word) => word.charAt(0).toUpperCase())
+                      .join("")}
+                  </span>
                   <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-700/50 text-zinc-400 border border-zinc-600/30">
                     {data.studentInfo.instituteCode}
                   </span>
@@ -134,7 +151,14 @@ export default function StudentHeader({
                   Program
                 </span>
                 <span className="text-sm text-zinc-200 leading-snug block">
-                  {data.studentInfo.program}
+                  {/* Full program name on md+ screens */}
+                  <span className="hidden md:inline">
+                    {data.studentInfo.program}
+                  </span>
+                  {/* Short form on mobile */}
+                  <span className="md:hidden">
+                    {getShortProgramName(data.studentInfo.program)}
+                  </span>
                   <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-primary/10 text-primary/80 border border-primary/20">
                     {data.studentInfo.programCode}
                   </span>
@@ -149,26 +173,26 @@ export default function StudentHeader({
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => onSemesterChange("OVERALL")}
-                  className={`group relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${selectedSemester === "OVERALL"
-                    ? "bg-primary text-black shadow-lg shadow-primary/25"
-                    : "bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700/80 hover:text-zinc-200 border border-zinc-700/50 hover:border-zinc-600"
-                    }`}
+                  className={`group relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
+                    selectedSemester === "OVERALL"
+                      ? "bg-primary text-black shadow-lg shadow-primary/25"
+                      : "bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700/80 hover:text-zinc-200 border border-zinc-700/50 hover:border-zinc-600"
+                  }`}
                 >
                   {selectedSemester === "OVERALL" && (
                     <span className="absolute inset-0 rounded-lg bg-primary/20 blur-md -z-10" />
                   )}
-                  <span className="flex items-center gap-2">
-                    Overall
-                  </span>
+                  <span className="flex items-center gap-2">Overall</span>
                 </button>
                 {data.semesters.map((sem) => (
                   <button
                     key={sem.euno}
                     onClick={() => onSemesterChange(sem.euno)}
-                    className={`group relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${selectedSemester === sem.euno
-                      ? "bg-primary text-black shadow-lg shadow-primary/25"
-                      : "bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700/80 hover:text-zinc-200 border border-zinc-700/50 hover:border-zinc-600"
-                      }`}
+                    className={`group relative px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 ${
+                      selectedSemester === sem.euno
+                        ? "bg-primary text-black shadow-lg shadow-primary/25"
+                        : "bg-zinc-800/80 text-zinc-400 hover:bg-zinc-700/80 hover:text-zinc-200 border border-zinc-700/50 hover:border-zinc-600"
+                    }`}
                   >
                     {selectedSemester === sem.euno && (
                       <span className="absolute inset-0 rounded-lg bg-primary/20 blur-md -z-10" />
@@ -183,7 +207,7 @@ export default function StudentHeader({
           </div>
 
           {/* CGPA Card with Buttons */}
-          <div className="flex flex-col gap-2 md:w-fit w-full">
+          <div className="flex flex-col gap-4 md:gap-2 md:w-fit w-full">
             <div className="flex gap-2">
               <Button
                 onClick={onReset}
@@ -243,7 +267,7 @@ export default function StudentHeader({
                             manualCredits,
                           });
                           toast.success(
-                            `Semester ${sem.euno} PDF exported successfully!`
+                            `Semester ${sem.euno} PDF exported successfully!`,
                           );
                         }}
                       >
@@ -276,26 +300,33 @@ export default function StudentHeader({
               </div>
             )}
             {/* Show Semester SGPA box when a specific semester is selected */}
-            {selectedSemester !== "OVERALL" && (() => {
-              const currentSem = data.semesters.find(s => s.euno === selectedSemester);
-              if (!currentSem) return null;
-              return (
-                <div className="bg-linear-to-br from-primary/20 to-primary/5 border border-primary/30 rounded-lg p-6 min-w-[200px]">
-                  <p className="text-sm text-neutral-100 mb-1">SEMESTER GPA</p>
-                  <p className="text-5xl font-bold text-primary">
-                    {currentSem.sgpa.toFixed(2)}
-                  </p>
-                  <p className="text-xs text-neutral-100 mt-2">Out of 10.0</p>
-                </div>
-              );
-            })()}
+            {selectedSemester !== "OVERALL" &&
+              (() => {
+                const currentSem = data.semesters.find(
+                  (s) => s.euno === selectedSemester,
+                );
+                if (!currentSem) return null;
+                return (
+                  <div className="bg-linear-to-br from-primary/20 to-primary/5 border border-primary/30 rounded-lg p-6 min-w-[200px]">
+                    <p className="text-sm text-neutral-100 mb-1">
+                      SEMESTER GPA
+                    </p>
+                    <p className="text-5xl font-bold text-primary">
+                      {currentSem.sgpa.toFixed(2)}
+                    </p>
+                    <p className="text-xs text-neutral-100 mt-2">Out of 10.0</p>
+                  </div>
+                );
+              })()}
             {/* Show CGPA section when no system CGPA and OVERALL is selected */}
             {data.cgpa === null && selectedSemester === "OVERALL" && (
               <div className="min-w-[200px] flex flex-col">
                 {/* Show calculated CGPA box if available */}
                 {manualCGPA !== null ? (
                   <div className="bg-linear-to-br from-primary/20 to-primary/5 border border-primary/30 rounded-lg p-6">
-                    <p className="text-sm text-neutral-100 mb-1">CALCULATED CGPA</p>
+                    <p className="text-sm text-neutral-100 mb-1">
+                      CALCULATED CGPA
+                    </p>
                     <p className="text-5xl font-bold text-primary">
                       {manualCGPA.toFixed(2)}
                     </p>
@@ -309,8 +340,12 @@ export default function StudentHeader({
                      hover:from-primary/30 hover:to-primary/10 transition-all cursor-pointer flex flex-col items-center justify-center gap-2"
                   >
                     <Calculator className="h-10 w-10 text-primary" />
-                    <p className="text-lg font-semibold text-primary">Calculate CGPA</p>
-                    <p className="text-xs text-neutral-100">Add credits manually</p>
+                    <p className="text-lg font-semibold text-primary">
+                      Calculate CGPA
+                    </p>
+                    <p className="text-xs text-neutral-100">
+                      Add credits manually
+                    </p>
                   </button>
                 )}
                 {/* Show edit link below the box when CGPA is calculated */}

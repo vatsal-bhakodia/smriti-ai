@@ -3,7 +3,11 @@
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProcessedSemester } from "@/types/result";
-import { filterLatestAttempts, calculateTotalMarks, calculateSemesterCreditsFromSubjects } from "@/utils/result";
+import {
+  filterLatestAttempts,
+  calculateTotalMarks,
+  calculateSemesterCreditsFromSubjects,
+} from "@/utils/result";
 import { ManualCreditsData } from "./CGPACalculatorModal";
 
 interface CumulativeResultBreakdownProps {
@@ -23,9 +27,9 @@ export default function CumulativeResultBreakdown({
   manualCredits,
 }: CumulativeResultBreakdownProps) {
   // Sort semesters by semester number
-  const sortedSemesters = useMemo(() =>
-    [...semesters].sort((a, b) => a.euno - b.euno),
-    [semesters]
+  const sortedSemesters = useMemo(
+    () => [...semesters].sort((a, b) => a.euno - b.euno),
+    [semesters],
   );
 
   // Calculate cumulative semester data using unique subjects (latest attempt only)
@@ -48,24 +52,42 @@ export default function CumulativeResultBreakdown({
 
       // Calculate semester credits based on manual credits type
       let semCredits = sem.credits;
-      if (manualCredits?.type === "semester" && manualCredits.semesterCredits?.[sem.euno]) {
+      if (
+        manualCredits?.type === "semester" &&
+        manualCredits.semesterCredits?.[sem.euno]
+      ) {
         // Use semester-level manual credits
         semCredits = manualCredits.semesterCredits[sem.euno];
-      } else if (manualCredits?.type === "subject" && manualCredits.subjectCredits) {
+      } else if (
+        manualCredits?.type === "subject" &&
+        manualCredits.subjectCredits
+      ) {
         // Calculate total from subject-level manual credits
-        semCredits = calculateSemesterCreditsFromSubjects(sem.euno, uniqueSubjects, manualCredits);
+        semCredits = calculateSemesterCreditsFromSubjects(
+          sem.euno,
+          uniqueSubjects,
+          manualCredits,
+        );
       }
 
       cumulativeCredits += semCredits;
       cumulativeGradePoints += sem.sgpa * semCredits;
 
-      const cumulativeGPA = cumulativeCredits > 0 ? cumulativeGradePoints / cumulativeCredits : 0;
-      const percentage = cumulativeMaxMarks > 0 ? (cumulativeMarks / cumulativeMaxMarks) * 100 : 0;
+      const cumulativeGPA =
+        cumulativeCredits > 0 ? cumulativeGradePoints / cumulativeCredits : 0;
+      const percentage =
+        cumulativeMaxMarks > 0
+          ? (cumulativeMarks / cumulativeMaxMarks) * 100
+          : 0;
 
       // Generate label like "Sem 1", "Sem 1+2", "Sem 1+2+3", etc.
-      const label = index === 0
-        ? `Sem ${sem.euno}`
-        : `Sem ${sortedSemesters.slice(0, index + 1).map(s => s.euno).join('+')}`;
+      const label =
+        index === 0
+          ? `Sem ${sem.euno}`
+          : `Sem ${sortedSemesters
+              .slice(0, index + 1)
+              .map((s) => s.euno)
+              .join("+")}`;
 
       data.push({
         label,
@@ -104,25 +126,42 @@ export default function CumulativeResultBreakdown({
 
         // Calculate semester credits based on manual credits type
         let semCredits = sem.credits;
-        if (manualCredits?.type === "semester" && manualCredits.semesterCredits?.[sem.euno]) {
+        if (
+          manualCredits?.type === "semester" &&
+          manualCredits.semesterCredits?.[sem.euno]
+        ) {
           // Use semester-level manual credits
           semCredits = manualCredits.semesterCredits[sem.euno];
-        } else if (manualCredits?.type === "subject" && manualCredits.subjectCredits) {
+        } else if (
+          manualCredits?.type === "subject" &&
+          manualCredits.subjectCredits
+        ) {
           // Calculate total from subject-level manual credits
-          semCredits = calculateSemesterCreditsFromSubjects(sem.euno, uniqueSubjects, manualCredits);
+          semCredits = calculateSemesterCreditsFromSubjects(
+            sem.euno,
+            uniqueSubjects,
+            manualCredits,
+          );
         }
 
         yearCumulativeCredits += semCredits;
         yearCumulativeGradePoints += sem.sgpa * semCredits;
       });
 
-      const yearGPA = yearCumulativeCredits > 0 ? yearCumulativeGradePoints / yearCumulativeCredits : 0;
-      const yearPercentage = yearCumulativeMaxMarks > 0 ? (yearCumulativeMarks / yearCumulativeMaxMarks) * 100 : 0;
+      const yearGPA =
+        yearCumulativeCredits > 0
+          ? yearCumulativeGradePoints / yearCumulativeCredits
+          : 0;
+      const yearPercentage =
+        yearCumulativeMaxMarks > 0
+          ? (yearCumulativeMarks / yearCumulativeMaxMarks) * 100
+          : 0;
 
       // Generate label like "Year 1", "Year 1+2", etc.
-      const yearLabel = yearCount === 1
-        ? `Year ${yearCount}`
-        : `Year ${Array.from({ length: yearCount }, (_, idx) => idx + 1).join('+')}`;
+      const yearLabel =
+        yearCount === 1
+          ? `Year ${yearCount}`
+          : `Year ${Array.from({ length: yearCount }, (_, idx) => idx + 1).join("+")}`;
 
       data.push({
         label: yearLabel,
@@ -137,7 +176,7 @@ export default function CumulativeResultBreakdown({
 
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
-      <CardContent className="p-6">
+      <CardContent className="px-6">
         <h3 className="text-lg font-semibold text-white mb-4">
           Cumulative Result Breakdown
         </h3>
@@ -147,9 +186,15 @@ export default function CumulativeResultBreakdown({
           <table className="w-full">
             <thead>
               <tr className="border-b border-zinc-700">
-                <th className="text-left p-3 text-white font-semibold">SEMESTER</th>
-                <th className="text-left p-3 text-white font-semibold">MARKS</th>
-                <th className="text-left p-3 text-white font-semibold">PERCENTAGE</th>
+                <th className="text-left p-3 text-white font-semibold">
+                  SEMESTER
+                </th>
+                <th className="text-left p-3 text-white font-semibold">
+                  MARKS
+                </th>
+                <th className="text-left p-3 text-white font-semibold">
+                  PERCENTAGE
+                </th>
                 <th className="text-left p-3 text-white font-semibold">GPA</th>
               </tr>
             </thead>
@@ -172,10 +217,18 @@ export default function CumulativeResultBreakdown({
             <table className="w-full">
               <thead>
                 <tr className="border-b border-zinc-700">
-                  <th className="text-left p-3 text-white font-semibold">YEAR</th>
-                  <th className="text-left p-3 text-white font-semibold">MARKS</th>
-                  <th className="text-left p-3 text-white font-semibold">PERCENTAGE</th>
-                  <th className="text-left p-3 text-white font-semibold">GPA</th>
+                  <th className="text-left p-3 text-white font-semibold">
+                    YEAR
+                  </th>
+                  <th className="text-left p-3 text-white font-semibold">
+                    MARKS
+                  </th>
+                  <th className="text-left p-3 text-white font-semibold">
+                    PERCENTAGE
+                  </th>
+                  <th className="text-left p-3 text-white font-semibold">
+                    GPA
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -184,7 +237,9 @@ export default function CumulativeResultBreakdown({
                     <td className="p-3 text-zinc-300">{row.label}</td>
                     <td className="p-3 text-zinc-300">{row.marks}</td>
                     <td className="p-3 text-zinc-300">{row.percentage}</td>
-                    <td className="p-3 text-primary font-semibold">{row.gpa}</td>
+                    <td className="p-3 text-primary font-semibold">
+                      {row.gpa}
+                    </td>
                   </tr>
                 ))}
               </tbody>

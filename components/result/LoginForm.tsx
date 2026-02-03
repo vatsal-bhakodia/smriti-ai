@@ -6,8 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, RefreshCw, Brain, Eye, EyeOff, X, ArrowLeft, ArrowRight } from "lucide-react";
-import { BorderBeam } from "@/components/magicui/border-beam"
+import {
+  AlertCircle,
+  RefreshCw,
+  Brain,
+  Eye,
+  EyeOff,
+  X,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
+import { BorderBeam } from "@/components/magicui/border-beam";
 
 interface LoginFormProps {
   enrollmentNumber: string;
@@ -77,7 +86,8 @@ export default function LoginForm({
                   Password Information
                 </h3>
                 <p className="text-white text-xs mb-2">
-                  Please double-check the following before entering your password:
+                  Please double-check the following before entering your
+                  password:
                 </p>
                 <ul className="text-white text-xs space-y-1 list-disc list-inside">
                   <li>
@@ -90,8 +100,8 @@ export default function LoginForm({
                     Ensure space between words as per registered father's name
                   </li>
                   <li>
-                    3 Wrong attempts will lead to temporary account lockout. Enter
-                    password wisely
+                    3 Wrong attempts will lead to temporary account lockout.
+                    Enter password wisely
                   </li>
                 </ul>
               </div>
@@ -101,7 +111,7 @@ export default function LoginForm({
       )}
 
       {/* Login Form Card */}
-      <Card className="bg-zinc-900 border-zinc-800 w-full max-w-xl mx-auto relative">
+      <Card className="bg-zinc-900 border-zinc-800 w-full max-w-xl mx-auto relative overflow-hidden">
         <CardContent className="p-6">
           {/* Header Section */}
           <div className="text-center mb-8">
@@ -220,7 +230,9 @@ export default function LoginForm({
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={isLoading}
                     className="absolute right-0 top-0 h-full px-3 hover:bg-transparent text-zinc-400 hover:text-white"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -266,8 +278,9 @@ export default function LoginForm({
                       className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700"
                     >
                       <RefreshCw
-                        className={`h-4 w-4 ${isLoadingCaptcha ? "animate-spin" : ""
-                          }`}
+                        className={`h-4 w-4 ${
+                          isLoadingCaptcha ? "animate-spin" : ""
+                        }`}
                       />
                     </Button>
                   </div>

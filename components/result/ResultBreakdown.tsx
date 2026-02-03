@@ -3,7 +3,10 @@
 import { useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProcessedSemester } from "@/types/result";
-import { getUniqueSubjectsLatestAttempt, calculateTotalMarks } from "@/utils/result";
+import {
+  getUniqueSubjectsLatestAttempt,
+  calculateTotalMarks,
+} from "@/utils/result";
 
 interface ResultBreakdownProps {
   semesters: ProcessedSemester[];
@@ -18,31 +21,31 @@ interface SemesterRowData {
   credits: number;
 }
 
-export default function ResultBreakdown({
-  semesters,
-}: ResultBreakdownProps) {
+export default function ResultBreakdown({ semesters }: ResultBreakdownProps) {
   // Calculate semester data with unique subjects (latest attempt only)
   const semesterData: SemesterRowData[] = useMemo(() => {
-    return semesters.map((sem) => {
-      const uniqueSubjects = getUniqueSubjectsLatestAttempt(sem.subjects);
-      const totalMarks = calculateTotalMarks(uniqueSubjects);
-      const maxMarks = uniqueSubjects.length * 100;
-      const percentage = maxMarks > 0 ? (totalMarks / maxMarks) * 100 : 0;
+    return semesters
+      .map((sem) => {
+        const uniqueSubjects = getUniqueSubjectsLatestAttempt(sem.subjects);
+        const totalMarks = calculateTotalMarks(uniqueSubjects);
+        const maxMarks = uniqueSubjects.length * 100;
+        const percentage = maxMarks > 0 ? (totalMarks / maxMarks) * 100 : 0;
 
-      return {
-        euno: sem.euno,
-        totalMarks,
-        maxMarks,
-        percentage,
-        sgpa: sem.sgpa,
-        credits: sem.credits,
-      };
-    }).sort((a, b) => a.euno - b.euno);
+        return {
+          euno: sem.euno,
+          totalMarks,
+          maxMarks,
+          percentage,
+          sgpa: sem.sgpa,
+          credits: sem.credits,
+        };
+      })
+      .sort((a, b) => a.euno - b.euno);
   }, [semesters]);
 
   return (
     <Card className="bg-zinc-900/95 border-zinc-800">
-      <CardContent className="p-6">
+      <CardContent className="px-6">
         <h3 className="text-lg font-semibold text-white mb-4">
           Result Breakdown
         </h3>
