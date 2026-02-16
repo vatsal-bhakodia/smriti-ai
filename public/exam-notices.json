@@ -1,6 +1,16 @@
 {
   "notices": [
     {
+      "title": "Exam (Dec. 2025) Result for BCA (Mercy Exam)",
+      "link": "http://164.100.158.135/ExamResults/2026/160226/Mercy result of BCA Exam Dec 2025.pdf",
+      "uploadDate": "16-02-26"
+    },
+    {
+      "title": "Exam (Dec. 2025) Result of LLB (Mercy Exam)",
+      "link": "http://164.100.158.135/ExamResults/2026/160226/Mercy result of LLB Exam 2025.pdf",
+      "uploadDate": "16-02-26"
+    },
+    {
       "title": "Exam (Dec. 2025) Mercy Result of BBA (ALL), (Batch 2015 onwards)",
       "link": "http://164.100.158.135/ExamResults/2026/13022026/Mercy Exam Result of BBA (ALL) programme Exam held in Dec 2025 (batch 2015 onwards).pdf",
       "uploadDate": "13-02-26"
@@ -2981,6 +2991,6 @@
       "uploadDate": "N/A"
     }
   ],
-  "lastUpdated": "2026-02-16T07:17:37.866Z",
-  "total": 596
+  "lastUpdated": "2026-02-16T13:23:17.645Z",
+  "total": 598
 }
