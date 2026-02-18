@@ -1,6 +1,11 @@
 {
   "notices": [
     {
+      "title": "Exam (Jan. 2026) Result of MPH(FE) 3rd Sem",
+      "link": "http://164.100.158.135/ExamResults/2026/180226/Result of MPH(FE) 3rd semester exam held in january 2026..pdf",
+      "uploadDate": "18-02-26"
+    },
+    {
       "title": "Exam (Dec. 2025) Result for BCA (Mercy Exam)",
       "link": "http://164.100.158.135/ExamResults/2026/160226/Mercy result of BCA Exam Dec 2025.pdf",
       "uploadDate": "16-02-26"
@@ -2991,6 +2996,6 @@
       "uploadDate": "N/A"
     }
   ],
-  "lastUpdated": "2026-02-18T07:13:11.125Z",
-  "total": 598
+  "lastUpdated": "2026-02-18T13:26:06.862Z",
+  "total": 599
 }
