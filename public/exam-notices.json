@@ -1,6 +1,21 @@
 {
   "notices": [
     {
+      "title": "Rechecking result of MBBS 2nd Prof. Supplementray Examination held in Dec. 2025",
+      "link": "http://164.100.158.135/ExamResults/2026/20022026/MBBS 2nd prof..pdf",
+      "uploadDate": "20-02-26"
+    },
+    {
+      "title": "Declaration of result of LLM (Weekend) (1st and 3rd Sem), End Term Examination held in Nov-Dec. 2025",
+      "link": "http://164.100.158.135/ExamResults/2026/20022026/Notice_Result of LLM (W)_Dec.2025.pdf",
+      "uploadDate": "20-02-26"
+    },
+    {
+      "title": "Declaration of result of M.Ed. (SE) (1st and 3rd Sem), End Term Examination held in Nov-Dec. 2025",
+      "link": "http://164.100.158.135/ExamResults/2026/20022026/Notice_Result of M.Ed. (SE)_Dec.2025.pdf",
+      "uploadDate": "20-02-26"
+    },
+    {
       "title": "Notice of Result of All M.Tech (USICT, USCT, USAR and C-DAC) ETE Dec. 2025",
       "link": "http://164.100.158.135/ExamResults/2026/190226/Result of M.Tech.pdf",
       "uploadDate": "19-02-26"
@@ -3011,6 +3026,6 @@
       "uploadDate": "N/A"
     }
   ],
-  "lastUpdated": "2026-02-20T07:08:10.185Z",
-  "total": 602
+  "lastUpdated": "2026-02-20T13:18:48.969Z",
+  "total": 605
 }
