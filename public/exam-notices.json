@@ -1,6 +1,11 @@
 {
   "notices": [
     {
+      "title": "Exam (Dec. 2025) result of MBBS 1st prof. Supplementary Examination",
+      "link": "http://164.100.158.135/ExamResults/2026/110326/Regarding result of MBBS 1st prof. supplementary examination held in December 2025.pdf",
+      "uploadDate": "11-02-26"
+    },
+    {
       "title": "Exam (Dec. 2025) Result of Ph.D. (Course Work), 1st Sem",
       "link": "http://164.100.158.135/ExamResults/2026/100326/phdresults.pdf",
       "uploadDate": "10-02-26"
@@ -3066,6 +3071,6 @@
       "uploadDate": "N/A"
     }
   ],
-  "lastUpdated": "2026-03-11T07:06:02.677Z",
-  "total": 613
+  "lastUpdated": "2026-03-11T13:21:06.709Z",
+  "total": 614
 }
