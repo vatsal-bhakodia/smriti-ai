@@ -5,13 +5,6 @@ const BACKEND_URL = process.env.BACKEND_URL;
 
 // Proxy API to fetch subject credits from CMS
 export async function POST(request: NextRequest) {
-  if (!BACKEND_URL) {
-    return NextResponse.json(
-      { error: "BACKEND_URL not configured" },
-      { status: 500 }
-    );
-  }
-
   try {
     const body = await request.json();
     const { paperCodes } = body as { paperCodes: string[] };
@@ -25,6 +18,14 @@ export async function POST(request: NextRequest) {
 
     // Normalize paper codes before sending to CMS
     const normalizedCodes = paperCodes.map(normalizePaperCode);
+
+    if (!BACKEND_URL) {
+      const mockCredits: Record<string, { total: number; theory: number; practical: number }> = {};
+      normalizedCodes.forEach((code) => {
+        mockCredits[code] = { total: 4, theory: 4, practical: 0 };
+      });
+      return NextResponse.json({ credits: mockCredits });
+    }
 
     // Call CMS API
     const response = await fetch(`${BACKEND_URL}/api/public/result/credits`, {

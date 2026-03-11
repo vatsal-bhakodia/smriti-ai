@@ -3,15 +3,22 @@ import {
   getSessionCookies,
   copySessionCookiesToResponse,
 } from "@/lib/result";
+import { sampleCaptchaImageBase64 } from "@/lib/sample-data";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
 export async function GET(req: NextRequest) {
   if (!BACKEND_URL) {
-    return NextResponse.json(
-      { error: "BACKEND_URL not configured" },
-      { status: 500 }
-    );
+    const base64Data = sampleCaptchaImageBase64.split(",")[1] || sampleCaptchaImageBase64;
+    const imageBuffer = Buffer.from(base64Data, "base64");
+    return new NextResponse(imageBuffer, {
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
+      },
+    });
   }
 
   try {

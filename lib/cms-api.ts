@@ -1,10 +1,15 @@
 import axios from "axios";
 
+import {
+  sampleUniversity,
+  sampleProgram,
+  sampleBranches,
+  sampleSubjects,
+} from "./sample-data";
+
 const getCmsUrl = () => {
   const cmsUrl = process.env.BACKEND_URL;
-  if (!cmsUrl) {
-    throw new Error("BACKEND_URL environment variable is not set");
-  }
+  if (!cmsUrl) return null;
   return cmsUrl.replace(/\/$/, "");
 };
 
@@ -51,6 +56,7 @@ export interface Subject {
 export async function getUniversities(): Promise<University[]> {
   try {
     const baseUrl = getCmsUrl();
+    if (!baseUrl) return [sampleUniversity];
     const response = await axios.get<University[]>(
       `${baseUrl}/api/public/universities`,
       {
@@ -80,6 +86,7 @@ export async function getProgramsByUniversityId(
 ): Promise<Program[]> {
   try {
     const baseUrl = getCmsUrl();
+    if (!baseUrl) return [sampleProgram];
     const response = await axios.get<Program[]>(
       `${baseUrl}/api/public/programs?universityId=${universityId}`,
       {
@@ -112,6 +119,7 @@ export async function getbranchesByProgramId(
 ): Promise<Branch[]> {
   try {
     const baseUrl = getCmsUrl();
+    if (!baseUrl) return sampleBranches;
     const response = await axios.get<Branch[]>(
       `${baseUrl}/api/public/branches?programId=${programId}`,
       {
@@ -132,6 +140,7 @@ export async function getbranchesByProgramId(
 export async function getAllSubjects(): Promise<Subject[]> {
   try {
     const baseUrl = getCmsUrl();
+    if (!baseUrl) return sampleSubjects;
     const response = await axios.get<Subject[]>(
       `${baseUrl}/api/public/subjects`,
       {

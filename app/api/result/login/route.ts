@@ -4,18 +4,12 @@ import {
   copySessionCookiesToResponse,
   fetchWithTimeout,
 } from "@/lib/result";
+import { sampleResults } from "@/lib/sample-data";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 const REQUEST_TIMEOUT = 8000;
 
 export async function POST(req: NextRequest) {
-  if (!BACKEND_URL) {
-    return NextResponse.json(
-      { error: "BACKEND_URL not configured" },
-      { status: 500 }
-    );
-  }
-
   try {
     const body = await req.json();
     const { enrollmentNumber, password, captcha } = body;
@@ -25,6 +19,17 @@ export async function POST(req: NextRequest) {
         { error: "Missing required fields" },
         { status: 400 }
       );
+    }
+
+    if (!BACKEND_URL) {
+      return NextResponse.json({
+        success: true,
+        studentInfo: {
+          name: "Sample Student",
+          enrollmentNo: enrollmentNumber,
+        },
+        results: sampleResults.map((r) => ({ ...r, nrollno: enrollmentNumber })),
+      });
     }
 
     const cookieHeader = getSessionCookies(req);

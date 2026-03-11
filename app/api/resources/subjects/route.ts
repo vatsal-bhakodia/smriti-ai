@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
+import { sampleSubjects } from "@/lib/sample-data";
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,10 +19,7 @@ export async function GET(req: NextRequest) {
 
     const cmsUrl = process.env.BACKEND_URL;
     if (!cmsUrl) {
-      return NextResponse.json(
-        { message: "CMS URL not configured" },
-        { status: 500 }
-      );
+      return NextResponse.json(sampleSubjects);
     }
 
     const baseUrl = cmsUrl.replace(/\/$/, "");

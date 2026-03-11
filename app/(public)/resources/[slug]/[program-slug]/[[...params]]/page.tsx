@@ -8,7 +8,12 @@ import { generateMetadataUtil } from "@/utils/generateMetadata";
 import { SemesterBranchSelector } from "./semester-branch-selector";
 import { SubjectDetailView } from "./subject-detail-view";
 import { SubjectSelectorWrapper } from "./subject-selector-wrapper";
-
+import {
+  sampleUniversity,
+  sampleProgram,
+  sampleBranches,
+  sampleSubjectDetails,
+} from "@/lib/sample-data";
 interface University {
   id: string;
   name: string;
@@ -71,7 +76,11 @@ async function getProgramData(universitySlug: string, programSlug: string) {
   try {
     const cmsUrl = process.env.BACKEND_URL;
     if (!cmsUrl) {
-      throw new Error("CMS URL not configured");
+      return {
+        university: sampleUniversity,
+        program: sampleProgram,
+        branches: sampleBranches,
+      };
     }
 
     const baseUrl = cmsUrl.replace(/\/$/, "");
@@ -98,7 +107,7 @@ async function getSubjectDetails(
   try {
     const cmsUrl = process.env.BACKEND_URL;
     if (!cmsUrl) {
-      throw new Error("CMS URL not configured");
+      return sampleSubjectDetails;
     }
 
     const baseUrl = cmsUrl.replace(/\/$/, "");
@@ -244,15 +253,12 @@ export async function generateMetadata({
 
     return generateMetadataUtil({
       title: `${subjectData.subject.name} | ${program.name}${branchName} ${semesterLabel} Syllabus & Notes`,
-      description: `Download ${subjectData.subject.name} (${
-        subjectData.subject.theoryCode
-      }) syllabus, notes, PYQs, books & practicals for ${
-        program.name
-      }${branchName} ${semesterLabel} at ${universitySlugCaps}. ${
-        resourceCount > 0
+      description: `Download ${subjectData.subject.name} (${subjectData.subject.theoryCode
+        }) syllabus, notes, PYQs, books & practicals for ${program.name
+        }${branchName} ${semesterLabel} at ${universitySlugCaps}. ${resourceCount > 0
           ? `${resourceCount}+ study resources available.`
           : "Complete study materials & previous year questions."
-      }`,
+        }`,
       keywords: [
         subjectData.subject.name,
         subjectData.subject.theoryCode,
@@ -523,11 +529,11 @@ export default async function ProgramPage({ params }: ProgramPageProps) {
           currentSubject={
             subjectData
               ? {
-                  name: subjectData.subject.name,
-                  url: branchSlug
-                    ? `/resources/${universitySlug}/${programSlug}/${semester}/${branchSlug}/${subjectData.subject.slug}`
-                    : `/resources/${universitySlug}/${programSlug}/${semester}/${subjectData.subject.slug}`,
-                }
+                name: subjectData.subject.name,
+                url: branchSlug
+                  ? `/resources/${universitySlug}/${programSlug}/${semester}/${branchSlug}/${subjectData.subject.slug}`
+                  : `/resources/${universitySlug}/${programSlug}/${semester}/${subjectData.subject.slug}`,
+              }
               : undefined
           }
           semester={semester}
