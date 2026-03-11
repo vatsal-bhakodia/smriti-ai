@@ -74,8 +74,19 @@ jobs:
           echo "No changes detected"
           echo "changes=false" >> $GITHUB_OUTPUT
         else
-          echo "Changes detected"
-          echo "changes=true" >> $GITHUB_OUTPUT
+          # Check if only the lastUpdated field changed
+          OLD_CONTENT=$(git show HEAD:public/contributors.json 2>/dev/null || echo "{}")
+          OLD_DATA=$(echo "$OLD_CONTENT" | jq -c 'del(.lastUpdated)')
+          NEW_DATA=$(jq -c 'del(.lastUpdated)' public/contributors.json)
+          
+          if [ "$OLD_DATA" = "$NEW_DATA" ]; then
+            echo "Only timestamp changed. Reverting file to avoid commit."
+            git checkout public/contributors.json
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Actual data changes detected"
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
         fi
         
     - name: Commit and push changes
