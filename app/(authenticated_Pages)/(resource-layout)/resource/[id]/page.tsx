@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState, useRef } from "react";
+import { use, useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,10 +32,64 @@ interface ResourceResponse {
   };
 }
 
-type AIResponse =
-  | { summary: string }
-  | { mindmap: string }
-  | { answer: string };
+type MessageType = "text" | "summary" | "mindmap" | "roadmap" | "qa";
+
+interface ChatMessage {
+  sender: "user" | "bot";
+  text: string;
+  type: MessageType;
+  id?: string;
+  isStreaming?: boolean;
+}
+
+// ============================
+// STREAMING HELPERS
+// ============================
+
+/**
+ * Reads a streaming response and calls onChunk for each text chunk.
+ * Returns the full text when the stream ends.
+ */
+async function readStream(
+  response: Response,
+  onChunk: (chunk: string) => void
+): Promise<string> {
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  let fullText = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const chunk = decoder.decode(value, { stream: true });
+    fullText += chunk;
+    onChunk(chunk);
+  }
+
+  return fullText;
+}
+
+/**
+ * Fake-streams cached text by emitting characters progressively.
+ * Gives the user the same visual experience as real streaming.
+ */
+async function fakeStream(
+  text: string,
+  onChunk: (textSoFar: string) => void,
+  charsPerTick: number = 5,
+  delayMs: number = 10
+): Promise<void> {
+  let shown = 0;
+  while (shown < text.length) {
+    shown = Math.min(shown + charsPerTick, text.length);
+    onChunk(text.slice(0, shown));
+    await new Promise((r) => setTimeout(r, delayMs));
+  }
+}
+
+// ============================
+// COMPONENT
+// ============================
 
 export default function ResourcePage({ params }: { params: any }) {
   const rawId = (use(params) as { id: string | string[] }).id;
@@ -49,16 +103,21 @@ export default function ResourcePage({ params }: { params: any }) {
   const [resourceSummary, setResourceSummary] = useState("");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [messages, setMessages] = useState<
-    { sender: "user" | "bot"; text: string; type: string; id?: string }[]
-  >([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
+  const [isBusy, setIsBusy] = useState(false);
   const lastProcessedUrlRef = useRef<string | null>(null);
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Handle pending YouTube URL when no resourceId is present
   useEffect(() => {
     const handlePendingYoutubeUrl = async () => {
-      if (resourceId) return; // Only process if no resourceId
+      if (resourceId) return;
 
       const pendingUrl = localStorage.getItem("pendingYoutubeUrl");
       if (!pendingUrl) {
@@ -66,15 +125,11 @@ export default function ResourcePage({ params }: { params: any }) {
         return;
       }
 
-      // Skip if we've already processed this exact URL
       if (lastProcessedUrlRef.current === pendingUrl) return;
-
-      // Mark as processing to prevent multiple calls for the same URL
       lastProcessedUrlRef.current = pendingUrl;
       setIsProcessingYoutubeUrl(true);
 
       try {
-        // Validate YouTube URL
         const videoIdMatch = pendingUrl.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
         if (!videoIdMatch) {
           toast.error("Invalid YouTube URL");
@@ -85,13 +140,11 @@ export default function ResourcePage({ params }: { params: any }) {
           return;
         }
 
-        // Get or create "My Resources" folder
         const folderResponse = await axios.get<{ folder: { id: string } }>(
           "/api/folder/default"
         );
         const folderId = folderResponse.data.folder.id;
 
-        // Get video title from YouTube API
         const API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
         if (!API_KEY) {
           toast.error("YouTube API key is missing");
@@ -117,7 +170,6 @@ export default function ResourcePage({ params }: { params: any }) {
           return;
         }
 
-        // Create resource
         const resourceResponse = await axios.post<{ resource: { id: string } }>(
           "/api/resource",
           {
@@ -128,11 +180,8 @@ export default function ResourcePage({ params }: { params: any }) {
           }
         );
 
-        // Clear localStorage
         localStorage.removeItem("pendingYoutubeUrl");
         lastProcessedUrlRef.current = null;
-
-        // Navigate to resource page with ID
         router.push(`/resource/${resourceResponse.data.resource.id}`);
       } catch (error: any) {
         console.error("Error processing YouTube URL:", error);
@@ -140,7 +189,6 @@ export default function ResourcePage({ params }: { params: any }) {
           error?.response?.data?.message || "Failed to process YouTube URL"
         );
         localStorage.removeItem("pendingYoutubeUrl");
-        // Reset ref on error so user can try again
         lastProcessedUrlRef.current = null;
         setIsProcessingYoutubeUrl(false);
         setIsLoading(false);
@@ -153,9 +201,7 @@ export default function ResourcePage({ params }: { params: any }) {
   // Load resource when resourceId changes
   useEffect(() => {
     const loadResource = async () => {
-      if (!resourceId) {
-        return;
-      }
+      if (!resourceId) return;
 
       setIsLoading(true);
       try {
@@ -178,86 +224,132 @@ export default function ResourcePage({ params }: { params: any }) {
     loadResource();
   }, [resourceId]);
 
-  const handleSend = async (
-    customInput?: string,
-    task: "summary" | "mindmap" | "roadmap" | "qa" = "qa"
-  ) => {
-    if (!resourceId) return;
+  // ============================
+  // STREAMING MESSAGE HANDLER
+  // ============================
 
-    const userMessage = customInput ?? input.trim();
-    if (!userMessage && task === "qa") return;
+  const handleSend = useCallback(
+    async (
+      customInput?: string,
+      task: "summary" | "mindmap" | "roadmap" | "qa" = "qa"
+    ) => {
+      if (!resourceId || isBusy) return;
 
-    setMessages((prev) => [
-      ...prev,
-      {
+      const userMessage = customInput ?? input.trim();
+      if (!userMessage && task === "qa") return;
+
+      setIsBusy(true);
+      setInput("");
+
+      // Add user message
+      const userMsg: ChatMessage = {
         sender: "user",
         text: userMessage || `Generate ${task}`,
         type: "text",
-      },
-    ]);
-    setInput("");
-
-    setMessages((prev) => [
-      ...prev,
-      { sender: "bot", text: "🧠 Smriti AI is thinking...", type: "text" },
-    ]);
-
-    // Check if task is 'summary' and we already have it
-    if (task === "summary" && resourceSummary) {
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        {
-          sender: "bot",
-          text: resourceSummary,
-          type: task,
-        },
-      ]);
-      return;
-    }
-
-    try {
-      const payload: any = {
-        resourceId,
-        task,
       };
 
-      if (task === "qa") {
-        payload.question = userMessage;
+      // Add a placeholder bot message that will be updated with streaming content
+      const botMsg: ChatMessage = {
+        sender: "bot",
+        text: "",
+        type: task as MessageType,
+        id: task === "mindmap" ? crypto.randomUUID() : undefined,
+        isStreaming: true,
+      };
+
+      setMessages((prev) => [...prev, userMsg, botMsg]);
+
+      try {
+        // Build the request
+        const payload: Record<string, string> = { resourceId, task };
+        if (task === "qa") payload.question = userMessage;
+
+        const response = await fetch("/api/resource/ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.message || `Request failed (${response.status})`);
+        }
+
+        const isCached = response.headers.get("X-Cached") === "true";
+
+        if (isCached) {
+          // Fake-stream cached content character-by-character
+          const cachedText = await response.text();
+
+          await fakeStream(cachedText, (textSoFar) => {
+            setMessages((prev) => {
+              const updated = [...prev];
+              updated[updated.length - 1] = {
+                ...updated[updated.length - 1],
+                text: textSoFar,
+              };
+              return updated;
+            });
+          });
+
+          // Mark as done
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              ...updated[updated.length - 1],
+              isStreaming: false,
+            };
+            return updated;
+          });
+        } else {
+          // Real streaming response
+          await readStream(response, (chunk) => {
+            setMessages((prev) => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              updated[updated.length - 1] = {
+                ...last,
+                text: last.text + chunk,
+              };
+              return updated;
+            });
+          });
+
+          // Mark as done and cache summary locally
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            updated[updated.length - 1] = {
+              ...last,
+              isStreaming: false,
+            };
+
+            // Cache summary in local state so subsequent clicks are instant
+            if (task === "summary" && last.text) {
+              setResourceSummary(last.text);
+            }
+
+            return updated;
+          });
+        }
+      } catch (error: any) {
+        console.error("Error:", error);
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[updated.length - 1] = {
+            sender: "bot",
+            text: `❌ ${error.message || "Something went wrong while processing your request."}`,
+            type: "text",
+            isStreaming: false,
+          };
+          return updated;
+        });
+      } finally {
+        setIsBusy(false);
       }
-
-      const res = await axios.post<AIResponse>("/api/resource/ai", payload);
-
-      let botText = "";
-
-      if ("summary" in res.data) {
-        botText = res.data.summary;
-      } else if ("mindmap" in res.data) {
-        botText = res.data.mindmap;
-      } else if ("answer" in res.data) {
-        botText = res.data.answer;
-      }
-
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        {
-          sender: "bot",
-          text: botText,
-          type: task,
-          id: task === "mindmap" ? crypto.randomUUID() : undefined,
-        },
-      ]);
-    } catch (error) {
-      console.error("Error:", error);
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        {
-          sender: "bot",
-          text: "❌ Something went wrong while processing your request.",
-          type: "text",
-        },
-      ]);
-    }
-  };
+    },
+    [resourceId, input, isBusy]
+  );
 
   const getSummary = () => handleSend("summarise this", "summary");
   const getMindMap = () => handleSend("Generate a mindmap", "mindmap");
@@ -380,45 +472,54 @@ export default function ResourcePage({ params }: { params: any }) {
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`flex w-full ${
-                    msg.sender === "user" ? "justify-end" : "justify-start"
-                  } animate-in fade-in slide-in-from-bottom-4 duration-500`}
+                  className={`flex w-full ${msg.sender === "user" ? "justify-end" : "justify-start"
+                    } animate-in fade-in slide-in-from-bottom-4 duration-500`}
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
                   <div
                     className={`
-                      ${
-                        msg.sender === "user"
-                          ? "bg-zinc-800 text-foreground max-w-xs"
-                          : "text-foreground w-full"
+                      ${msg.sender === "user"
+                        ? "bg-zinc-800 text-foreground max-w-xs"
+                        : "text-foreground w-full"
                       }
                       p-4 rounded-xl shadow prose prose-invert
-                      ${
-                        msg.sender === "user"
-                          ? "rounded-br-none"
-                          : "rounded-bl-none"
+                      ${msg.sender === "user"
+                        ? "rounded-br-none"
+                        : "rounded-bl-none"
                       }
                       leading-loose
                     `}
                   >
-                    {msg.sender === "bot" && msg.type === "mindmap" ? (
+                    {msg.sender === "bot" && msg.type === "mindmap" && !msg.isStreaming ? (
                       <Mermaid
                         id={msg.id || `mermaid-${idx}`}
                         chart={prepareMermaidCode({ code: msg.text })}
                         key={msg.id || `mermaid-${idx}`}
                       />
+                    ) : msg.sender === "bot" && msg.isStreaming && !msg.text ? (
+                      <div className="flex items-center gap-2 text-zinc-400">
+                        <div className="flex gap-1">
+                          <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                          <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                          <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                        </div>
+                        <span>Smriti AI is thinking...</span>
+                      </div>
                     ) : (
                       <div
-                        className={`max-w-none ${
-                          msg.sender === "bot" ? "markdown-body" : ""
-                        }`}
+                        className={`max-w-none ${msg.sender === "bot" ? "markdown-body" : ""
+                          }`}
                       >
                         <ReactMarkdown>{msg.text}</ReactMarkdown>
+                        {msg.isStreaming && (
+                          <span className="inline-block w-1.5 h-5 bg-primary animate-pulse ml-0.5 align-text-bottom rounded-sm" />
+                        )}
                       </div>
                     )}
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
           )}
         </div>
@@ -434,6 +535,7 @@ export default function ResourcePage({ params }: { params: any }) {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask anything..."
               rows={1}
+              disabled={isBusy}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -445,6 +547,7 @@ export default function ResourcePage({ params }: { params: any }) {
               size="icon"
               className="rounded-full bg-primary hover:bg-primary-dark text-black hover:scale-105 transition"
               onClick={() => handleSend(input)}
+              disabled={isBusy}
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -455,6 +558,7 @@ export default function ResourcePage({ params }: { params: any }) {
               variant="outline"
               className="rounded-full border-zinc-700 text-white hover:bg-zinc-800"
               onClick={getSummary}
+              disabled={isBusy}
             >
               <Wand2 className="h-4 w-4" />
               <span className="hidden sm:inline ml-2">AI Summarize</span>
@@ -463,6 +567,7 @@ export default function ResourcePage({ params }: { params: any }) {
               variant="outline"
               className="rounded-full border-zinc-700 text-white hover:bg-zinc-800"
               onClick={getMindMap}
+              disabled={isBusy}
             >
               <BrainCircuit className="h-4 w-4" />
               <span className="hidden sm:inline ml-2">Mind Map</span>
@@ -471,6 +576,7 @@ export default function ResourcePage({ params }: { params: any }) {
               variant="outline"
               className="rounded-full border-zinc-700 text-white hover:bg-zinc-800"
               onClick={getRoadMap}
+              disabled={isBusy}
             >
               <Route className="h-4 w-4" />
               <span className="hidden sm:inline ml-2">Road Map</span>
@@ -481,6 +587,7 @@ export default function ResourcePage({ params }: { params: any }) {
                   variant="outline"
                   className="rounded-full border-zinc-700 text-white hover:bg-zinc-800"
                   onClick={() => router.push(`/resource/${resourceId}/quiz`)}
+                  disabled={isBusy}
                 >
                   <FileQuestion className="h-4 w-4" />
                   <span className="hidden sm:inline ml-2">Quiz</span>
@@ -491,6 +598,7 @@ export default function ResourcePage({ params }: { params: any }) {
                   onClick={() =>
                     router.push(`/resource/${resourceId}/flashcard`)
                   }
+                  disabled={isBusy}
                 >
                   <Brain className="h-4 w-4" />
                   <span className="hidden sm:inline ml-2">Flashcards</span>

@@ -65,7 +65,7 @@ function getAIClient() {
 }
 
 /**
- * Process a prompt with the configured AI provider
+ * Process a prompt with the configured AI provider (non-streaming)
  * @param systemPrompt - The system instruction for the AI
  * @param userPrompt - The user's actual prompt/content
  * @returns The AI's response as a string
@@ -81,8 +81,6 @@ export async function processPrompt(
     // --- Gemini ---
     //
     if (ai.provider === "gemini") {
-      // Gemini doesn't have separate system/user roles in the same way
-      // We combine them with clear separation
       const combinedPrompt = `${systemPrompt}
 
 ---
@@ -115,4 +113,70 @@ ${userPrompt}`;
       }`
     );
   }
+}
+
+/**
+ * Process a prompt with streaming response.
+ * Returns a ReadableStream that yields text chunks as they arrive from the AI.
+ */
+export async function processPromptStream(
+  systemPrompt: string,
+  userPrompt: string = ""
+): Promise<ReadableStream<string>> {
+  const ai = getAIClient();
+
+  //
+  // --- Gemini (streaming) ---
+  //
+  if (ai.provider === "gemini") {
+    const combinedPrompt = `${systemPrompt}\n\n---\n\n${userPrompt}`;
+
+    const result = await ai.instance.generateContentStream(combinedPrompt);
+
+    return new ReadableStream<string>({
+      async start(controller) {
+        try {
+          for await (const chunk of result.stream) {
+            const text = chunk.text();
+            if (text) {
+              controller.enqueue(text);
+            }
+          }
+          controller.close();
+        } catch (error) {
+          controller.error(error);
+        }
+      },
+    });
+  }
+
+  //
+  // --- OpenAI & DeepSeek (streaming) ---
+  //
+  const stream = await ai.instance.chat.completions.create({
+    model: ai.model,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    temperature: 0.7,
+    max_tokens: 4096,
+    stream: true,
+  });
+
+  return new ReadableStream<string>({
+    async start(controller) {
+      try {
+        for await (const chunk of stream) {
+          const text = chunk.choices[0]?.delta?.content;
+          if (text) {
+            controller.enqueue(text);
+          }
+        }
+        controller.close();
+      } catch (error) {
+        controller.error(error);
+      }
+    },
+  });
 }

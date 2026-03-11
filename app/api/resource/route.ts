@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getAuth } from "@clerk/nextjs/server";
 import { uploadPDFBuffer } from "@/lib/bufferToStream";
-import { extractTextFromPDF } from "@/lib/pdfParser";
-import { SUMMARY_PROMPT_PDF, SUMMARY_PROMPTS } from "@/lib/prompts";
-import { processPrompt } from "@/lib/processPrompt";
 
 // GET: get single or multiple resources
 export async function GET(req: NextRequest) {
@@ -85,32 +82,11 @@ export async function POST(req: NextRequest) {
     try {
       // For TEXT type, use placeholder URL if not provided
       const resourceUrl = type === "TEXT" ? (url || "text://content") : url;
-      
-      // For TEXT type, generate summary from the text content if provided
-      let finalSummary = summary || "";
-      if (type === "TEXT" && summary && summary.trim()) {
-        try {
-          // If text is short (likely just a topic name), use title-based summary
-          // Otherwise, generate summary from the text content
-          if (summary.trim().length < 100) {
-            const prompt = SUMMARY_PROMPTS.fromTitle(title, "TEXT");
-            const generatedSummary = await processPrompt(prompt.system, prompt.user);
-            finalSummary = generatedSummary || summary;
-          } else {
-            // Long text - generate summary from content
-            const prompt = SUMMARY_PROMPTS.fromTranscript(summary);
-            const generatedSummary = await processPrompt(prompt.system, prompt.user);
-            finalSummary = generatedSummary || summary;
-          }
-        } catch (error) {
-          console.error("Error generating summary for TEXT resource:", error);
-          // Fall back to using the original text if summary generation fails
-          finalSummary = summary;
-        }
-      }
-      
+
+      // Store provided text as-is (for TEXT type). Summary is generated
+      // on-demand when the user interacts with the resource.
       const resource = await prisma.resource.create({
-        data: { folderId, title, type, url: resourceUrl, summary: finalSummary },
+        data: { folderId, title, type, url: resourceUrl, summary: summary || "" },
       });
 
       return NextResponse.json(
@@ -146,26 +122,22 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Extract text from PDF using serverless-compatible parser
-    const pdfText = await extractTextFromPDF(buffer);
-
     // Upload PDF to cloud storage
     const uploadResult: any = await uploadPDFBuffer(
       buffer,
       file.name.replace(/\.pdf$/, "")
     );
-    console.log(uploadResult);
     const pdfURL = uploadResult.secure_url;
-    const SYSTEM_PROMPT = SUMMARY_PROMPT_PDF(pdfText || "");
-    const summary = await processPrompt(SYSTEM_PROMPT);
+
+    // Summary will be generated on-demand when user asks for it
     const resource = await prisma.resource.create({
       data: {
         folderId,
         title,
         type,
         url: pdfURL,
-        summary: summary! ? summary : "",
-      }, //summary: summary || "" //create krte hue summary paas ni ho ri toh "" hi store krwa rha hu
+        summary: "",
+      },
     });
     return NextResponse.json(
       { message: "Resource created", resource },

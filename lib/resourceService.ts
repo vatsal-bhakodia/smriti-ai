@@ -1,18 +1,8 @@
 import { fetchPdfText } from "@/lib/pdfParser";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
-import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
-import { OpenAIEmbeddings } from "@langchain/openai";
-import { createClient } from "@supabase/supabase-js";
 import { getYoutubeTranscript } from "@/utils/youtube";
 import { processPrompt } from "@/lib/processPrompt";
 import { SUMMARY_PROMPTS } from "@/lib/prompts";
 import prisma from "@/lib/prisma";
-import type { Embeddings } from "@langchain/core/embeddings";
-
-const SUPABASE_TABLE = process.env.SUPABASE_VECTOR_TABLE || "documents";
-const SUPABASE_QUERY_NAME =
-  process.env.SUPABASE_VECTOR_QUERY || "match_documents";
 
 // ============================
 // TEXT EXTRACTION
@@ -51,8 +41,8 @@ export async function getResourceText(resource: {
 // ============================
 
 /**
- * Generates a summary for a resource
- * Tries full text extraction first, falls back to title-based generation
+ * Generates a summary for a resource (non-streaming).
+ * Tries full text extraction first, falls back to title-based generation.
  */
 export async function generateSummary(resource: {
   type: string;
@@ -64,17 +54,15 @@ export async function generateSummary(resource: {
   let prompt;
 
   try {
-    // Try to get full text first
     fullText = await getResourceText(resource);
 
     if (fullText) {
-      // Generate summary from full text
       if (resource.type === "VIDEO") {
         prompt = SUMMARY_PROMPTS.fromTranscript(fullText);
       } else if (resource.type === "PDF") {
         prompt = SUMMARY_PROMPTS.fromPdfText(fullText);
       } else if (resource.type === "TEXT") {
-        prompt = SUMMARY_PROMPTS.fromTranscript(fullText); // Treat as transcript
+        prompt = SUMMARY_PROMPTS.fromTranscript(fullText);
       }
     }
   } catch (error) {
@@ -96,12 +84,13 @@ export async function generateSummary(resource: {
 }
 
 /**
- * Gets existing summary or generates a new one
- * Caches the result in the database
+ * Gets existing summary or generates a new one.
+ * Caches the result in the database.
+ * Returns { summary, cached } so callers know whether to stream or fake-stream.
  */
 export async function getOrGenerateSummary(
   resourceId: string
-): Promise<string> {
+): Promise<{ summary: string; cached: boolean }> {
   const resource = await prisma.resource.findUnique({
     where: { id: resourceId },
   });
@@ -112,7 +101,7 @@ export async function getOrGenerateSummary(
 
   // Return existing summary if available
   if (resource.summary && resource.summary.length > 0) {
-    return resource.summary;
+    return { summary: resource.summary, cached: true };
   }
 
   // Generate new summary
@@ -126,110 +115,51 @@ export async function getOrGenerateSummary(
     });
   }
 
-  return summary;
-}
-
-// ============================
-// CONTEXTUAL RETRIEVAL (RAG)
-// ============================
-
-/**
- * Gets the appropriate embeddings instance based on AI_PROVIDER env variable
- * Follows the same pattern as processPrompt.ts
- */
-function getEmbeddings(): Embeddings {
-  const provider = process.env.AI_PROVIDER || "gemini";
-
-  // --- OpenAI ---
-  if (provider === "openai") {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("OPENAI_API_KEY is required for OpenAI embeddings");
-    }
-
-    return new OpenAIEmbeddings({
-      openAIApiKey: apiKey,
-      modelName: process.env.OPENAI_EMBED_MODEL || "text-embedding-3-small",
-    });
-  }
-
-  // --- DeepSeek ---
-  if (provider === "deepseek") {
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) {
-      throw new Error("DEEPSEEK_API_KEY is required for DeepSeek embeddings");
-    }
-
-    // DeepSeek uses OpenAI-compatible API, so we use OpenAIEmbeddings with custom configuration
-    return new OpenAIEmbeddings({
-      openAIApiKey: apiKey,
-      modelName: process.env.DEEPSEEK_EMBED_MODEL || "text-embedding-3-small",
-      configuration: {
-        baseURL: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
-      },
-    });
-  }
-
-  // --- Gemini (default) ---
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (!geminiKey) {
-    throw new Error("GEMINI_API_KEY is required for Gemini embeddings");
-  }
-
-  return new GoogleGenerativeAIEmbeddings({
-    apiKey: geminiKey,
-    model: process.env.GEMINI_EMBED_MODEL || "text-embedding-004",
-  });
+  return { summary, cached: false };
 }
 
 /**
- * Builds contextual snippets using RAG (Retrieval Augmented Generation)
- * Splits text into chunks, creates embeddings, and finds most relevant chunks
- * Uses the AI provider specified in process.env.AI_PROVIDER
+ * Build the summary prompt for a resource (for streaming generation).
+ * Returns { system, user } prompt pair, or null if resource already has a summary.
  */
-export async function buildContextualSnippet(
-  text: string,
-  question: string,
+export async function getSummaryPrompt(
   resourceId: string
-): Promise<string> {
-  const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 1200,
-    chunkOverlap: 200,
+): Promise<{ system: string; user: string } | null> {
+  const resource = await prisma.resource.findUnique({
+    where: { id: resourceId },
   });
-  const docs = await splitter.createDocuments([text], [{ resourceId }]);
 
-  // Get embeddings based on AI_PROVIDER env variable
-  const embeddings = getEmbeddings();
+  if (!resource) {
+    throw new Error("Resource not found");
+  }
 
-  let relevant;
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  let fullText: string | null = null;
+  let prompt;
 
-  // Prefer persisted vectors in Supabase when configured
-  if (supabaseUrl && supabaseKey) {
-    try {
-      const client = createClient(supabaseUrl, supabaseKey);
-      const store = await SupabaseVectorStore.fromDocuments(docs, embeddings, {
-        client,
-        tableName: SUPABASE_TABLE,
-        queryName: SUPABASE_QUERY_NAME,
-      });
-      relevant = await store.similaritySearch(question, 4);
-    } catch (err) {
-      console.warn(
-        "Supabase vector search failed; falling back to in-memory store.",
-        err
-      );
+  try {
+    fullText = await getResourceText(resource);
+
+    if (fullText) {
+      if (resource.type === "VIDEO") {
+        prompt = SUMMARY_PROMPTS.fromTranscript(fullText);
+      } else if (resource.type === "PDF") {
+        prompt = SUMMARY_PROMPTS.fromPdfText(fullText);
+      } else if (resource.type === "TEXT") {
+        prompt = SUMMARY_PROMPTS.fromTranscript(fullText);
+      }
     }
+  } catch {
+    // Fall through to title fallback
   }
 
-  if (!relevant) {
-    return "";
+  if (!prompt) {
+    prompt = SUMMARY_PROMPTS.fromTitle(
+      resource.title,
+      resource.type as "VIDEO" | "PDF" | "TEXT"
+    );
   }
 
-  return relevant
-    .map((d: { pageContent: string }) => d.pageContent)
-    .join("\n---\n");
+  return prompt;
 }
 
 // ============================
@@ -237,14 +167,13 @@ export async function buildContextualSnippet(
 // ============================
 
 /**
- * Extracts JSON array from AI response text
- * Handles cases where AI returns markdown code blocks
+ * Extracts JSON array from AI response text.
+ * Handles cases where AI returns markdown code blocks.
  */
 export function extractJSON(text: string): any {
-  // Remove markdown code blocks if present
   let cleaned = text.trim();
 
-  // Remove ```json and ``` markers
+  // Remove markdown code blocks if present
   cleaned = cleaned.replace(/```json\n?/g, "");
   cleaned = cleaned.replace(/```\n?/g, "");
   cleaned = cleaned.trim();

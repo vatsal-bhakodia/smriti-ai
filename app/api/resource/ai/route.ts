@@ -1,20 +1,85 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import { processPrompt } from "@/lib/processPrompt";
+import { processPrompt, processPromptStream } from "@/lib/processPrompt";
 import {
   ROADMAP_PROMPT,
   QA_PROMPTS,
   MINDMAP_PROMPT,
   QUIZ_PROMPT,
   FLASHCARD_PROMPT,
+  SUMMARY_PROMPTS,
 } from "@/lib/prompts";
 import {
   getOrGenerateSummary,
   getResourceText,
-  buildContextualSnippet,
+  getSummaryPrompt,
   extractJSON,
 } from "@/lib/resourceService";
+
+// ============================
+// HELPERS
+// ============================
+
+/**
+ * Creates a streaming HTTP response from an AI ReadableStream.
+ * Optionally collects the full text and runs an onComplete callback (e.g. to persist to DB).
+ */
+function createStreamResponse(
+  aiStream: ReadableStream<string>,
+  onComplete?: (fullText: string) => Promise<void>
+): Response {
+  const encoder = new TextEncoder();
+
+  const outStream = new ReadableStream({
+    async start(controller) {
+      const reader = aiStream.getReader();
+      let fullText = "";
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          fullText += value;
+          controller.enqueue(encoder.encode(value));
+        }
+        controller.close();
+
+        // Fire-and-forget: persist summary / other data after stream ends
+        if (onComplete) {
+          onComplete(fullText).catch((err) =>
+            console.error("onComplete callback failed:", err)
+          );
+        }
+      } catch (error) {
+        controller.error(error);
+      }
+    },
+  });
+
+  return new Response(outStream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Transfer-Encoding": "chunked",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
+}
+
+/**
+ * Creates a "fake stream" response that sends cached text as a single chunk.
+ * The frontend will animate it character-by-character.
+ * We use a special header to tell the frontend this is cached content.
+ */
+function createCachedResponse(text: string): Response {
+  return new Response(text, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "X-Cached": "true",
+    },
+  });
+}
 
 // ============================
 // MAIN HANDLER
@@ -84,25 +149,64 @@ export async function POST(req: NextRequest) {
 // TASK HANDLERS
 // ============================
 
+/**
+ * Summary handler — returns cached text instantly or streams a fresh generation.
+ * When streaming, persists the generated summary to DB after completion.
+ */
 async function handleSummary(resourceId: string) {
-  const summary = await getOrGenerateSummary(resourceId);
-  return NextResponse.json({
-    message: "Summary generated",
-    summary,
+  // Check if summary is already cached
+  const resource = await prisma.resource.findUnique({
+    where: { id: resourceId },
+  });
+
+  if (!resource) {
+    return NextResponse.json(
+      { message: "Resource not found" },
+      { status: 404 }
+    );
+  }
+
+  // Return cached summary (frontend will fake-stream it)
+  if (resource.summary && resource.summary.length > 0) {
+    return createCachedResponse(resource.summary);
+  }
+
+  // Generate fresh summary via streaming
+  const prompt = await getSummaryPrompt(resourceId);
+  if (!prompt) {
+    return NextResponse.json(
+      { message: "Could not build summary prompt" },
+      { status: 500 }
+    );
+  }
+
+  const aiStream = await processPromptStream(prompt.system, prompt.user);
+
+  return createStreamResponse(aiStream, async (fullText) => {
+    // Persist the generated summary for future requests
+    if (fullText && fullText.length > 0) {
+      await prisma.resource.update({
+        where: { id: resourceId },
+        data: { summary: fullText },
+      });
+    }
   });
 }
 
+/**
+ * Roadmap handler — streams a learning roadmap based on the resource summary.
+ */
 async function handleRoadmap(resourceId: string) {
-  const summary = await getOrGenerateSummary(resourceId);
+  const { summary } = await getOrGenerateSummary(resourceId);
   const prompt = ROADMAP_PROMPT(summary);
-  const answer = await processPrompt(prompt.system, prompt.user);
-
-  return NextResponse.json({
-    message: "Roadmap generated",
-    answer,
-  });
+  const aiStream = await processPromptStream(prompt.system, prompt.user);
+  return createStreamResponse(aiStream);
 }
 
+/**
+ * Q&A handler — streams an answer based on resource content.
+ * Uses full source text when available, falls back to summary.
+ */
 async function handleQA(
   resource: { id: string; type: string; url: string; summary?: string | null },
   question?: string
@@ -114,54 +218,47 @@ async function handleQA(
     );
   }
 
-  // Always try contextual retrieval first for better answers
   let prompt;
+
+  // Try to use full source text for better answers
   try {
     const sourceText = await getResourceText(resource);
-
-    if (sourceText) {
-      const context = await buildContextualSnippet(
-        sourceText,
-        question,
-        resource.id
-      );
-
-      if (context && context.length > 0) {
-        prompt = QA_PROMPTS.withContext(context, question);
-      }
+    if (sourceText && sourceText.length > 0) {
+      // Use full text directly (truncated if too long) instead of broken vector search
+      const truncated =
+        sourceText.length > 12000
+          ? sourceText.slice(0, 12000) + "\n\n[...truncated]"
+          : sourceText;
+      prompt = QA_PROMPTS.withContext(truncated, question);
     }
   } catch (err) {
-    console.warn(
-      "Contextual retrieval failed, falling back to summary-based Q&A.",
-      err
-    );
+    console.warn("Source text extraction failed, falling back to summary.", err);
   }
 
-  // Fallback: use summary if contextual retrieval failed
+  // Fallback: use summary
   if (!prompt) {
-    const summary = await getOrGenerateSummary(resource.id);
+    const { summary } = await getOrGenerateSummary(resource.id);
     prompt = QA_PROMPTS.withSummary(summary, question);
   }
 
-  const answer = await processPrompt(prompt.system, prompt.user);
-
-  return NextResponse.json({
-    message: "Answer generated",
-    answer,
-  });
+  const aiStream = await processPromptStream(prompt.system, prompt.user);
+  return createStreamResponse(aiStream);
 }
 
+/**
+ * Mindmap handler — streams mermaid.js code for a mind map.
+ */
 async function handleMindmap(resourceId: string) {
-  const summary = await getOrGenerateSummary(resourceId);
+  const { summary } = await getOrGenerateSummary(resourceId);
   const prompt = MINDMAP_PROMPT(summary);
-  const mindmap = await processPrompt(prompt.system, prompt.user);
-
-  return NextResponse.json({
-    message: "Mindmap code generated",
-    mindmap,
-  });
+  const aiStream = await processPromptStream(prompt.system, prompt.user);
+  return createStreamResponse(aiStream);
 }
 
+/**
+ * Quiz handler — returns cached quiz or generates a new one.
+ * Quizzes require structured JSON so we use non-streaming generation.
+ */
 async function handleQuiz(resource: { id: string; type: string }) {
   // Check if quiz already exists
   const existingQuiz = await prisma.quiz.findFirst({
@@ -177,8 +274,8 @@ async function handleQuiz(resource: { id: string; type: string }) {
     });
   }
 
-  // Generate new quiz
-  const summary = await getOrGenerateSummary(resource.id);
+  // Generate new quiz (non-streaming — needs structured JSON)
+  const { summary } = await getOrGenerateSummary(resource.id);
   const prompt = QUIZ_PROMPT(summary);
   const mcqText = await processPrompt(prompt.system, prompt.user);
   const mcqs = extractJSON(mcqText);
@@ -190,12 +287,10 @@ async function handleQuiz(resource: { id: string; type: string }) {
     explanation: string;
   }
 
-  // Create quiz record
   const quizRecord = await prisma.quiz.create({
     data: { resourceId: resource.id },
   });
 
-  // Create quiz questions
   const quizQAs = await Promise.all(
     mcqs.map((q: QuizQuestion) =>
       prisma.quizQA.create({
@@ -217,8 +312,11 @@ async function handleQuiz(resource: { id: string; type: string }) {
   });
 }
 
+/**
+ * Flashcards handler — returns cached deck or generates new flashcards.
+ * Non-streaming since it needs structured JSON.
+ */
 async function handleFlashcards(resource: { id: string; title: string }) {
-  // Check if flashcard deck already exists
   const existingDeck = await prisma.flashcardDeck.findUnique({
     where: { resourceId: resource.id },
     include: { cards: true },
@@ -232,8 +330,7 @@ async function handleFlashcards(resource: { id: string; title: string }) {
     });
   }
 
-  // Generate new flashcards
-  const summary = await getOrGenerateSummary(resource.id);
+  const { summary } = await getOrGenerateSummary(resource.id);
   const prompt = FLASHCARD_PROMPT(summary);
   const flashcardText = await processPrompt(prompt.system, prompt.user);
   const flashcards = extractJSON(flashcardText);
@@ -243,7 +340,6 @@ async function handleFlashcards(resource: { id: string; title: string }) {
     definition: string;
   }
 
-  // Create flashcard deck
   const deckRecord = await prisma.flashcardDeck.create({
     data: {
       resourceId: resource.id,
@@ -251,7 +347,6 @@ async function handleFlashcards(resource: { id: string; title: string }) {
     },
   });
 
-  // Create flashcards
   const cards = await Promise.all(
     flashcards.map((card: Flashcard) =>
       prisma.flashcard.create({
