@@ -1,6 +1,21 @@
 {
   "notices": [
     {
+      "title": "Rechecking Notice for BA (LLB) and BBA (LLB) programme",
+      "link": "http://164.100.158.135/ExamResults/2026/130326/Rechecking Notice for BA (LLB) and BBA (LLB) programme upload on the university website.pdf",
+      "uploadDate": "13-03-26"
+    },
+    {
+      "title": "Rechecking Notice for M.Sc. (Bioinformatics) 3rd semester programme",
+      "link": "http://164.100.158.135/ExamResults/2026/130326/Rechecking Notice for M.Sc. (Bioinformatics) 3rd semester programme upload on the university website.pdf",
+      "uploadDate": "13-03-26"
+    },
+    {
+      "title": "Rechecking Notice for MCA 1st & 3rd semester",
+      "link": "http://164.100.158.135/ExamResults/2026/130326/Rechecking Notice for MCA 1st & 3rd semester programme upload on the university website.pdf",
+      "uploadDate": "13-03-26"
+    },
+    {
       "title": "Exam (Dec. 2025) result of MBBS 1st prof. Supplementary Examination",
       "link": "http://164.100.158.135/ExamResults/2026/110326/Regarding result of MBBS 1st prof. supplementary examination held in December 2025.pdf",
       "uploadDate": "11-03-26"
@@ -3071,6 +3086,6 @@
       "uploadDate": "N/A"
     }
   ],
-  "lastUpdated": "2026-03-12T07:07:38.371Z",
-  "total": 614
+  "lastUpdated": "2026-03-13T13:18:55.758Z",
+  "total": 617
 }
