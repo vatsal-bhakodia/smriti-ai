@@ -19,6 +19,7 @@ export interface ResultAPIResponse {
   ryear: number;
   declareddate: string;
   eugpa: number;
+  credits?: number; // Injected from the login API (fetched from DB during login)
 }
 
 export interface SubjectCreditsResponse {
@@ -41,6 +42,7 @@ export interface ProcessedSemester {
   totalMarks: number;
   sgpa: number;
   credits: number;
+  allCreditsKnown?: boolean;
 }
 
 export interface ProcessedData {

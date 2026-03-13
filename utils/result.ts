@@ -20,6 +20,18 @@ export function marksToGrade(marks: number): string {
   return "F";
 }
 
+// Convert marks to grade point
+export function marksToGradePoint(marks: number): number {
+  if (marks >= 90 && marks <= 100) return 10;
+  if (marks >= 75 && marks <= 89) return 9;
+  if (marks >= 65 && marks <= 74) return 8;
+  if (marks >= 55 && marks <= 64) return 7;
+  if (marks >= 50 && marks <= 54) return 6;
+  if (marks >= 45 && marks <= 49) return 5;
+  if (marks >= 40 && marks <= 44) return 4;
+  return 0; // F or Absent
+}
+
 // Add dash between letters and numbers (e.g., "HS301" -> "HS-301")
 export function normalizePaperCode(code: string): string {
   return code
@@ -117,8 +129,18 @@ export function getSubjectCredits(
   creditsMap: CreditsMap,
   programName: string
 ): DetailedCredits | null {
-  const creditData = creditsMap[subject.papercode];
+  // First: check if credits were embedded directly in the result item (from login API)
+  if (subject.credits !== undefined && subject.credits !== null) {
+    return {
+      total: subject.credits,
+      theory: subject.credits,
+      practical: null,
+      isFallback: false,
+    };
+  }
 
+  // Second: check the creditsMap (populated from embedded credits or cache)
+  const creditData = creditsMap[subject.papercode];
   if (creditData?.credits) {
     return {
       total: creditData.credits,
@@ -128,7 +150,7 @@ export function getSubjectCredits(
     };
   }
 
-  // Fallback: If program credits not found, use 1 credit
+  // Fallback: If program has DB data but a specific subject wasn't matched, use 1 credit
   if (checkAvailableCreditData(programName)) {
     return {
       total: 1,
@@ -138,7 +160,7 @@ export function getSubjectCredits(
     };
   }
 
-  // No fallback for other programs
+  // No fallback for programs without DB credit data
   return null;
 }
 

@@ -4,8 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import { ResultAPIResponse, ProcessedData, CreditsMap } from "@/types/result";
 import {
   marksToGrade,
+  marksToGradePoint,
   getSubjectCredits,
-  checkAvailableCreditData,
   filterLatestAttempts,
   STORAGE_KEYS,
 } from "@/utils/result";
@@ -55,52 +55,38 @@ export function useResultsData(): UseResultsDataReturn {
     }
   };
 
-  // Fetch subject credits from CMS (only for programs with available credit data)
-  const fetchCredits = async (results: ResultAPIResponse[]) => {
+  // Extract subject credits directly from API result items (login API now embeds them)
+  // Works for any program — the CMS DB returns credits for whatever subjects it has.
+  const extractCredits = (results: ResultAPIResponse[]) => {
     try {
-      // Check if we have credit data available for this program
-      const programName = results[0]?.prgname || "";
-      if (!checkAvailableCreditData(programName)) {
-        // No credit data available for this program, skip API call
-        return;
-      }
-
-      // Check sessionStorage first
+      // Try sessionStorage cache first (avoids redundant reprocessing on re-render)
       const cachedCredits = loadCachedCredits();
       if (cachedCredits && Object.keys(cachedCredits).length > 0) {
         setCreditsMap(cachedCredits);
         return;
       }
 
-      // Get unique paper codes
-      const paperCodes = [...new Set(results.map((r) => r.papercode))];
-
-      if (paperCodes.length === 0) return;
-
-      const response = await fetch("/api/result/credits", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ paperCodes }),
+      // Extract credits embedded in each result item by the login API
+      const credits: CreditsMap = {};
+      results.forEach(r => {
+        if (r.credits !== undefined && r.credits !== null) {
+          credits[r.papercode] = { credits: r.credits };
+        }
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const credits = data.credits || {};
+      if (Object.keys(credits).length > 0) {
         setCreditsMap(credits);
-        // Cache credits to sessionStorage
         saveCachedCredits(credits);
       }
     } catch (error) {
-      console.error("Error fetching subject credits:", error);
+      console.error("Error extracting subject credits:", error);
     }
   };
 
   // Fetch credits when results change
   useEffect(() => {
     if (rawResults.length > 0) {
-      fetchCredits(rawResults);
+      extractCredits(rawResults);
     }
   }, [rawResults]);
 
@@ -129,24 +115,30 @@ export function useResultsData(): UseResultsDataReturn {
         // Filter to keep only latest attempts for credit calculation
         const filteredSubjects = filterLatestAttempts(subjects);
 
-        // Use eugpa directly from the response (all subjects in a semester have the same eugpa)
-        const sgpa = subjects[0]?.eugpa || 0;
         const totalMarks = filteredSubjects.reduce(
           (sum, sub) => sum + (parseFloat(sub.moderatedprint) || 0),
           0
         );
-        // Calculate credits using CMS data with fallback for B.Tech/BCA
+        // Calculate credits + SGPA from marks × credits (eugpa is now 0 from API)
         let semesterCredits = 0;
+        let weightedGradePoints = 0;
+        let semAllCreditsKnown = true;
         for (const sub of filteredSubjects) {
           const subCredits = getSubjectCredits(sub, creditsMap, programName);
           if (subCredits === null) {
             hasCompleteCredits = false;
+            semAllCreditsKnown = false;
           } else {
+            const gp = marksToGradePoint(parseFloat(sub.moderatedprint) || 0);
+            weightedGradePoints += gp * subCredits.total;
             semesterCredits += subCredits.total;
           }
         }
 
-        return { euno, subjects, filteredSubjects, totalMarks, sgpa, credits: semesterCredits };
+        // SGPA = Σ(GP × credits) / Σcredits for this semester
+        const sgpa = semesterCredits > 0 ? weightedGradePoints / semesterCredits : 0;
+
+        return { euno, subjects, filteredSubjects, totalMarks, sgpa, credits: semesterCredits, allCreditsKnown: semAllCreditsKnown };
       })
       .sort((a, b) => a.euno - b.euno);
 

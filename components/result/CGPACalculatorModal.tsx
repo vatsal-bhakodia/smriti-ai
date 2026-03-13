@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calculator } from "lucide-react";
 import { ProcessedSemester } from "@/types/result";
-import { filterLatestAttempts, STORAGE_KEYS } from "@/utils/result";
+import { filterLatestAttempts, STORAGE_KEYS, marksToGradePoint } from "@/utils/result";
 import CGPAFormula from "./CGPAFormula";
 
 export interface ManualCreditsData {
@@ -117,8 +117,9 @@ export default function CGPACalculatorModal({
           return;
         }
 
-        // Calculate grade points: eugpa is the grade point
-        totalGradePoints += subject.eugpa * credits;
+        // Calculate grade points from marks (moderatedprint), since eugpa is no longer returned by the portal
+        const marks = parseFloat(subject.moderatedprint) || 0;
+        totalGradePoints += marksToGradePoint(marks) * credits;
         totalCredits += credits;
       });
     });
