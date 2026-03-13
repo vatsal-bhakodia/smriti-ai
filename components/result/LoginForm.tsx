@@ -253,9 +253,6 @@ export default function LoginForm({
                     type="text"
                     placeholder="ENTER CAPTCHA"
                     value={captcha}
-                    onChange={(e) =>
-                      onCaptchaChange(e.target.value.toUpperCase())
-                    }
                     className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 flex-1 w-full md:w-auto"
                     disabled={isLoading}
                   />
@@ -278,9 +275,8 @@ export default function LoginForm({
                       className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700"
                     >
                       <RefreshCw
-                        className={`h-4 w-4 ${
-                          isLoadingCaptcha ? "animate-spin" : ""
-                        }`}
+                        className={`h-4 w-4 ${isLoadingCaptcha ? "animate-spin" : ""
+                          }`}
                       />
                     </Button>
                   </div>
