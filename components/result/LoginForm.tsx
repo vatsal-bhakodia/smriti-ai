@@ -255,6 +255,9 @@ export default function LoginForm({
                     value={captcha}
                     className="bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 flex-1 w-full md:w-auto"
                     disabled={isLoading}
+                    onChange={(e) =>
+                      onCaptchaChange(e.target.value)
+                    }
                   />
                   <div className="flex gap-2">
                     {isLoadingCaptcha || !captchaImage ? (
