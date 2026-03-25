@@ -1,6 +1,21 @@
 {
   "notices": [
     {
+      "title": "Exam (Feb. 2026) Result for MD/MS (Supplementary)",
+      "link": "http://ipu.ac.in/Pubinfo2026/ntc2503260322.pdf",
+      "uploadDate": "25-03-26"
+    },
+    {
+      "title": "Exam (Feb. 2026) Result for MD/MS Unani (Regular & Supplementary)",
+      "link": "http://ipu.ac.in/Pubinfo2026/ntc250326300.pdf",
+      "uploadDate": "25-03-26"
+    },
+    {
+      "title": "Exam (Dec. 2025) Rechecking result of MBBS 3rd prof. Part-I",
+      "link": "http://ipu.ac.in/Pubinfo2026/ntp230326514.pdf",
+      "uploadDate": "23-03-26"
+    },
+    {
       "title": "Rechecking Notice for BA (LLB) and BBA (LLB) programme",
       "link": "http://164.100.158.135/ExamResults/2026/130326/Rechecking Notice for BA (LLB) and BBA (LLB) programme upload on the university website.pdf",
       "uploadDate": "13-03-26"
@@ -3086,6 +3101,6 @@
       "uploadDate": "N/A"
     }
   ],
-  "lastUpdated": "2026-03-13T13:18:55.758Z",
-  "total": 617
+  "lastUpdated": "2026-03-25T13:42:44.181Z",
+  "total": 620
 }
