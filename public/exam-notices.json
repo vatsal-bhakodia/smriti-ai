@@ -1,6 +1,11 @@
 {
   "notices": [
     {
+      "title": "Exam (Dec. 2025) Rechecking result of MBBS (3rd Prof PART 01)",
+      "link": "http://164.100.158.135/ExamResults/2026/060426/Rechecking result of prog. MBBS (3rd Prof PART 01) for exam held in December 2025.pdf",
+      "uploadDate": "06-04-26"
+    },
+    {
       "title": "Exam (Feb. 2026) Result for MD/MS (Supplementary)",
       "link": "http://ipu.ac.in/Pubinfo2026/ntc2503260322.pdf",
       "uploadDate": "25-03-26"
@@ -3101,6 +3106,6 @@
       "uploadDate": "N/A"
     }
   ],
-  "lastUpdated": "2026-03-25T13:42:44.181Z",
-  "total": 620
+  "lastUpdated": "2026-04-06T13:39:50.341Z",
+  "total": 621
 }
