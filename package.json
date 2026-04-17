@@ -11,7 +11,7 @@
     "scrape:notices": "tsx scripts/scrape-exam-notices.ts"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.31.3",
+    "@clerk/nextjs": "^6.39.2",
     "@contentful/rich-text-react-renderer": "^16.1.0",
     "@fontsource/outfit": "^5.2.5",
     "@google/generative-ai": "^0.24.0",
